@@ -839,6 +839,8 @@ def main():
     build_apps()
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
+    if CFG.get("indexnow_key"):  # IndexNow (Bing, Yandex): the key file proves the site is ours
+        (OUT / f'{CFG["indexnow_key"]}.txt').write_text(CFG["indexnow_key"])
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
     urls = "".join(f"<url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in pages)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
