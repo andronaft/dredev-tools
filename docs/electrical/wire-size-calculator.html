@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wire Size Calculator (NEC 310.16) | What Size Wire Do I Need?</title>
+<meta name="description" content="Free NEC wire size calculator: breaker size, copper or aluminum conductor from Table 310.16 with 75 °C terminations, 125 % for continuous loads and an optional voltage drop check.">
+<link rel="canonical" href="https://andronaft.github.io/dredev-tools/electrical/wire-size-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Wire Size Calculator (NEC 310.16) | What Size Wire Do I Need?">
+<meta property="og:description" content="Free NEC wire size calculator: breaker size, copper or aluminum conductor from Table 310.16 with 75 °C terminations, 125 % for continuous loads and an optional voltage drop check.">
+<meta property="og:url" content="https://andronaft.github.io/dredev-tools/electrical/wire-size-calculator.html">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Wire size calculator (NEC)", "url": "https://andronaft.github.io/dredev-tools/electrical/wire-size-calculator.html", "description": "Free NEC wire size calculator: breaker size, copper or aluminum conductor from Table 310.16 with 75 °C terminations, 125 % for continuous loads and an optional voltage drop check.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What size wire for a 30 amp breaker?", "acceptedAnswer": {"@type": "Answer", "text": "With copper THHN and 75 °C terminations, 10 AWG (35 A at 75 °C, and 240.4(D) limits 10 AWG copper to 30 A). Long runs may need a larger size for voltage drop."}}, {"@type": "Question", "name": "Why 125 % for continuous loads?", "acceptedAnswer": {"@type": "Answer", "text": "NEC 210.19(A)(1) and 215.2 require conductors for continuous loads (3 hours or more, like EV chargers and water heaters) to carry 125 % of the continuous current."}}, {"@type": "Question", "name": "Why does NM-B use the 60 °C column?", "acceptedAnswer": {"@type": "Answer", "text": "NEC 334.80 limits NM cable ampacity to the 60 °C column, even though the conductors are rated 90 °C."}}]}</script>
+</head>
+<body class="t-elec" data-calc="wire">
+<header class="top"><div class="wrap">
+<a class="brand" href="../index.html"><i></i>Dre Dev Tools</a>
+<nav>
+<a href="../hvac/superheat-subcooling-calculator.html">HVAC</a>
+<a href="../electrical/voltage-drop-calculator.html">Electrical</a>
+<a href="../coating/epoxy-coverage-calculator.html" class="hide-sm">Coatings</a>
+<a href="../index.html#apps">Apps</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<div class="crumbs"><a href="../index.html">Tools</a> › Electrical</div>
+<div class="hero"><div class="eyebrow">Free electrical tool</div><h1>Wire size calculator (NEC)</h1><p class="lead">The smallest copper or aluminum conductor for your load and breaker, by NEC Table 310.16, with an optional 3 % voltage drop check.</p></div>
+<div class="calc card"><div class="fields"><div><label for="amps">Load <small>(A)</small></label><input id="amps" inputmode="decimal" value="24"></div>
+<div><label for="wire">Wire type</label><select id="wire"><option value="nmb">NM-B (Romex)</option><option value="thhn" selected>THHN / THWN-2</option><option value="thwn">THW / THWN</option><option value="uf">UF-B</option></select></div>
+<div class="full"><div class="seg" id="cond" role="group" aria-label="Conductor"><button data-v="cu" aria-pressed="true">Copper</button><button data-v="al" aria-pressed="false">Aluminum</button></div></div>
+<div class="full"><label>Continuous load (3 h or more)?</label><div class="seg" id="cont" role="group" aria-label="Continuous load"><button data-v="no" aria-pressed="true">No</button><button data-v="yes" aria-pressed="false">Yes, ×125 %</button></div></div>
+<div><label for="term">Terminal rating</label><select id="term"><option value="60">60 °C</option><option value="75" selected>75 °C</option></select></div>
+<div><label for="phase">Supply</label><select id="phase"><option value="single">1-phase</option><option value="three">3-phase</option><option value="dc">DC</option></select></div>
+<div><label for="len">Length <small>(ft, one way, optional)</small></label><input id="len" inputmode="decimal" placeholder="e.g. 80"></div>
+<div><label for="volts">Voltage <small>(V)</small></label><input id="volts" inputmode="decimal" value="240"></div></div><div class="result" aria-live="polite"><div class="eyebrow">Wire size</div><div class="big" id="ws-size">–</div>
+<div class="rows"><div><span>Breaker</span><span id="ws-ocpd">–</span></div>
+<div><span>Design current</span><span id="ws-design">–</span></div>
+<div><span>By ampacity</span><span id="ws-amp">–</span></div>
+<div><span>Voltage drop (≤ 3 %)</span><span id="ws-drop">–</span></div></div>
+<p class="note">Assumes 30 °C ambient and no more than 3 current-carrying conductors. Check local code, equipment ratings and derating.</p></div></div>
+
+<section class="promo"><img class="icon" src="../img/electrician-calc-icon.jpg" alt="" width="72" height="72"><div>
+<h3>Electrician Calc: Wire &amp; Panel</h3>
+<p>Full cable sizing with ambient and grouping derating, IEC and NEC, step-by-step working and PDF reports. <a href="../apps/electrician-calc.html">See what's inside</a>.</p>
+<div class="btns"><a class="btn" href="mailto:mobile.support@zhukovskyi.space?subject=Beta:%20Electrician%20Calc">Get early access</a><span class="btn off">App Store &amp; Google Play: coming soon</span></div>
+</div></section>
+<section class="faq"><h2>Questions</h2><details><summary>What size wire for a 30 amp breaker?</summary><p>With copper THHN and 75 °C terminations, 10 AWG (35 A at 75 °C, and 240.4(D) limits 10 AWG copper to 30 A). Long runs may need a larger size for voltage drop.</p></details><details><summary>Why 125 % for continuous loads?</summary><p>NEC 210.19(A)(1) and 215.2 require conductors for continuous loads (3 hours or more, like EV chargers and water heaters) to carry 125 % of the continuous current.</p></details><details><summary>Why does NM-B use the 60 °C column?</summary><p>NEC 334.80 limits NM cable ampacity to the 60 °C column, even though the conductors are rated 90 °C.</p></details></section>
+
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev. Free tools and offline apps. No account, no tracking cookies.</span>
+<span><a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a></span>
+</div></footer>
+<script src="../assets/calc.js"></script>
+</body>
+</html>

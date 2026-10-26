@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pool Chemical Calculator: Chlorine, Baking Soda, Stabilizer, Salt</title>
+<meta name="description" content="Free pool chemical calculator: how much liquid chlorine, bleach, cal-hypo, baking soda, stabilizer (CYA) or salt to add for your pool volume.">
+<link rel="canonical" href="https://andronaft.github.io/dredev-tools/pool/pool-chemical-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pool Chemical Calculator: Chlorine, Baking Soda, Stabilizer, Salt">
+<meta property="og:description" content="Free pool chemical calculator: how much liquid chlorine, bleach, cal-hypo, baking soda, stabilizer (CYA) or salt to add for your pool volume.">
+<meta property="og:url" content="https://andronaft.github.io/dredev-tools/pool/pool-chemical-calculator.html">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Pool chemical calculator", "url": "https://andronaft.github.io/dredev-tools/pool/pool-chemical-calculator.html", "description": "Free pool chemical calculator: how much liquid chlorine, bleach, cal-hypo, baking soda, stabilizer (CYA) or salt to add for your pool volume.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much liquid chlorine to raise FC by 1 ppm?", "acceptedAnswer": {"@type": "Answer", "text": "About 12.8 fl oz of 10 % liquid chlorine per 10,000 US gallons. Bleach is weaker: 6 % bleach needs roughly 21 fl oz for the same rise."}}, {"@type": "Question", "name": "What FC should I aim for?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on your stabilizer (CYA) level: the higher the CYA, the more free chlorine you need. PoolPro uses Trouble Free Pool's FC/CYA chart for targets."}}, {"@type": "Question", "name": "Where does the math come from?", "acceptedAnswer": {"@type": "Answer", "text": "Chlorine strength follows the same bleach density formula as TFP Pool Math; baking soda raises total alkalinity by 1 ppm per 1.68 mg per litre; stabilizer and salt are added at their label purity."}}]}</script>
+</head>
+<body class="t-pool" data-calc="pool">
+<header class="top"><div class="wrap">
+<a class="brand" href="../index.html"><i></i>Dre Dev Tools</a>
+<nav>
+<a href="../hvac/superheat-subcooling-calculator.html">HVAC</a>
+<a href="../electrical/voltage-drop-calculator.html">Electrical</a>
+<a href="../coating/epoxy-coverage-calculator.html" class="hide-sm">Coatings</a>
+<a href="../index.html#apps">Apps</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<div class="crumbs"><a href="../index.html">Tools</a> › Pool</div>
+<div class="hero"><div class="eyebrow">Free pool tool</div><h1>Pool chemical calculator</h1><p class="lead">How much chlorine, baking soda, stabilizer or salt to add, from your pool's volume and your test results.</p></div>
+<div class="calc card"><div class="fields"><div class="full"><div class="seg" id="punit" role="group" aria-label="Volume unit"><button data-v="gal" aria-pressed="true">US gallons</button><button data-v="l" aria-pressed="false">Litres</button></div></div>
+<div class="full"><label for="pvol">Pool volume</label><input id="pvol" inputmode="decimal" value="15000"></div>
+<div class="full"><label for="pwhat">Raise</label><select id="pwhat"><option value="fc">Free chlorine (FC)</option><option value="ta">Total alkalinity (baking soda)</option><option value="cya">Stabilizer (CYA)</option><option value="salt">Salt (for salt systems)</option></select></div>
+<div class="full" id="pprod-row"><label for="pprod">Chlorine product</label><select id="pprod"><option value="liquid10">Liquid chlorine 10 %</option><option value="liquid125">Liquid chlorine 12.5 %</option><option value="bleach6">Bleach 6 %</option><option value="bleach825">Bleach 8.25 %</option><option value="calhypo65">Cal-hypo 65 %</option><option value="dichlor">Dichlor 56 %</option></select></div>
+<div><label for="pfrom">Current <small>(ppm)</small></label><input id="pfrom" inputmode="decimal" value="2"></div>
+<div><label for="pto">Target <small>(ppm)</small></label><input id="pto" inputmode="decimal" value="5"></div></div><div class="result" aria-live="polite"><div class="eyebrow">Add</div><div class="big" id="p-amount">–</div>
+<div class="rows"><div><span>Metric</span><span id="p-alt">–</span></div></div>
+<p class="note">Add in portions and retest. Never mix chlorine products with each other or with acid. Dichlor and cal-hypo also add CYA and calcium.</p></div></div>
+
+
+<section class="faq"><h2>Questions</h2><details><summary>How much liquid chlorine to raise FC by 1 ppm?</summary><p>About 12.8 fl oz of 10 % liquid chlorine per 10,000 US gallons. Bleach is weaker: 6 % bleach needs roughly 21 fl oz for the same rise.</p></details><details><summary>What FC should I aim for?</summary><p>It depends on your stabilizer (CYA) level: the higher the CYA, the more free chlorine you need. PoolPro uses Trouble Free Pool's FC/CYA chart for targets.</p></details><details><summary>Where does the math come from?</summary><p>Chlorine strength follows the same bleach density formula as TFP Pool Math; baking soda raises total alkalinity by 1 ppm per 1.68 mg per litre; stabilizer and salt are added at their label purity.</p></details></section>
+
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev. Free tools and offline apps. No account, no tracking cookies.</span>
+<span><a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a></span>
+</div></footer>
+<script src="../assets/calc.js"></script>
+</body>
+</html>

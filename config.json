@@ -30,6 +30,42 @@
       "app_store_url": "",
       "google_play_live": false,
       "beta_group_url": ""
+    },
+    "days-until": {
+      "name": "Days Until: Countdown Widget",
+      "short": "Days Until",
+      "package": "com.andrii.countdown",
+      "repo_dir": "Countdown_to_events",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "focus-sprint": {
+      "name": "Focus Sprint: ADHD Timer",
+      "short": "Focus Sprint",
+      "package": "com.andrii.focus_sprint",
+      "repo_dir": "adhd_neurodiversity",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "water-buddy": {
+      "name": "Water Buddy: Drink Reminder",
+      "short": "Water Buddy",
+      "package": "com.andronaft.waterbuddy",
+      "repo_dir": "water-buddy-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "fastwise": {
+      "name": "Fastwise: Fasting Tracker",
+      "short": "Fastwise",
+      "package": "com.andrii.fastwise",
+      "repo_dir": "fasting_tracker_app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
     }
   }
 }

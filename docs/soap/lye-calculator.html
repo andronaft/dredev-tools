@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lye Calculator for Cold Process Soap (NaOH) | Free</title>
+<meta name="description" content="Free lye calculator for cold process soap: grams of sodium hydroxide and water for your oils, superfat and lye concentration. SAP values for 19 common oils.">
+<link rel="canonical" href="https://andronaft.github.io/dredev-tools/soap/lye-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lye Calculator for Cold Process Soap (NaOH) | Free">
+<meta property="og:description" content="Free lye calculator for cold process soap: grams of sodium hydroxide and water for your oils, superfat and lye concentration. SAP values for 19 common oils.">
+<meta property="og:url" content="https://andronaft.github.io/dredev-tools/soap/lye-calculator.html">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Lye calculator (NaOH)", "url": "https://andronaft.github.io/dredev-tools/soap/lye-calculator.html", "description": "Free lye calculator for cold process soap: grams of sodium hydroxide and water for your oils, superfat and lye concentration. SAP values for 19 common oils.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How is the lye amount calculated?", "acceptedAnswer": {"@type": "Answer", "text": "Lye = Σ (oil grams × SAP value) × (1 − superfat) ÷ purity. SAP values are in grams of KOH per gram of oil and are converted to NaOH by molar mass (39.997 / 56.106)."}}, {"@type": "Question", "name": "What superfat should I use?", "acceptedAnswer": {"@type": "Answer", "text": "5 % is a common starting point for bar soap: a little oil stays unsaponified for a milder bar. Salt bars and 100 % coconut soaps often use 15–20 %."}}, {"@type": "Question", "name": "Where do the SAP values come from?", "acceptedAnswer": {"@type": "Answer", "text": "From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point."}}]}</script>
+</head>
+<body class="t-soap" data-calc="lye">
+<header class="top"><div class="wrap">
+<a class="brand" href="../index.html"><i></i>Dre Dev Tools</a>
+<nav>
+<a href="../hvac/superheat-subcooling-calculator.html">HVAC</a>
+<a href="../electrical/voltage-drop-calculator.html">Electrical</a>
+<a href="../coating/epoxy-coverage-calculator.html" class="hide-sm">Coatings</a>
+<a href="../index.html#apps">Apps</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<div class="crumbs"><a href="../index.html">Tools</a> › Soap</div>
+<div class="hero"><div class="eyebrow">Free soap making tool</div><h1>Lye calculator (NaOH)</h1><p class="lead">Sodium hydroxide and water for your oils, with superfat and lye concentration. Always double-check before you weigh lye.</p></div>
+<div class="calc card"><div class="fields"><div class="full" id="oils"></div>
+<div class="full"><button type="button" class="btn ghost" id="add-oil">+ Add oil</button></div>
+<div><label for="sf">Superfat <small>(%)</small></label><input id="sf" inputmode="decimal" value="5"></div>
+<div><label for="conc">Lye concentration <small>(%)</small></label><input id="conc" inputmode="decimal" value="33"></div>
+<div><label for="purity">NaOH purity <small>(%)</small></label><input id="purity" inputmode="decimal" value="100"></div></div><div class="result" aria-live="polite"><div class="eyebrow">Weigh out</div><div class="big" id="l-naoh">–</div>
+<div class="rows"><div><span>Water</span><span id="l-water">–</span></div><div><span>Oils</span><span id="l-oils">–</span></div>
+<div><span>Water : lye</span><span id="l-ratio">–</span></div><div><span>Batch</span><span id="l-batch">–</span></div></div>
+<p class="note">Lye is caustic: gloves, goggles, ventilation, and always add lye to water, never water to lye.</p></div></div>
+
+
+<section class="faq"><h2>Questions</h2><details><summary>How is the lye amount calculated?</summary><p>Lye = Σ (oil grams × SAP value) × (1 − superfat) ÷ purity. SAP values are in grams of KOH per gram of oil and are converted to NaOH by molar mass (39.997 / 56.106).</p></details><details><summary>What superfat should I use?</summary><p>5 % is a common starting point for bar soap: a little oil stays unsaponified for a milder bar. Salt bars and 100 % coconut soaps often use 15–20 %.</p></details><details><summary>Where do the SAP values come from?</summary><p>From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point.</p></details></section>
+
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev. Free tools and offline apps. No account, no tracking cookies.</span>
+<span><a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a></span>
+</div></footer>
+<script>window.OILS = [{"id": "olive", "sap": 0.19, "name": "Olive oil"}, {"id": "coconut76", "sap": 0.257, "name": "Coconut oil, 76\u00b0"}, {"id": "palm", "sap": 0.199, "name": "Palm oil"}, {"id": "palm_kernel", "sap": 0.247, "name": "Palm kernel oil"}, {"id": "castor", "sap": 0.18, "name": "Castor oil"}, {"id": "shea", "sap": 0.179, "name": "Shea butter"}, {"id": "cocoa", "sap": 0.194, "name": "Cocoa butter"}, {"id": "mango_butter", "sap": 0.191, "name": "Mango butter"}, {"id": "lard", "sap": 0.198, "name": "Lard"}, {"id": "tallow_beef", "sap": 0.2, "name": "Beef tallow"}, {"id": "almond", "sap": 0.195, "name": "Sweet almond oil"}, {"id": "avocado", "sap": 0.186, "name": "Avocado oil"}, {"id": "sunflower", "sap": 0.189, "name": "Sunflower oil"}, {"id": "sunflower_ho", "sap": 0.189, "name": "Sunflower oil, high oleic"}, {"id": "rice_bran", "sap": 0.187, "name": "Rice bran oil"}, {"id": "canola", "sap": 0.186, "name": "Canola oil"}, {"id": "babassu", "sap": 0.245, "name": "Babassu oil"}, {"id": "soybean", "sap": 0.191, "name": "Soybean oil"}, {"id": "beeswax", "sap": 0.094, "name": "Beeswax"}];</script><script src="../assets/calc.js"></script>
+</body>
+</html>

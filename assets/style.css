@@ -19,11 +19,35 @@
 .t-hvac { --accent: #0e7490; --soft: #e6f6f9; }
 .t-elec { --accent: #b45309; --soft: #fff5e0; }
 .t-coat { --accent: #7c3aed; --soft: #f3edff; }
+.t-days { --accent: #b91c1c; --soft: #fdecec; }
+.t-pool { --accent: #0e7490; --soft: #e3f6fa; }
+.t-bread { --accent: #92400e; --soft: #fbf0e3; }
+.t-soap { --accent: #9d174d; --soft: #fcebf3; }
+.t-focus { --accent: #7c3aed; --soft: #f1ebff; }
+.t-water { --accent: #0369a1; --soft: #e5f4fc; }
+.t-fast { --accent: #0f766e; --soft: #e3f5f2; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .t-hvac { --accent: #38bdf8; --soft: #0f2530; }
   :root:not([data-theme="light"]) .t-elec { --accent: #fbbf24; --soft: #2a2110; }
   :root:not([data-theme="light"]) .t-coat { --accent: #a78bfa; --soft: #221a35; }
+  :root:not([data-theme="light"]) .t-days { --accent: #f87171; --soft: #2c1515; }
+  :root:not([data-theme="light"]) .t-pool { --accent: #67e8f9; --soft: #0d2a30; }
+  :root:not([data-theme="light"]) .t-bread { --accent: #fbbf24; --soft: #2a1f10; }
+  :root:not([data-theme="light"]) .t-soap { --accent: #f9a8d4; --soft: #2c1622; }
+  :root:not([data-theme="light"]) .t-focus { --accent: #a78bfa; --soft: #221a35; }
+  :root:not([data-theme="light"]) .t-water { --accent: #7dd3fc; --soft: #0f2533; }
+  :root:not([data-theme="light"]) .t-fast { --accent: #5eead4; --soft: #0f2a27; }
 }
+:root[data-theme="dark"] .t-days { --accent: #f87171; --soft: #2c1515; }
+:root[data-theme="dark"] .t-pool { --accent: #67e8f9; --soft: #0d2a30; }
+:root[data-theme="dark"] .t-bread { --accent: #fbbf24; --soft: #2a1f10; }
+:root[data-theme="dark"] .t-soap { --accent: #f9a8d4; --soft: #2c1622; }
+:root[data-theme="dark"] .t-focus { --accent: #a78bfa; --soft: #221a35; }
+:root[data-theme="dark"] .t-water { --accent: #7dd3fc; --soft: #0f2533; }
+:root[data-theme="dark"] .t-fast { --accent: #5eead4; --soft: #0f2a27; }
+:root[data-theme="dark"] .t-hvac { --accent: #38bdf8; --soft: #0f2530; }
+:root[data-theme="dark"] .t-elec { --accent: #fbbf24; --soft: #2a2110; }
+:root[data-theme="dark"] .t-coat { --accent: #a78bfa; --soft: #221a35; }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -119,3 +143,8 @@ ul.ticks li::before { content: "✓"; color: var(--accent); font-weight: 800; ma
 footer { border-top: 1px solid var(--line); margin-top: 56px; padding: 24px 0 40px; color: var(--muted); font-size: 14px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
 footer a { color: var(--muted); }
+
+[hidden] { display: none !important; }
+#oils { display: grid; gap: 8px; }
+.oilrow { display: grid; grid-template-columns: minmax(0, 1fr) 96px auto; gap: 8px; align-items: center; }
+.oilrow .btn { padding: 8px 12px; }

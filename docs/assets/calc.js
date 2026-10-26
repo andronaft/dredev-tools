@@ -246,8 +246,271 @@ function initCoat() {
   run();
 }
 
+/* ---------- AWG ↔ mm² ---------- */
+
+function initAwg() {
+  const rows = NEC.map(([s, c]) => ({ label: +s >= 250 ? `${s} kcmil` : `${s} AWG`, cmil: c, mm2: c * MM2_PER_CMIL }));
+  const sel = $('awg');
+  sel.innerHTML = rows.map((r, i) => `<option value="${i}">${r.label}</option>`).join('');
+  sel.value = String(rows.findIndex((r) => r.label === '12 AWG'));
+  function fromAwg() {
+    const r = rows[+sel.value];
+    $('awg-mm2').innerHTML = `${fmt(r.mm2, 2)}<small> mm²</small>`;
+    $('awg-cmil').textContent = `${r.cmil.toLocaleString('en-US')} cmil`;
+    const std = IEC.find((a) => a >= r.mm2 - 1e-9);
+    $('awg-iec').textContent = std ? `${std} mm²` : 'larger than 300 mm²';
+  }
+  function fromMm2() {
+    const a = num('mm2');
+    if (!Number.isFinite(a) || a <= 0) { $('mm2-awg').textContent = '–'; $('mm2-near').textContent = '–'; return; }
+    const up = rows.find((r) => r.mm2 >= a - 1e-9);
+    let near = rows[0];
+    rows.forEach((r) => { if (Math.abs(r.mm2 - a) < Math.abs(near.mm2 - a)) near = r; });
+    $('mm2-awg').innerHTML = up ? `${up.label}` : 'over 500 kcmil';
+    $('mm2-near').textContent = `${near.label} (${fmt(near.mm2, 2)} mm²)`;
+  }
+  sel.addEventListener('change', fromAwg);
+  $('mm2').addEventListener('input', fromMm2);
+  fromAwg();
+  fromMm2();
+}
+
+/* ---------- Wire size (NEC 310.16, 30 °C, ≤ 3 current-carrying conductors) ---------- */
+
+const NEC_SIZES = ['14', '12', '10', '8', '6', '4', '3', '2', '1', '1/0', '2/0', '3/0', '4/0', '250', '300', '350', '400', '500'];
+const AMPACITY = {
+  cu: { 60: [15, 20, 30, 40, 55, 70, 85, 95, 110, 125, 145, 165, 195, 215, 240, 260, 280, 320],
+        75: [20, 25, 35, 50, 65, 85, 100, 115, 130, 150, 175, 200, 230, 255, 285, 310, 335, 380],
+        90: [25, 30, 40, 55, 75, 95, 115, 130, 145, 170, 195, 225, 260, 290, 320, 350, 380, 430] },
+  al: { 60: [0, 15, 25, 35, 40, 55, 65, 75, 85, 100, 115, 130, 150, 170, 195, 210, 225, 260],
+        75: [0, 20, 30, 40, 50, 65, 75, 90, 100, 120, 135, 155, 180, 205, 230, 250, 270, 310],
+        90: [0, 25, 35, 45, 55, 75, 85, 100, 115, 135, 150, 175, 205, 230, 260, 280, 305, 350] },
+};
+const BREAKERS = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600];
+// Wire type → [insulation column, highest column usable for the final ampacity]; NM-B is held to 60 °C by 334.80.
+const WIRES = { nmb: [90, 60], uf: [60, 60], thwn: [75, 75], thhn: [90, 75] };
+const SMALL = { cu: { 14: 15, 12: 20, 10: 30 }, al: { 12: 15, 10: 25 } }; // 240.4(D)
+
+function initWireSize() {
+  const cond = segmented('cond', run);
+  const cont = segmented('cont', run);
+  function run() {
+    const amps = num('amps');
+    const [insulT, limitT] = WIRES[$('wire').value];
+    const term = +$('term').value;
+    const c = cond();
+    if (!(amps > 0)) { $('ws-size').textContent = '–'; return; }
+    const design = cont() === 'yes' ? amps * 1.25 : amps;
+    const ocpd = BREAKERS.find((b) => b >= design - 1e-9);
+    const cap = Math.min(limitT, term);
+    let pick = null;
+    for (let i = 0; i < NEC_SIZES.length && ocpd; i++) {
+      const insul = AMPACITY[c][insulT][i];
+      const termA = AMPACITY[c][cap][i];
+      if (!insul) continue;
+      const a = Math.min(insul, termA);
+      const small = SMALL[c][NEC_SIZES[i]];
+      if (small && ocpd > small) continue;
+      if (termA < design || a < amps) continue;
+      const next = BREAKERS.find((b) => b >= a - 1e-9);
+      if (!(a >= ocpd || (ocpd <= 800 && next >= ocpd))) continue;
+      pick = { i, a };
+      break;
+    }
+    let final = pick;
+    const len = num('len');
+    const volts = num('volts');
+    let dropTxt = 'not checked';
+    if (pick && len > 0 && volts > 0) {
+      const metres = len * 0.3048;
+      const supply = $('phase').value;
+      for (let i = pick.i; i < NEC_SIZES.length; i++) {
+        const mm2 = NEC[i + 2][1] * MM2_PER_CMIL; // NEC table starts at 18 AWG, sizes here at 14
+        const pct = (dropVolts({ supply, cond: c, mm2, metres, amps, iec: false, pf: 1 }) / volts) * 100;
+        if (pct <= 3) { final = { i, a: pick.a }; dropTxt = `${fmt(pct, 2)} % with ${label(i)}`; break; }
+        if (i === NEC_SIZES.length - 1) { final = null; dropTxt = 'over 3 % even at 500 kcmil'; }
+      }
+    }
+    function label(i) { return +NEC_SIZES[i] >= 250 ? `${NEC_SIZES[i]} kcmil` : `${NEC_SIZES[i]} AWG`; }
+    $('ws-size').innerHTML = final ? `${label(final.i)}<small> ${c === 'cu' ? 'copper' : 'aluminum'}</small>` : (ocpd ? 'no size fits' : 'over 600 A');
+    $('ws-ocpd').textContent = ocpd ? `${ocpd} A` : '–';
+    $('ws-design').textContent = `${fmt(design, 1)} A${cont() === 'yes' ? ' (125 % of continuous load)' : ''}`;
+    $('ws-amp').textContent = pick ? `${label(pick.i)} · ${pick.a} A at ${cap} °C` : '–';
+    $('ws-drop').textContent = dropTxt;
+  }
+  ['amps', 'len', 'volts'].forEach((id) => $(id).addEventListener('input', run));
+  ['wire', 'term', 'phase'].forEach((id) => $(id).addEventListener('change', run));
+  run();
+}
+
+/* ---------- Pool chemicals (same math as PoolPro) ---------- */
+
+const MW = { cl2: 70.906, naocl: 74.44, caco3Eq: 50.04, nahco3: 84.007 };
+const POOL_PRODUCTS = {
+  liquid10: { name: 'Liquid chlorine 10 %', liquid: true, gpl: 100 },
+  liquid125: { name: 'Liquid chlorine 12.5 %', liquid: true, gpl: 125 },
+  bleach6: { name: 'Bleach 6 %', liquid: true, gpl: 6 * 10 * (1.0174 + 0.01003 * 6) * MW.cl2 / MW.naocl },
+  bleach825: { name: 'Bleach 8.25 %', liquid: true, gpl: 8.25 * 10 * (1.0174 + 0.01003 * 8.25) * MW.cl2 / MW.naocl },
+  calhypo65: { name: 'Cal-hypo 65 %', share: 0.65 },
+  dichlor: { name: 'Dichlor 56 %', share: 0.56 },
+};
+
+function initPool() {
+  const unit = segmented('punit', run);
+  function run() {
+    const vol = num('pvol');
+    const litres = unit() === 'gal' ? vol * 3.78541 : vol;
+    const what = $('pwhat').value;
+    const from = num('pfrom');
+    const to = num('pto');
+    $('pprod-row').hidden = what !== 'fc';
+    const delta = to - from;
+    const ok = litres > 0 && Number.isFinite(delta);
+    if (!ok || delta <= 0) {
+      $('p-amount').textContent = ok ? 'Already at target' : '–';
+      $('p-alt').textContent = '–';
+      return;
+    }
+    const gramsOf = (mgPerL) => (mgPerL * litres) / 1000;
+    let grams = null; let ml = null;
+    if (what === 'fc') {
+      const p = POOL_PRODUCTS[$('pprod').value];
+      if (p.liquid) ml = (gramsOf(delta) / p.gpl) * 1000; else grams = gramsOf(delta) / p.share;
+    } else if (what === 'ta') {
+      grams = gramsOf((delta / MW.caco3Eq) * MW.nahco3);
+    } else if (what === 'cya' || what === 'salt') {
+      grams = gramsOf(delta) / 0.99;
+    }
+    if (ml != null) {
+      $('p-amount').innerHTML = `${fmt(ml / 29.5735, 1)}<small> fl oz</small>`;
+      $('p-alt').textContent = `${fmt(ml / 1000, 2)} L · ${fmt(ml / 3785.41, 2)} gal`;
+    } else {
+      const lb = grams / 453.592;
+      $('p-amount').innerHTML = lb >= 1 ? `${fmt(lb, 2)}<small> lb</small>` : `${fmt(grams / 28.3495, 1)}<small> oz</small>`;
+      $('p-alt').textContent = grams >= 1000 ? `${fmt(grams / 1000, 2)} kg` : `${fmt(grams, 0)} g`;
+    }
+  }
+  ['pvol', 'pfrom', 'pto'].forEach((id) => $(id).addEventListener('input', run));
+  ['pwhat', 'pprod'].forEach((id) => $(id).addEventListener('change', run));
+  run();
+}
+
+/* ---------- Baker's percentages (same math as Levain) ---------- */
+
+function initBread() {
+  const mode = segmented('bmode', run);
+  const count = segmented('bcount', run);
+  function run() {
+    const byFlour = mode() === 'flour';
+    $('b-flour-row').hidden = !byFlour;
+    $('b-dough-row').hidden = byFlour;
+    const h = num('bhyd') / 100, st = num('bst') / 100, s = num('bsalt') / 100;
+    const share = 1 / (1 + num('bsth') / 100);
+    const counted = count() === 'yes';
+    const a = st * share;
+    let bowl;
+    if (byFlour) bowl = num('bflour');
+    else {
+      const perGram = counted ? (1 + a) * (1 + h + s) : 1 + h + st + s;
+      bowl = num('bdough') / perGram;
+    }
+    const ok = [bowl, h, st, s, share].every(Number.isFinite) && bowl > 0;
+    const starter = st * bowl, sFlour = starter * share, sWater = starter - sFlour;
+    const base = counted ? bowl + sFlour : bowl;
+    const water = h * base - (counted ? sWater : 0);
+    const salt = s * base;
+    const trueHyd = ((water + sWater) / (bowl + sFlour)) * 100;
+    $('b-flour').innerHTML = ok ? `${fmt(bowl, 0)}<small> g flour</small>` : '–';
+    $('b-water').textContent = ok ? `${fmt(water, 0)} g` : '–';
+    $('b-starter').textContent = ok ? `${fmt(starter, 0)} g` : '–';
+    $('b-salt').textContent = ok ? `${fmt(salt, 1)} g` : '–';
+    $('b-total').textContent = ok ? `${fmt(bowl + water + starter + salt, 0)} g` : '–';
+    $('b-true').textContent = ok ? `${fmt(trueHyd, 1)} %` : '–';
+  }
+  ['bflour', 'bdough', 'bhyd', 'bst', 'bsth', 'bsalt'].forEach((id) => $(id).addEventListener('input', run));
+  run();
+}
+
+/* ---------- Lye (same math as Lye Calc; SAP in g KOH per g oil) ---------- */
+
+function initLye() {
+  const oils = window.OILS;
+  const list = $('oils');
+  function row(id = 'olive', g = '') {
+    const div = document.createElement('div');
+    div.className = 'oilrow';
+    div.innerHTML = `<select aria-label="Oil">${oils.map((o) => `<option value="${o.id}"${o.id === id ? ' selected' : ''}>${o.name}</option>`).join('')}</select>
+      <input inputmode="decimal" aria-label="Grams" placeholder="g" value="${g}"><button type="button" class="btn ghost" aria-label="Remove">✕</button>`;
+    div.querySelector('button').addEventListener('click', () => { div.remove(); run(); });
+    div.querySelectorAll('select,input').forEach((el) => el.addEventListener('input', run));
+    list.appendChild(div);
+  }
+  function run() {
+    let total = 0, koh = 0;
+    list.querySelectorAll('.oilrow').forEach((r) => {
+      const o = oils.find((x) => x.id === r.querySelector('select').value);
+      const g = parseFloat(String(r.querySelector('input').value).replace(',', '.'));
+      if (o && g > 0) { total += g; koh += g * o.sap; }
+    });
+    const sf = (num('sf') || 0) / 100;
+    const purity = (num('purity') || 100) / 100;
+    const conc = num('conc');
+    const naoh = (koh * (39.997 / 56.106) * (1 - sf)) / purity;
+    const water = conc > 0 && conc < 100 ? (naoh * (100 - conc)) / conc : NaN;
+    const ok = total > 0;
+    $('l-naoh').innerHTML = ok ? `${fmt(naoh, 1)}<small> g NaOH</small>` : '–';
+    $('l-water').textContent = ok && Number.isFinite(water) ? `${fmt(water, 1)} g` : '–';
+    $('l-oils').textContent = ok ? `${fmt(total, 0)} g` : '–';
+    $('l-ratio').textContent = ok && Number.isFinite(water) ? `${fmt(water / naoh, 2)} : 1` : '–';
+    $('l-batch').textContent = ok && Number.isFinite(water) ? `${fmt(total + naoh + water, 0)} g` : '–';
+  }
+  $('add-oil').addEventListener('click', () => { row('coconut76'); run(); });
+  ['sf', 'purity', 'conc'].forEach((id) => $(id).addEventListener('input', run));
+  row('olive', '700'); row('coconut76', '200'); row('castor', '100');
+  run();
+}
+
+/* ---------- Christmas / New Year countdown ---------- */
+
+function initCountdown() {
+  const pad = (n) => String(n).padStart(2, '0');
+  // Next occurrence of month/day at local midnight; on the day itself the target is that day (shows 0).
+  function next(month, day, now) {
+    let t = new Date(now.getFullYear(), month, day);
+    const endOfDay = new Date(now.getFullYear(), month, day + 1);
+    if (now >= endOfDay) t = new Date(now.getFullYear() + 1, month, day);
+    return t;
+  }
+  function show(prefix, target, now, sleeps) {
+    const ms = Math.max(0, target - now);
+    const s = Math.floor(ms / 1000);
+    const days = Math.floor(s / 86400);
+    $(`${prefix}-days`).innerHTML = `${days}<small> ${days === 1 ? 'day' : 'days'}</small>`;
+    $(`${prefix}-hms`).textContent = `${pad(Math.floor((s % 86400) / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+    $(`${prefix}-date`).textContent = target.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    if (sleeps) {
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const n = Math.round((target - today) / 86400000);
+      $(`${prefix}-sleeps`).textContent = n === 0 ? "It's Christmas! 🎄" : `${n} ${n === 1 ? 'sleep' : 'sleeps'}`;
+    }
+  }
+  function tick() {
+    const now = new Date();
+    show('cd-xmas', next(11, 25, now), now, true);
+    show('cd-ny', next(0, 1, now), now, false);
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.calc;
+  if (page === 'xmas') initCountdown();
+  if (page === 'awg') initAwg();
+  if (page === 'wire') initWireSize();
+  if (page === 'pool') initPool();
+  if (page === 'bread') initBread();
+  if (page === 'lye') initLye();
   if (page === 'hvac') initHvac();
   if (page === 'vd') initVoltageDrop();
   if (page === 'coat') initCoat();
