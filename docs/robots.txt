@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://andronaft-2.github.io/dredev-tools/sitemap.xml
+Sitemap: https://andronaft.github.io/dredev-tools/sitemap.xml
