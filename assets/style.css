@@ -26,6 +26,12 @@
 .t-focus { --accent: #7c3aed; --soft: #f1ebff; }
 .t-water { --accent: #0369a1; --soft: #e5f4fc; }
 .t-fast { --accent: #0f766e; --soft: #e3f5f2; }
+.t-roof { --accent: #9a3412; --soft: #fdeee6; }
+.t-slab { --accent: #57534e; --soft: #f1efed; }
+.t-paint { --accent: #4338ca; --soft: #eceafd; }
+.t-site { --accent: #15803d; --soft: #e6f6ec; }
+.t-lid { --accent: #1d4ed8; --soft: #e8effd; }
+.t-wash { --accent: #0f766e; --soft: #e3f5f2; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .t-hvac { --accent: #38bdf8; --soft: #0f2530; }
   :root:not([data-theme="light"]) .t-elec { --accent: #fbbf24; --soft: #2a2110; }
@@ -37,6 +43,12 @@
   :root:not([data-theme="light"]) .t-focus { --accent: #a78bfa; --soft: #221a35; }
   :root:not([data-theme="light"]) .t-water { --accent: #7dd3fc; --soft: #0f2533; }
   :root:not([data-theme="light"]) .t-fast { --accent: #5eead4; --soft: #0f2a27; }
+  :root:not([data-theme="light"]) .t-roof { --accent: #fdba74; --soft: #2c1a10; }
+  :root:not([data-theme="light"]) .t-slab { --accent: #d6d3d1; --soft: #24221f; }
+  :root:not([data-theme="light"]) .t-paint { --accent: #a5b4fc; --soft: #1c1d3a; }
+  :root:not([data-theme="light"]) .t-site { --accent: #86efac; --soft: #10261a; }
+  :root:not([data-theme="light"]) .t-lid { --accent: #93c5fd; --soft: #122038; }
+  :root:not([data-theme="light"]) .t-wash { --accent: #5eead4; --soft: #0f2a27; }
 }
 :root[data-theme="dark"] .t-days { --accent: #f87171; --soft: #2c1515; }
 :root[data-theme="dark"] .t-pool { --accent: #67e8f9; --soft: #0d2a30; }
@@ -48,6 +60,12 @@
 :root[data-theme="dark"] .t-hvac { --accent: #38bdf8; --soft: #0f2530; }
 :root[data-theme="dark"] .t-elec { --accent: #fbbf24; --soft: #2a2110; }
 :root[data-theme="dark"] .t-coat { --accent: #a78bfa; --soft: #221a35; }
+:root[data-theme="dark"] .t-roof { --accent: #fdba74; --soft: #2c1a10; }
+:root[data-theme="dark"] .t-slab { --accent: #d6d3d1; --soft: #24221f; }
+:root[data-theme="dark"] .t-paint { --accent: #a5b4fc; --soft: #1c1d3a; }
+:root[data-theme="dark"] .t-site { --accent: #86efac; --soft: #10261a; }
+:root[data-theme="dark"] .t-lid { --accent: #93c5fd; --soft: #122038; }
+:root[data-theme="dark"] .t-wash { --accent: #5eead4; --soft: #0f2a27; }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }

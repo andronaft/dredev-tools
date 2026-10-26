@@ -207,6 +207,135 @@ APPS = {
         "category": "HealthApplication",
         "note": "Fastwise does not give medical advice. Talk to your doctor before fasting if you have a health condition.",
     },
+    "poolpro": {
+        "theme": "t-pool",
+        "tagline": "Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route.",
+        "intro": "PoolPro turns a pool test into exact doses for the chemicals already on your shelf, in the order to add them. "
+                 "For pool owners and pool service techs. Offline, no account, no ads and no brand pushing.",
+        "free": ["Doses for FC, pH, TA, calcium, CYA and salt", "Liquid chlorine, cal-hypo, dichlor, trichlor, acid, baking soda and more, or your own product",
+                 "TFP-style FC/CYA targets and CSI", "Gallons, ounces and pounds, or litres and grams"],
+        "pro": ["Unlimited pools, each with its own log", "Weekly service route with directions", "PDF report for every client visit", "CSV export of every test"],
+        "calc": ("pool/pool-chemical-calculator.html", "Pool chemical calculator"),
+        "icons": ["pool-chem-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "pool-chem-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "UtilitiesApplication",
+        "privacy": f'{CFG["policy_base"]}/poolpro/privacy.html',
+        "terms": f'{CFG["policy_base"]}/poolpro/terms.html',
+    },
+    "softwash": {
+        "theme": "t-wash",
+        "tagline": "Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes.",
+        "intro": "For soft wash and pressure washing businesses. Mix sodium hypochlorite right, know the real strength that hits the wall, "
+                 "and send a clean PDF quote before you leave the driveway.",
+        "free": ["Tank mix: SH, water and surfactant from the SH you actually have", "One-tap targets for house, roof, concrete, fence and deck",
+                 "Downstream and proportioner math: draw ratio to % at the surface", "Bucket test for your injector's real draw"],
+        "pro": ["Unlimited quotes with your price", "PDF quotes with your company name", "Job history: quoted, booked, done", "Chemical load list for the truck"],
+        "calc": None,
+        "icons": ["softwash-calc-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "softwash-calc-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "BusinessApplication",
+        "privacy": f'{CFG["policy_base"]}/softwash/privacy.html',
+        "terms": f'{CFG["policy_base"]}/softwash/terms.html',
+    },
+    "roofcalc": {
+        "theme": "t-roof",
+        "tagline": "Roofing calculator: squares from the footprint and pitch, every material and PDF quotes.",
+        "intro": "For roofers who bid jobs every week. Measure from the ground, get the squares and every material, "
+                 "and send a PDF quote before you leave the driveway. No ads, works offline.",
+        "free": ["Sloped area from length, span, overhang and pitch, gable or hip", "Eaves, rakes, ridge, hips and valleys worked out for you",
+                 "Shingle bundles with waste by roof type", "Starter, ridge cap, drip edge, underlayment, ice & water and nails"],
+        "pro": ["PDF quotes with your company name", "Saved estimates and supplier order list", "Multi-section roofs: house, garage, porch",
+                "Tear-off tons and ice barrier by code"],
+        "calc": None,
+        "icons": ["roofcalc-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "roofcalc-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "BusinessApplication",
+        "privacy": f'{CFG["policy_base"]}/roofcalc/privacy.html',
+        "terms": f'{CFG["policy_base"]}/roofcalc/terms.html',
+    },
+    "slabcalc": {
+        "theme": "t-slab",
+        "tagline": "Concrete calculator: cubic yards and bags, rebar, mesh and forms on a feet-inch keypad. Pay once, no ads.",
+        "intro": "For contractors and serious DIYers. Type 12' 6½\" in five taps and get yards, bags, rebar and forms while you type. "
+                 "Pro is a one-time purchase.",
+        "free": ["Slabs, footings, pads, columns, sonotubes and post holes", "Cubic yards, cubic feet or m³ with waste", "Ready-mix rounded to the next ¼ yard",
+                 "80, 60 and 40 lb bags, or 25 and 30 kg"],
+        "pro": ["Walls, stairs and every concrete shape", "Rebar grid: bars, sticks, laps and weight", "Wire mesh, form boards and stakes",
+                "Ready-mix vs bags cost with your prices", "Jobs: every pour in one order"],
+        "calc": None,
+        "icons": ["slabcalc-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "slabcalc-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "UtilitiesApplication",
+        "privacy": f'{CFG["policy_base"]}/slabcalc/privacy.html',
+        "terms": f'{CFG["policy_base"]}/slabcalc/terms.html',
+    },
+    "paintbid": {
+        "theme": "t-paint",
+        "tagline": "Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.",
+        "intro": "For painting contractors. Walk the house, tap in the rooms, and send a clean PDF quote before you leave the driveway. "
+                 "No login, no loading screens.",
+        "free": ["Rooms, single walls, accent walls and exterior elevations", "Doors and windows by count, identical rooms at once",
+                 "Walls, ceilings and trim with 1–3 coats and primer", "Exact gallons from your paint's coverage"],
+        "pro": ["PDF quotes with your business name", "Price per room on every quote", "Unlimited saved jobs", "Paint store shopping list"],
+        "calc": None,
+        "icons": ["paintbid-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "paintbid-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "BusinessApplication",
+        "privacy": f'{CFG["policy_base"]}/paintbid/privacy.html',
+        "terms": f'{CFG["policy_base"]}/paintbid/terms.html',
+    },
+    "sitelog": {
+        "theme": "t-site",
+        "tagline": "Daily site reports and punch lists with photos. A PDF in one tap. Works offline.",
+        "intro": "The fast, offline site diary for contractors who run their own jobs. Write the daily report in two minutes, "
+                 "walk the site with a punch list, and send a clean PDF before you leave.",
+        "free": ["Weather, crew and hours with man-hours added up", "Yesterday's crew already filled in", "Work done, deliveries, delays, inspections and photos",
+                 "Punch list with photos, locations, trades and due dates"],
+        "pro": ["Unlimited projects (free: 1)", "Unlimited photos on every report and snag", "Your logo on every PDF", "Punch list PDF for one trade at a time"],
+        "calc": None,
+        "icons": ["sitelog-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "sitelog-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "BusinessApplication",
+        "privacy": f'{CFG["policy_base"]}/sitelog/privacy.html',
+        "terms": f'{CFG["policy_base"]}/sitelog/terms.html',
+    },
+    "lye-calc": {
+        "group": "makers",
+        "theme": "t-soap",
+        "tagline": "Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost.",
+        "intro": "A soap making calculator that gets the lye right and never loses your recipes. Add oils by weight or percent, "
+                 "set superfat and water, and see exactly what to weigh.",
+        "free": ["NaOH, KOH or dual lye, with lye purity", "Lye amounts from published SAP values", "Superfat, water and fragrance",
+                 "Soap qualities and fatty acid profile", "78 oils, butters and fats; 8 starter recipes", "Save up to 5 recipes"],
+        "pro": ["Unlimited saved recipes", "Batch cost and cost per bar", "Wholesale and retail prices with your profit per bar",
+                "Printable recipe sheet (PDF)", "Resize any recipe to a new batch size"],
+        "calc": ("soap/lye-calculator.html", "Lye calculator"),
+        "icons": ["soapcalc-app/fastlane/metadata/android/en-US/images/icon.png"],
+        "shots": "soapcalc-app/fastlane/metadata/android/en-US/images/phoneScreenshots",
+        "category": "LifestyleApplication",
+        "privacy": f'{CFG["policy_base"]}/lye-calc/privacy.html',
+        "terms": f'{CFG["policy_base"]}/lye-calc/terms.html',
+        "note": "Lye is caustic: wear gloves and goggles and check every recipe.",
+    },
+    "leben-in-deutschland": {
+        "group": "everyday",
+        "lang": "uk",
+        "theme": "t-lid",
+        "tagline": "Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.",
+        "intro": "На тесті питання лише німецькою. У застосунку ви бачите оригінальне німецьке питання, переклад українською, "
+                 "а після відповіді — чому правильна саме ця відповідь. Так ви не зазубрюєте, а розумієте.",
+        "free": ["Усі 300 загальних питань і по 10 для кожної з 16 федеральних земель", "Німецький оригінал і переклад українською",
+                 "Пробний іспит: 33 питання, 60 хвилин (один на день)", "Мої помилки, навчання за темами, пошук і закладки",
+                 "Без реклами, без акаунта, працює без інтернету"],
+        "pro": ["Пояснення українською до всіх 460 питань", "Необмежені пробні іспити", "Розумне тренування: спершу помилки, потім нові питання"],
+        "calc": None,
+        "icons": ["lid-test-ua-app/fastlane/metadata/android/uk/images/icon.png", "lid-test-ua-app/tool/store/icon-1024.png"],
+        "shots": "lid-test-ua-app/fastlane/metadata/android/uk/images/phoneScreenshots",
+        "category": "EducationApplication",
+        "privacy": f'{CFG["policy_base"]}/lid-test/privacy.html',
+        "terms": f'{CFG["policy_base"]}/lid-test/terms.html',
+        "note": "Неофіційний застосунок, не пов'язаний з BAMF.",
+    },
 }
 
 
@@ -220,14 +349,14 @@ def prep_images():
 
 # ---------- page shell ----------
 
-def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts=""):
+def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en"):
     depth = path.count("/")
     rel = "../" * depth
     canonical = f"{BASE}/{path}".replace("/index.html", "/")
     ld = "".join(f'<script type="application/ld+json">{json.dumps(j, ensure_ascii=False)}</script>' for j in (jsonld or []))
     calc_attr = f' data-calc="{calc}"' if calc else ""
     doc = f"""<!doctype html>
-<html lang="en">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -272,7 +401,7 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="")
 
 # ---------- shared blocks ----------
 
-def store_buttons(key, source):
+def store_buttons(key, source, lang="en"):
     c = CFG["apps"][key]
     btns = []
     play = f"https://play.google.com/store/apps/details?id={c['package']}&referrer=utm_source%3Ddredev-tools%26utm_campaign%3D{source}"
@@ -285,8 +414,10 @@ def store_buttons(key, source):
             btns.append(f'<a class="btn" href="{c["beta_group_url"]}">Join the free Android beta</a>')
         else:
             subject = f"Beta: {c['short']}"
-            btns.append(f'<a class="btn" href="mailto:{CFG["support_email"]}?subject={subject.replace(" ", "%20")}">Get early access</a>')
-        btns.append('<span class="btn off">App Store &amp; Google Play: coming soon</span>')
+            label = "Отримати ранній доступ" if lang == "uk" else "Get early access"
+            btns.append(f'<a class="btn" href="mailto:{CFG["support_email"]}?subject={subject.replace(" ", "%20")}">{label}</a>')
+        soon = "App Store і Google Play: незабаром" if lang == "uk" else "App Store &amp; Google Play: coming soon"
+        btns.append(f'<span class="btn off">{soon}</span>')
     return f'<div class="btns">{"".join(btns)}</div>'
 
 
@@ -753,6 +884,14 @@ def build_countdown():
 
 # ---------- App pages ----------
 
+APP_LABELS = {
+    "en": {"free": "Free", "pro": "Pro", "private": "No account. Your data stays on your device.", "privacy": "Privacy",
+           "terms": "Terms", "support": "Support", "title": "app for iPhone and Android"},
+    "uk": {"free": "Безкоштовно", "pro": "Pro", "private": "Без акаунта. Ваші дані лишаються на пристрої.", "privacy": "Конфіденційність",
+           "terms": "Умови", "support": "Підтримка", "title": "застосунок для iPhone і Android"},
+}
+
+
 def build_apps():
     for key, a in APPS.items():
         c = CFG["apps"][key]
@@ -764,6 +903,8 @@ def build_apps():
         calc = (f'<section><h2>Try it in your browser</h2><p><a class="btn ghost" href="{{rel}}{a["calc"][0]}">{a["calc"][1]} →</a></p></section>'
                 if a.get("calc") else "")
         note = f' {e(a["note"])}' if a.get("note") else ""
+        lang = a.get("lang", "en")
+        L = APP_LABELS[lang]
         ld = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": c["name"], "operatingSystem": "iOS, Android",
               "applicationCategory": a["category"], "description": a["tagline"], "url": f"{BASE}/{path}",
               "publisher": {"@type": "Organization", "name": CFG["brand"]}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
@@ -771,17 +912,17 @@ def build_apps():
 <div class="hero">{icon}
 <h1 style="margin-top:14px">{e(c["name"])}</h1>
 <p class="lead">{e(a["tagline"])}</p>
-<div style="margin-top:20px">{store_buttons(key, "app-page")}</div></div>
+<div style="margin-top:20px">{store_buttons(key, "app-page", lang)}</div></div>
 {f'<section class="shots">{shots}</section>' if shots else ""}
 <section class="prose"><p>{e(a["intro"])}</p></section>
 <section class="grid">
-<div class="card"><span class="tag">Free</span><ul class="ticks">{"".join(f"<li>{e(x)}</li>" for x in a["free"])}</ul></div>
-<div class="card"><span class="tag">Pro</span><ul class="ticks">{"".join(f"<li>{e(x)}</li>" for x in a["pro"])}</ul></div>
+<div class="card"><span class="tag">{L["free"]}</span><ul class="ticks">{"".join(f"<li>{e(x)}</li>" for x in a["free"])}</ul></div>
+<div class="card"><span class="tag">{L["pro"]}</span><ul class="ticks">{"".join(f"<li>{e(x)}</li>" for x in a["pro"])}</ul></div>
 </section>
 {calc}
-<p class="note">No account. Your data stays on your device.{note} <a href="{privacy}">Privacy</a> · <a href="{terms}">Terms</a> · <a href="mailto:{CFG["support_email"]}">Support</a></p>
+<p class="note">{L["private"]}{note} <a href="{privacy}">{L["privacy"]}</a> · <a href="{terms}">{L["terms"]}</a> · <a href="mailto:{CFG["support_email"]}">{L["support"]}</a></p>
 """
-        shell(path, f"{c['name']} — app for iPhone and Android", a["tagline"], body, a["theme"], jsonld=[ld])
+        shell(path, f"{c['name']} — {L['title']}", a["tagline"], body, a["theme"], jsonld=[ld], lang=lang)
 
 
 # ---------- Home ----------
@@ -812,6 +953,7 @@ def build_home():
 <p class="lead">Free, fast tools for HVAC techs, electricians and coating installers. Every number comes from published tables, and every tool has a phone app that works offline.</p></div>
 <section><h2>Free calculators</h2><div class="grid">{calc_cards}</div></section>
 <section id="apps"><h2>Apps for the trades</h2><div class="grid">{app_cards("trades")}</div></section>
+<section><h2>Apps for makers</h2><div class="grid">{app_cards("makers")}</div></section>
 <section><h2>Everyday apps</h2><div class="grid">{app_cards("everyday")}</div>
 <p><a href="{{rel}}countdown/christmas-countdown.html">How many days until Christmas? Live countdown →</a></p></section>
 <section class="prose"><h2>Why these tools</h2>

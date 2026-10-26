@@ -66,6 +66,78 @@
       "app_store_url": "",
       "google_play_live": false,
       "beta_group_url": ""
+    },
+    "poolpro": {
+      "name": "PoolPro: Chemistry & Route",
+      "short": "PoolPro",
+      "package": "com.andrii.poolchem",
+      "repo_dir": "pool-chem-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "softwash": {
+      "name": "SoftWash Pro: Mix & Quote",
+      "short": "SoftWash Pro",
+      "package": "com.andrii.softwash",
+      "repo_dir": "softwash-calc-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "roofcalc": {
+      "name": "RoofCalc: Roofing Calculator",
+      "short": "RoofCalc",
+      "package": "com.andrii.roofcalc",
+      "repo_dir": "roofcalc-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "slabcalc": {
+      "name": "SlabCalc: Concrete & Rebar",
+      "short": "SlabCalc",
+      "package": "com.andrii.slabcalc",
+      "repo_dir": "slabcalc-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "paintbid": {
+      "name": "PaintBid: Painting Estimator",
+      "short": "PaintBid",
+      "package": "com.andrii.paintbid",
+      "repo_dir": "paintbid-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "sitelog": {
+      "name": "SiteLog: Daily Report & Snags",
+      "short": "SiteLog",
+      "package": "com.andrii.sitelog",
+      "repo_dir": "sitelog-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "lye-calc": {
+      "name": "Lye Calc: Soap Recipes",
+      "short": "Lye Calc",
+      "package": "com.andrii.soapcalc",
+      "repo_dir": "soapcalc-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "leben-in-deutschland": {
+      "name": "Leben in Deutschland: тест UA",
+      "short": "Leben in DE",
+      "package": "com.andrii.lidtest",
+      "repo_dir": "lid-test-ua-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
     }
   },
   "indexnow_key": "f6c728771c1959446af1337396223617"
