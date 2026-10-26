@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voltage Drop Calculator (NEC &amp; IEC) | AWG and mm², Free</title>
+<meta name="description" content="Free voltage drop calculator for AWG and mm² wire, copper or aluminum, single phase, three phase and DC. Shows % drop, load voltage and the minimum wire size.">
+<link rel="canonical" href="https://andronaft-2.github.io/dredev-tools/electrical/voltage-drop-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Voltage Drop Calculator (NEC &amp; IEC) | AWG and mm², Free">
+<meta property="og:description" content="Free voltage drop calculator for AWG and mm² wire, copper or aluminum, single phase, three phase and DC. Shows % drop, load voltage and the minimum wire size.">
+<meta property="og:url" content="https://andronaft-2.github.io/dredev-tools/electrical/voltage-drop-calculator.html">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Voltage Drop Calculator", "url": "https://andronaft-2.github.io/dredev-tools/electrical/voltage-drop-calculator.html", "description": "Voltage drop for NEC and IEC wire sizes.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the voltage drop formula?", "acceptedAnswer": {"@type": "Answer", "text": "For copper under the NEC, VD = 2 × K × I × L / CM for single phase and 1.732 × K × I × L / CM for three phase, with K ≈ 12.9 Ω·cmil/ft, I the load current, L the one-way length in feet and CM the conductor area in circular mils. This calculator uses the equivalent IEC 60364-5-52 Annex G method with conductor reactance, which matches the K-factor result within about 0.5 % at unity power factor."}}, {"@type": "Question", "name": "What voltage drop is acceptable?", "acceptedAnswer": {"@type": "Answer", "text": "The NEC informational notes recommend no more than 3 % on a branch circuit and 5 % for feeder plus branch combined. IEC 60364-5-52 suggests 3 % for lighting and 5 % for other uses on installations supplied from the public network."}}, {"@type": "Question", "name": "Is the length one way or round trip?", "acceptedAnswer": {"@type": "Answer", "text": "Enter the one-way length from the panel to the load. The formula already counts both conductors (or the three phases)."}}, {"@type": "Question", "name": "Why does power factor matter?", "acceptedAnswer": {"@type": "Answer", "text": "On AC circuits the drop depends on resistance and reactance. With motor loads (power factor below 1) the reactive part grows, which matters most on large conductors."}}]}</script>
+</head>
+<body class="t-elec" data-calc="vd">
+<header class="top"><div class="wrap">
+<a class="brand" href="../index.html"><i></i>Dre Dev Tools</a>
+<nav>
+<a href="../hvac/superheat-subcooling-calculator.html">HVAC</a>
+<a href="../electrical/voltage-drop-calculator.html">Electrical</a>
+<a href="../coating/epoxy-coverage-calculator.html" class="hide-sm">Coatings</a>
+<a href="../index.html#apps">Apps</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<div class="crumbs"><a href="../index.html">Tools</a> › Electrical</div>
+<div class="hero"><div class="eyebrow">Free electrical tool</div>
+<h1>Voltage Drop Calculator</h1>
+<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p></div>
+
+<div class="calc card">
+<div class="fields">
+<div class="full"><div class="seg" id="std" role="group" aria-label="Standard">
+<button data-v="nec" aria-pressed="true">NEC · AWG · ft</button><button data-v="iec" aria-pressed="false">IEC · mm² · m</button></div></div>
+<div class="full"><div class="seg" id="supply" role="group" aria-label="Supply">
+<button data-v="single" aria-pressed="true">1-phase</button><button data-v="three" aria-pressed="false">3-phase</button><button data-v="dc" aria-pressed="false">DC</button></div></div>
+<div class="full"><div class="seg" id="cond" role="group" aria-label="Conductor">
+<button data-v="cu" aria-pressed="true">Copper</button><button data-v="al" aria-pressed="false">Aluminum</button></div></div>
+<div><label for="size">Wire size</label><select id="size"></select></div>
+<div><label for="len">Length <small id="len-unit">(ft, one way)</small></label><input id="len" inputmode="decimal"></div>
+<div><label for="amps">Load <small>(A)</small></label><input id="amps" inputmode="decimal" value="16"></div>
+<div><label for="volts">Voltage <small>(V)</small></label><input id="volts" inputmode="decimal"></div>
+<div class="full"><label for="pf">Power factor <small>(1 for resistive loads, ~0.85 for motors)</small></label><input id="pf" inputmode="decimal" value="1"></div>
+</div>
+<div class="result" aria-live="polite">
+<div class="eyebrow">Voltage drop</div>
+<div class="big" id="vd-pct">–</div>
+<div class="rows">
+<div><span>Drop</span><span id="vd-v">–</span></div>
+<div><span>Voltage at load</span><span id="vd-end">–</span></div>
+<div><span>Smallest size for ≤ 3 %</span><span id="vd-min">–</span></div>
+</div>
+<div id="vd-verdict" class="verdict"></div>
+<p class="note">Checks voltage drop only. Size the wire for ampacity and overcurrent protection too.</p>
+</div>
+</div>
+
+<section class="promo"><img class="icon" src="../img/electrician-calc-icon.jpg" alt="" width="72" height="72"><div>
+<h3>Electrician Calc: Wire &amp; Panel</h3>
+<p>Wire size with ampacity and derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports. <a href="../apps/electrician-calc.html">See what's inside</a>.</p>
+<div class="btns"><a class="btn" href="mailto:mobile.support@zhukovskyi.space?subject=Beta:%20Electrician%20Calc">Get early access</a><span class="btn off">App Store &amp; Google Play: coming soon</span></div>
+</div></section>
+<section class="faq"><h2>Questions</h2><details><summary>What is the voltage drop formula?</summary><p>For copper under the NEC, VD = 2 × K × I × L / CM for single phase and 1.732 × K × I × L / CM for three phase, with K ≈ 12.9 Ω·cmil/ft, I the load current, L the one-way length in feet and CM the conductor area in circular mils. This calculator uses the equivalent IEC 60364-5-52 Annex G method with conductor reactance, which matches the K-factor result within about 0.5 % at unity power factor.</p></details><details><summary>What voltage drop is acceptable?</summary><p>The NEC informational notes recommend no more than 3 % on a branch circuit and 5 % for feeder plus branch combined. IEC 60364-5-52 suggests 3 % for lighting and 5 % for other uses on installations supplied from the public network.</p></details><details><summary>Is the length one way or round trip?</summary><p>Enter the one-way length from the panel to the load. The formula already counts both conductors (or the three phases).</p></details><details><summary>Why does power factor matter?</summary><p>On AC circuits the drop depends on resistance and reactance. With motor loads (power factor below 1) the reactive part grows, which matters most on large conductors.</p></details></section>
+
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev. Free tools for the trades. No account, no tracking cookies.</span>
+<span><a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a></span>
+</div></footer>
+<script src="../assets/calc.js"></script>
+</body>
+</html>

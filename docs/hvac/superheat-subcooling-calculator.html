@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Superheat &amp; Subcooling Calculator (R-454B, R-32, R-410A) | Free</title>
+<meta name="description" content="Free superheat and subcooling calculator with PT lookup for R-454B, R-32, R-410A and R-22. Bubble and dew points from published PT charts.">
+<link rel="canonical" href="https://andronaft-2.github.io/dredev-tools/hvac/superheat-subcooling-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Superheat &amp; Subcooling Calculator (R-454B, R-32, R-410A) | Free">
+<meta property="og:description" content="Free superheat and subcooling calculator with PT lookup for R-454B, R-32, R-410A and R-22. Bubble and dew points from published PT charts.">
+<meta property="og:url" content="https://andronaft-2.github.io/dredev-tools/hvac/superheat-subcooling-calculator.html">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Superheat & Subcooling Calculator", "url": "https://andronaft-2.github.io/dredev-tools/hvac/superheat-subcooling-calculator.html", "description": "Superheat, subcooling and PT lookup for common refrigerants.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do you calculate superheat?", "acceptedAnswer": {"@type": "Answer", "text": "Read the suction (low-side) pressure and convert it to the saturation temperature with the refrigerant's PT chart. Measure the suction line temperature near the service valve. Superheat = suction line temperature − saturation temperature. For blends with glide such as R-454B or R-407C, use the dew point (vapor) column."}}, {"@type": "Question", "name": "How do you calculate subcooling?", "acceptedAnswer": {"@type": "Answer", "text": "Read the liquid (high-side) pressure and convert it to the saturation temperature. Measure the liquid line temperature near the service valve. Subcooling = saturation temperature − liquid line temperature. For blends with glide, use the bubble point (liquid) column."}}, {"@type": "Question", "name": "Should I charge by superheat or subcooling?", "acceptedAnswer": {"@type": "Answer", "text": "Fixed-orifice (piston) systems are charged by superheat against a target from the outdoor and indoor conditions. TXV and EEV systems are charged by subcooling against the target on the outdoor unit's nameplate or the manufacturer's charging chart. Always follow the manufacturer's instructions for the specific unit."}}, {"@type": "Question", "name": "Is R-454B a drop-in for R-410A?", "acceptedAnswer": {"@type": "Answer", "text": "No. R-454B is an A2L (mildly flammable) refrigerant for equipment designed for it, with its own pressures, glide and safety requirements. Use the R-454B chart, not the R-410A one, and follow the A2L handling rules."}}, {"@type": "Question", "name": "Where does this PT data come from?", "acceptedAnswer": {"@type": "Answer", "text": "From the published Arkema Forane® pressure–temperature charts (NIST REFPROP data). Between the printed 5 °F points the calculator interpolates along the vapor-pressure curve. It is a reference tool: verify against the equipment manufacturer's data."}}]}</script>
+</head>
+<body class="t-hvac" data-calc="hvac">
+<header class="top"><div class="wrap">
+<a class="brand" href="../index.html"><i></i>Dre Dev Tools</a>
+<nav>
+<a href="../hvac/superheat-subcooling-calculator.html">HVAC</a>
+<a href="../electrical/voltage-drop-calculator.html">Electrical</a>
+<a href="../coating/epoxy-coverage-calculator.html" class="hide-sm">Coatings</a>
+<a href="../index.html#apps">Apps</a>
+</nav>
+</div></header>
+<main class="wrap">
+
+<div class="crumbs"><a href="../index.html">Tools</a> › HVAC</div>
+<div class="hero"><div class="eyebrow">Free HVAC tool</div>
+<h1>Superheat &amp; Subcooling Calculator</h1>
+<p class="lead">Enter gauge pressure and line temperature. Get saturation, superheat or subcooling instantly for R-410A, R-454B, R-32 and R-22, from published PT charts.</p></div>
+
+<div class="calc card">
+<div class="fields">
+<div class="full"><div class="seg" id="mode" role="group" aria-label="Measurement">
+<button data-v="sh" aria-pressed="true">Superheat</button><button data-v="sc" aria-pressed="false">Subcooling</button></div></div>
+<div class="full"><label for="ref">Refrigerant</label><select id="ref"><option value="R-410A">R-410A</option><option value="R-454B">R-454B (glide)</option><option value="R-32">R-32</option><option value="R-22">R-22</option></select></div>
+<div><label for="p" id="p-label">Suction pressure <small>(psig)</small></label><input id="p" inputmode="decimal" value="130"></div>
+<div><label for="t" id="t-label">Suction line temp <small>(°F)</small></label><input id="t" inputmode="decimal" value="55"></div>
+</div>
+<div class="result" aria-live="polite">
+<div id="out-title" class="eyebrow">Superheat</div>
+<div class="big" id="out">–</div>
+<div class="rows"><div><span>In kelvin</span><span id="out-c"></span></div>
+<div><span id="sat-label">Saturation temp</span><span id="sat">–</span></div></div>
+<div id="hvac-warn" class="verdict"></div>
+</div>
+</div>
+
+<section class="calc card" style="margin-top:20px">
+<div class="fields">
+<div class="full"><h2 style="margin:0">PT lookup</h2></div>
+<div class="full"><div class="seg" id="ptmode" role="group" aria-label="Lookup direction">
+<button data-v="p2t" aria-pressed="true">Pressure → temp</button><button data-v="t2p" aria-pressed="false">Temp → pressure</button></div></div>
+<div class="full"><label for="pt-in" id="pt-in-label">Pressure <small>(psig)</small></label><input id="pt-in" inputmode="decimal" value="120"></div>
+</div>
+<div class="result"><div class="eyebrow">Saturation</div><div class="rows" id="pt-out"></div></div>
+</section>
+
+<section class="promo"><img class="icon" src="../img/hvac-charge-icon.jpg" alt="" width="72" height="72"><div>
+<h3>HVAC Charge: Superheat &amp; PT</h3>
+<p>Same numbers on your phone, offline on the roof, plus 16 refrigerants, piston target superheat and an add/recover call. <a href="../apps/hvac-charge.html">See what's inside</a>.</p>
+<div class="btns"><a class="btn" href="mailto:mobile.support@zhukovskyi.space?subject=Beta:%20HVAC%20Charge">Get early access</a><span class="btn off">App Store &amp; Google Play: coming soon</span></div>
+</div></section>
+
+<section><h2>PT charts</h2><p class="muted">Full pressure–temperature tables, −50 °F to 150 °F.</p><div class="chips"><a href="../hvac/pt-chart/r-410a.html">R-410A</a><a href="../hvac/pt-chart/r-454b.html">R-454B</a><a href="../hvac/pt-chart/r-32.html">R-32</a><a href="../hvac/pt-chart/r-22.html">R-22</a><a href="../hvac/pt-chart/r-134a.html">R-134a</a><a href="../hvac/pt-chart/r-404a.html">R-404A</a><a href="../hvac/pt-chart/r-407c.html">R-407C</a><a href="../hvac/pt-chart/r-407a.html">R-407A</a><a href="../hvac/pt-chart/r-448a.html">R-448A</a><a href="../hvac/pt-chart/r-449a.html">R-449A</a><a href="../hvac/pt-chart/r-452a.html">R-452A</a><a href="../hvac/pt-chart/r-513a.html">R-513A</a><a href="../hvac/pt-chart/r-507a.html">R-507A</a><a href="../hvac/pt-chart/r-427a.html">R-427A</a><a href="../hvac/pt-chart/r-408a.html">R-408A</a><a href="../hvac/pt-chart/r-409a.html">R-409A</a></div></section>
+<section class="faq"><h2>Questions</h2><details><summary>How do you calculate superheat?</summary><p>Read the suction (low-side) pressure and convert it to the saturation temperature with the refrigerant's PT chart. Measure the suction line temperature near the service valve. Superheat = suction line temperature − saturation temperature. For blends with glide such as R-454B or R-407C, use the <b>dew point</b> (vapor) column.</p></details><details><summary>How do you calculate subcooling?</summary><p>Read the liquid (high-side) pressure and convert it to the saturation temperature. Measure the liquid line temperature near the service valve. Subcooling = saturation temperature − liquid line temperature. For blends with glide, use the <b>bubble point</b> (liquid) column.</p></details><details><summary>Should I charge by superheat or subcooling?</summary><p>Fixed-orifice (piston) systems are charged by superheat against a target from the outdoor and indoor conditions. TXV and EEV systems are charged by subcooling against the target on the outdoor unit's nameplate or the manufacturer's charging chart. Always follow the manufacturer's instructions for the specific unit.</p></details><details><summary>Is R-454B a drop-in for R-410A?</summary><p>No. R-454B is an A2L (mildly flammable) refrigerant for equipment designed for it, with its own pressures, glide and safety requirements. Use the R-454B chart, not the R-410A one, and follow the A2L handling rules.</p></details><details><summary>Where does this PT data come from?</summary><p>From the published Arkema Forane® pressure–temperature charts (NIST REFPROP data). Between the printed 5 °F points the calculator interpolates along the vapor-pressure curve. It is a reference tool: verify against the equipment manufacturer's data.</p></details></section>
+<p class="note">Reference only. Verify against the equipment manufacturer's charging instructions. Handling refrigerants requires EPA Section 608 certification in the US.</p>
+
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev. Free tools for the trades. No account, no tracking cookies.</span>
+<span><a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a></span>
+</div></footer>
+<script src="../assets/pt-data.js"></script><script src="../assets/calc.js"></script>
+</body>
+</html>

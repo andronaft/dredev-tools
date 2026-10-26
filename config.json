@@ -1,0 +1,35 @@
+{
+  "base_url": "https://andronaft-2.github.io/dredev-tools",
+  "brand": "Dre Dev",
+  "support_email": "mobile.support@zhukovskyi.space",
+  "policy_base": "https://andronaft-2.github.io/app_politics_and_terms",
+  "apps": {
+    "hvac-charge": {
+      "name": "HVAC Charge: Superheat & PT",
+      "short": "HVAC Charge",
+      "package": "com.andrii.hvaccharge",
+      "repo_dir": "hvac-charge-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "electrician-calc": {
+      "name": "Electrician Calc: Wire & Panel",
+      "short": "Electrician Calc",
+      "package": "com.andrii.electriccalc",
+      "repo_dir": "Calculator_for_electrical",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    },
+    "coatcalc": {
+      "name": "CoatCalc: Epoxy Floor Coating",
+      "short": "CoatCalc",
+      "package": "com.andrii.coatcalc",
+      "repo_dir": "coatcalc-app",
+      "app_store_url": "",
+      "google_play_live": false,
+      "beta_group_url": ""
+    }
+  }
+}
