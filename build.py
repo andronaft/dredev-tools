@@ -117,13 +117,14 @@ APPS = {
     },
     "electrician-calc": {
         "theme": "t-elec",
-        "tagline": "Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364.",
+        "tagline": "Wire and breaker size, voltage drop, conduit fill and a panel planner: 23 calculators on NEC and IEC 60364 tables.",
         "intro": "Real ampacity tables, correction factors and protection checks with every step shown. "
                  "NEC (AWG, feet) or IEC 60364 (mm², metres), picked from your region and switched with one tap.",
-        "free": ["Cable size with ampacity, derating and voltage-drop check", "Voltage drop: volts, %, end voltage, minimum size",
-                 "Power and Ohm's law for DC, single and three phase"],
-        "pro": ["Panel planner: circuits to breakers, cables and RCD groups", "Motor circuits, fault level, load schedule, PF correction",
-                "Earth fault loop, earthing conductors and electrodes", "Solar PV strings, battery and backup power sizing",
+        "free": ["Wire size with ampacity, derating and the breaker, voltage drop checked", "Voltage drop: volts, %, end voltage, minimum size",
+                 "Power and Ohm's law for DC, single and three phase", "One project with its PDF report under your business name"],
+        "pro": ["Panel planner: circuits to breakers, wires and AFCI/GFCI or RCD groups, with a printable panel directory",
+                "Conduit fill, motor circuits, fault level, load schedule, PF correction",
+                "Grounding conductors, ground rods and earth fault loop", "Solar PV strings, battery and backup power sizing",
                 "Unlimited projects with PDF reports"],
         "calc": ("electrical/voltage-drop-calculator.html", "Voltage drop calculator"),
         "icons": ["Calculator_for_electrical/fastlane/metadata/android/en-US/images/icon.png"],
@@ -624,7 +625,7 @@ def build_vd():
 </div>
 </div>
 
-{promo("electrician-calc", "vd-calc", "Wire size with ampacity and derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports.")}
+{promo("electrician-calc", "vd-calc", "Wire size with ampacity and derating, panel planner, motors, solar: 23 calculators with step-by-step working and PDF reports.")}
 {faq_html}
 """
     shell(path, "Voltage Drop Calculator (NEC & IEC) | AWG and mm², Free",
@@ -737,7 +738,7 @@ def build_more():
         [("Is 2.5 mm² the same as 14 AWG?", "Close but not equal: 14 AWG is 2.08 mm² and 12 AWG is 3.31 mm². When you replace a metric cable with AWG wire, pick the size that is not smaller and check ampacity and voltage drop for your circuit."),
          ("Where do these numbers come from?", "Areas are from NEC Chapter 9, Table 8 (circular mils), converted with 1 cmil = 0.000506707 mm². Metric sizes are the IEC 60228 series.")],
         "t-elec", "awg",
-        promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."))
+        promo("electrician-calc", "awg", "Wire size with ampacity and derating, voltage drop and 23 calculators for NEC and IEC."))
 
     calc_page(
         "electrical/wire-size-calculator.html", "Wire Size Calculator (NEC 310.16) | What Size Wire Do I Need?",
@@ -762,7 +763,7 @@ def build_more():
          ("Why 125 % for continuous loads?", "NEC 210.19(A)(1) and 215.2 require conductors for continuous loads (3 hours or more, like EV chargers and water heaters) to carry 125 % of the continuous current."),
          ("Why does NM-B use the 60 °C column?", "NEC 334.80 limits NM cable ampacity to the 60 °C column, even though the conductors are rated 90 °C.")],
         "t-elec", "wire",
-        promo("electrician-calc", "wire-size", "Full cable sizing with ambient and grouping derating, IEC and NEC, step-by-step working and PDF reports."))
+        promo("electrician-calc", "wire-size", "Full wire sizing with ambient and conductor-count derating, NEC and IEC, step-by-step working and PDF reports."))
 
     calc_page(
         "pool/pool-chemical-calculator.html", "Pool Chemical Calculator: Chlorine, Baking Soda, Stabilizer, Salt",

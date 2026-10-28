@@ -14,7 +14,7 @@
       "beta_group_url": ""
     },
     "electrician-calc": {
-      "name": "Electrician Calc: Wire & Panel",
+      "name": "Electrician Calc: Wire Size",
       "short": "Electrician Calc",
       "package": "com.andrii.electriccalc",
       "repo_dir": "Calculator_for_electrical",
