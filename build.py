@@ -121,7 +121,7 @@ APPS = {
         "intro": "Real ampacity tables, correction factors and protection checks with every step shown. "
                  "NEC (AWG, feet) or IEC 60364 (mm², metres), picked from your region and switched with one tap.",
         "free": ["Wire size with ampacity, derating and the breaker, voltage drop checked", "Voltage drop: volts, %, end voltage, minimum size",
-                 "Power and Ohm's law for DC, single and three phase", "One project with its PDF report under your business name"],
+                 "Power and Ohm's law for DC, single and three phase", "Three projects with their PDF reports under your business name"],
         "pro": ["Panel planner: circuits to breakers, wires and AFCI/GFCI or RCD groups, with a printable panel directory",
                 "Conduit fill, motor circuits, fault level, load schedule, PF correction",
                 "Grounding conductors, ground rods and earth fault loop", "Solar PV strings, battery and backup power sizing",
