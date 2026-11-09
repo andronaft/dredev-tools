@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Builds the static marketing site into ./docs (served by GitHub Pages from main:/docs).
+"""Builds the static marketing site into ./site. It is served from zhukovskyi.space/calculators: the my_space repo
+copies ./site with tools/sync_calculators.py. ./docs (GitHub Pages, the old address) only holds redirects to it.
 
 Data comes straight from the app repos next to this folder (PT charts from hvac-charge-app, screenshots and icons
 from fastlane), so the site never drifts from the apps. Store links live in config.json: fill them in and rebuild.
@@ -17,7 +18,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent  # ~/Desktop/mobile_sub_app
-OUT = HERE / "docs"  # GitHub Pages serves main:/docs
+OUT = HERE / "site"  # the real site, copied into my_space and served at base_url
+LEGACY_OUT = HERE / "docs"  # GitHub Pages serves main:/docs: one redirect page per old address
 CFG = json.loads((HERE / "config.json").read_text())
 BASE = CFG["base_url"].rstrip("/")
 TODAY = date.today().isoformat()
@@ -433,6 +435,7 @@ def promo(key, source, pitch):
     a, c = APPS[key], CFG["apps"][key]
     icon = f'<img class="icon" src="{{rel}}{a["icon"]}" alt="" width="72" height="72">' if a["icon"] else ""
     return f"""<section class="promo">{icon}<div>
+<div class="eyebrow">The whole job, on your phone</div>
 <h3>{e(c["name"])}</h3>
 <p>{e(pitch)} <a href="{{rel}}apps/{key}.html">See what's inside</a>.</p>
 {store_buttons(key, source)}
@@ -1049,16 +1052,53 @@ def main():
     build_apps()
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
-    # Search Console verification files live at the repo root; Pages serves docs/, so copy them in on every build.
-    for f in HERE.glob("google*.html"):
-        shutil.copy(f, OUT / f.name)
     if CFG.get("indexnow_key"):  # IndexNow (Bing, Yandex): the key file proves the site is ours
         (OUT / f'{CFG["indexnow_key"]}.txt').write_text(CFG["indexnow_key"])
     write_llms()
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
     urls = "".join(f"<url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in pages)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
-    print(f"{len(pages)} pages, {len(PT)} PT charts -> {OUT}")
+    build_legacy()
+    print(f"{len(pages)} pages, {len(PT)} PT charts -> {OUT}; redirects -> {LEGACY_OUT}")
+
+
+def build_legacy():
+    """GitHub Pages cannot send a 301, so every old address gets a page that points search engines at the
+    new one (canonical) and sends people there at once (meta refresh, with a plain link as a fallback)."""
+    if LEGACY_OUT.exists():
+        shutil.rmtree(LEGACY_OUT)
+    LEGACY_OUT.mkdir()
+
+    def stub(rel, target):
+        dest = LEGACY_OUT / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(f'''<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Moved to {e(target)}</title>
+<link rel="canonical" href="{e(target)}">
+<meta http-equiv="refresh" content="0; url={e(target)}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<p>This page has moved to <a href="{e(target)}">{e(target)}</a>.</p>
+<script>location.replace({json.dumps(target)} + location.search + location.hash)</script>
+</body>
+</html>
+''')
+
+    for f in sorted(OUT.rglob("*.html")):
+        rel = f.relative_to(OUT).as_posix()
+        if rel == "404.html":
+            continue
+        stub(rel, f"{BASE}/{rel}".replace("/index.html", "/"))
+    stub("404.html", f"{BASE}/")
+    (LEGACY_OUT / ".nojekyll").write_text("")
+    (LEGACY_OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n")
+    # Search Console verification files for the old address live at the repo root; Pages serves docs/.
+    for f in HERE.glob("google*.html"):
+        shutil.copy(f, LEGACY_OUT / f.name)
 
 
 if __name__ == "__main__":

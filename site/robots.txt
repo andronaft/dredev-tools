@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://zhukovskyi.space/calculators/sitemap.xml
