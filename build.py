@@ -387,7 +387,7 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
 </main>
 <footer><div class="wrap">
 <span>© 2026 {e(CFG["brand"])}. Free tools and offline apps. No account, no tracking cookies.</span>
-<span><a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a></span>
+<span>Made by <a href="{CFG["developer_site"]}/">Andrii Zhukovskyi</a> · <a href="{CFG["developer_site"]}/apps/">all apps</a> · <a href="{CFG["developer_site"]}/testers/">become a tester</a> · <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a></span>
 </div></footer>
 {scripts.replace("{rel}", rel)}
 </body>
@@ -410,13 +410,21 @@ def store_buttons(key, source, lang="en"):
     if c["google_play_live"]:
         btns.append(f'<a class="btn" href="{play}">Get it on Google Play</a>')
     if not btns:
+        uk = lang == "uk"
+        dev = f'{CFG["developer_site"]}/apps/{c.get("site_slug", key)}/'
         if c["beta_group_url"]:
             btns.append(f'<a class="btn" href="{c["beta_group_url"]}">Join the free Android beta</a>')
+        elif c.get("status") == "testing":
+            # Closed test on Google Play: the app page on the developer site walks through joining the testers group first.
+            btns.append(f'<a class="btn" href="{dev}">{"Стати тестером" if uk else "Become a tester, free"}</a>')
+            btns.append(f'<a class="btn ghost" href="{CFG["tester_signup"]}" target="_blank" rel="noopener">{"iPhone? Записатися" if uk else "iPhone? Sign up"}</a>')
         else:
-            subject = f"Beta: {c['short']}"
-            label = "Отримати ранній доступ" if lang == "uk" else "Get early access"
-            btns.append(f'<a class="btn" href="mailto:{CFG["support_email"]}?subject={subject.replace(" ", "%20")}">{label}</a>')
-        soon = "App Store і Google Play: незабаром" if lang == "uk" else "App Store &amp; Google Play: coming soon"
+            label = "Отримати ранній доступ" if uk else "Get early access"
+            btns.append(f'<a class="btn" href="{CFG["tester_signup"]}" target="_blank" rel="noopener">{label}</a>')
+        if c.get("status") == "testing":
+            soon = "Закритий тест у Google Play, App Store незабаром" if uk else "Closed test on Google Play &middot; App Store coming soon"
+        else:
+            soon = "App Store і Google Play: незабаром" if uk else "App Store &amp; Google Play: coming soon"
         btns.append(f'<span class="btn off">{soon}</span>')
     return f'<div class="btns">{"".join(btns)}</div>'
 
@@ -957,7 +965,8 @@ def build_home():
 <section><h2>Everyday apps</h2><div class="grid">{app_cards("everyday")}</div>
 <p><a href="{{rel}}countdown/christmas-countdown.html">How many days until Christmas? Live countdown →</a></p></section>
 <section class="prose"><h2>Why these tools</h2>
-<p>No account, no ads, no data leaving your phone. Built by an independent developer who answers every email: <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>.</p></section>
+<p>No account, no ads, no data leaving your phone. Built by an independent developer, <a href="{CFG["developer_site"]}/">Andrii Zhukovskyi</a>, who answers every email: <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>.</p>
+<p>Most of the apps are in a free closed test on Google Play right now, with the App Store next. <a href="{CFG["developer_site"]}/testers/">Become a tester</a> and get them before release.</p></section>
 """
     shell("index.html", f"{CFG['brand']} Tools: free calculators for HVAC, electrical and floor coating",
           "Free online calculators for the trades: superheat and subcooling, refrigerant PT charts, voltage drop and epoxy coverage, plus offline phone apps.",

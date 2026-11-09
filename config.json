@@ -3,6 +3,8 @@
   "brand": "Dre Dev",
   "support_email": "mobile.support@zhukovskyi.space",
   "policy_base": "https://andronaft-2.github.io/app_politics_and_terms",
+  "developer_site": "https://zhukovskyi.space",
+  "tester_signup": "https://forms.gle/Vn9wgynXFbegDsWS7",
   "apps": {
     "hvac-charge": {
       "name": "HVAC Charge: Superheat & PT",
@@ -11,7 +13,8 @@
       "repo_dir": "hvac-charge-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "electrician-calc": {
       "name": "Electrician Calc: Wire & Panel",
@@ -20,7 +23,8 @@
       "repo_dir": "Calculator_for_electrical",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "soon"
     },
     "coatcalc": {
       "name": "CoatCalc: Epoxy Floor Coating",
@@ -29,7 +33,8 @@
       "repo_dir": "coatcalc-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "days-until": {
       "name": "Days Until: Countdown Widget",
@@ -38,7 +43,8 @@
       "repo_dir": "Countdown_to_events",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "soon"
     },
     "focus-sprint": {
       "name": "Focus Sprint: ADHD Timer",
@@ -47,7 +53,8 @@
       "repo_dir": "adhd_neurodiversity",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "water-buddy": {
       "name": "Water Buddy: Drink Reminder",
@@ -56,7 +63,8 @@
       "repo_dir": "water-buddy-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "fastwise": {
       "name": "Fastwise: Fasting Tracker",
@@ -65,7 +73,8 @@
       "repo_dir": "fasting_tracker_app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "soon"
     },
     "poolpro": {
       "name": "PoolPro: Chemistry & Route",
@@ -74,7 +83,8 @@
       "repo_dir": "pool-chem-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "softwash": {
       "name": "SoftWash Pro: Mix & Quote",
@@ -83,7 +93,8 @@
       "repo_dir": "softwash-calc-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "roofcalc": {
       "name": "RoofCalc: Roofing Calculator",
@@ -92,7 +103,8 @@
       "repo_dir": "roofcalc-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "slabcalc": {
       "name": "SlabCalc: Concrete & Rebar",
@@ -101,7 +113,8 @@
       "repo_dir": "slabcalc-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "paintbid": {
       "name": "PaintBid: Painting Estimator",
@@ -110,7 +123,8 @@
       "repo_dir": "paintbid-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "soon"
     },
     "sitelog": {
       "name": "SiteLog: Daily Report & Snags",
@@ -119,7 +133,8 @@
       "repo_dir": "sitelog-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "lye-calc": {
       "name": "Lye Calc: Soap Recipes",
@@ -128,7 +143,8 @@
       "repo_dir": "soapcalc-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "testing"
     },
     "leben-in-deutschland": {
       "name": "Leben in Deutschland: тест UA",
@@ -137,7 +153,9 @@
       "repo_dir": "lid-test-ua-app",
       "app_store_url": "",
       "google_play_live": false,
-      "beta_group_url": ""
+      "beta_group_url": "",
+      "status": "soon",
+      "site_slug": "lid-test"
     }
   },
   "indexnow_key": "f6c728771c1959446af1337396223617"
