@@ -1049,6 +1049,9 @@ def main():
     build_apps()
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
+    # Search Console verification files live at the repo root; Pages serves docs/, so copy them in on every build.
+    for f in HERE.glob("google*.html"):
+        shutil.copy(f, OUT / f.name)
     if CFG.get("indexnow_key"):  # IndexNow (Bing, Yandex): the key file proves the site is ours
         (OUT / f'{CFG["indexnow_key"]}.txt').write_text(CFG["indexnow_key"])
     write_llms()
