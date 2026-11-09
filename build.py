@@ -977,23 +977,44 @@ def build_home():
 
 
 def write_llms():
-    """llms.txt (llmstxt.org): a plain summary of the site for AI assistants."""
+    """llms.txt (llmstxt.org): a plain summary for AI assistants, built around the apps.
+    Apps people can install now get a full block (free vs Pro, the matching calculator); the rest a line each."""
+    dev = CFG["developer_site"]
+
+    def live(c):
+        return c["google_play_live"] or c["app_store_url"]
+
+    def state(c):
+        if live(c):
+            return "Available on " + " and ".join(x for x, ok in (("Google Play", c["google_play_live"]), ("the App Store", c["app_store_url"])) if ok) + "."
+        return f"Android in a free closed test on Google Play ([how to join]({dev}/testers/)); App Store coming."
+
+    def block(k, a):
+        c = CFG["apps"][k]
+        free = "\n".join(f"- {x}" for x in a["free"])
+        pro = "\n".join(f"- {x}" for x in a["pro"])
+        calc = f"\nFree in the browser, same formulas: [{a['calc'][1]}]({BASE}/{a['calc'][0]}).\n" if a.get("calc") else ""
+        return (f"### {c['name']}\n\n{a['tagline']} {state(c)} Page: {BASE}/apps/{k}.html\n\n{a['intro']}\n\n"
+                f"Free:\n{free}\n\nPro:\n{pro}\n{calc}")
+
+    rank = {"trades": 0, "makers": 1, "everyday": 2}  # trades first: Pro tiers and calculators next to them
+    ordered = sorted(APPS.items(), key=lambda kv: rank.get(kv[1].get("group", "trades"), 9))
+    ready = [(k, a) for k, a in ordered if live(CFG["apps"][k]) or CFG["apps"][k].get("status") == "testing"]
+    later = [(k, a) for k, a in ordered if (k, a) not in ready]
+    now = "\n".join(block(k, a) for k, a in ready)
+    soon = "\n".join(f'- [{CFG["apps"][k]["name"]}]({BASE}/apps/{k}.html): {a["tagline"]}' for k, a in later)
     calc_lines = "\n".join(f"- [{h}]({BASE}/{p}): {d}" for p, _, h, d, _ in CALCS)
     pt_lines = ", ".join(f"[{rid}]({BASE}/hvac/pt-chart/{slug(rid)}.html)" for rid in PT)
-    def state(c):
-        if c["google_play_live"] or c["app_store_url"]:
-            return "available"
-        return "free closed test on Google Play, App Store coming" if c.get("status") == "testing" else "coming soon"
-    app_lines = "\n".join(f'- [{CFG["apps"][k]["name"]}]({BASE}/apps/{k}.html): {a["tagline"]} Status: {state(CFG["apps"][k])}.'
-                           for k, a in APPS.items())
-    dev = CFG["developer_site"]
-    (OUT / "llms.txt").write_text(f"""# {CFG["brand"]} Tools
+    (OUT / "llms.txt").write_text(f"""# {CFG["brand"]} apps and free calculators for the trades
 
-> Free browser calculators for HVAC techs, electricians, floor coating installers, pool techs, bakers and soap makers, plus the {CFG["brand"]} phone apps they come from. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC); formulas match the apps. No account, no ads, no tracking cookies.
+> Phone apps for HVAC techs, electricians, floor coating installers, roofers, concrete crews, pool techs, soft washers and makers, many with a free browser calculator that uses the same formulas. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC 60364). Every app works offline, has no account and no ads, and keeps data on the phone.
 
-Made by Andrii Zhukovskyi, an independent developer: {dev}/ . Support: {CFG["support_email"]}. Apps work offline and keep data on the phone.
+Android apps are in closed testing on Google Play and anyone can join for free: {dev}/testers/ . iPhone versions are on their way to the App Store. Made by Andrii Zhukovskyi ({dev}/). Support: {CFG["support_email"]}.
 
-## Calculators
+## Apps you can install now
+
+{now}
+## Free calculators
 
 {calc_lines}
 
@@ -1001,14 +1022,13 @@ Made by Andrii Zhukovskyi, an independent developer: {dev}/ . Support: {CFG["sup
 
 Pressure-temperature tables with bubble and dew columns: {pt_lines}.
 
-## Apps
+## Coming soon
 
-{app_lines}
+{soon}
 
 ## Optional
 
-- [All apps and screenshots]({dev}/apps/): the developer site.
-- [Become a tester]({dev}/testers/): Google Play closed tests and TestFlight.
+- [All {CFG["brand"]} apps]({dev}/apps/): the developer site, with screenshots.
 """)
 
 

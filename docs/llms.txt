@@ -1,10 +1,204 @@
-# Dre Dev Tools
+# Dre Dev apps and free calculators for the trades
 
-> Free browser calculators for HVAC techs, electricians, floor coating installers, pool techs, bakers and soap makers, plus the Dre Dev phone apps they come from. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC); formulas match the apps. No account, no ads, no tracking cookies.
+> Phone apps for HVAC techs, electricians, floor coating installers, roofers, concrete crews, pool techs, soft washers and makers, many with a free browser calculator that uses the same formulas. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC 60364). Every app works offline, has no account and no ads, and keeps data on the phone.
 
-Made by Andrii Zhukovskyi, an independent developer: https://zhukovskyi.space/ . Support: mobile.support@zhukovskyi.space. Apps work offline and keep data on the phone.
+Android apps are in closed testing on Google Play and anyone can join for free: https://zhukovskyi.space/testers/ . iPhone versions are on their way to the App Store. Made by Andrii Zhukovskyi (https://zhukovskyi.space/). Support: mobile.support@zhukovskyi.space.
 
-## Calculators
+## Apps you can install now
+
+### HVAC Charge: Superheat & PT
+
+Superheat, subcooling and PT charts for R-454B, R-32, R-410A and more. Offline, no account. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/hvac-charge.html
+
+Built for service techs on the roof, not in the office. Enter gauge pressure and line temperature; saturation, superheat and subcooling update as you type, from published manufacturer PT charts.
+
+Free:
+- Superheat and subcooling with R-410A, R-454B, R-32 and R-22
+- Pressure ↔ temperature lookup with bubble and dew points
+- Works offline, no login, no ads
+
+Pro:
+- All 22 refrigerants: R-404A, R-134a, R-407C, R-448A, R-1234yf, R-290, CO2 and more
+- Target superheat for fixed-orifice (piston) systems from the manufacturer charging table
+- Clear add / recover call against the target
+- Saved readings with notes to share with the office or customer
+
+Free in the browser, same formulas: [Superheat & subcooling calculator](https://andronaft.github.io/dredev-tools/hvac/superheat-subcooling-calculator.html).
+
+### CoatCalc: Epoxy Floor Coating
+
+Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/coatcalc.html
+
+For garage-floor and concrete-coating installers. Order the right number of kits, check if you can coat today, and send a professional quote before you leave the driveway.
+
+Free:
+- Coverage: gallons and kits from area, mils, solids and waste, with a save-a-kit tip
+- Flake pounds and bags
+- Dew point: can I coat today?
+- Job estimate with materials and cost
+
+Pro:
+- Crack and joint filler, cove and stem wall, partial-kit A:B mixer
+- Pot life and recoat times adjusted for temperature
+- PDF quotes, saved jobs and a supplier order list
+- Client price on every estimate
+
+Free in the browser, same formulas: [Epoxy coverage calculator](https://andronaft.github.io/dredev-tools/coating/epoxy-coverage-calculator.html).
+
+### PoolPro: Chemistry & Route
+
+Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/poolpro.html
+
+PoolPro turns a pool test into exact doses for the chemicals already on your shelf, in the order to add them. For pool owners and pool service techs. Offline, no account, no ads and no brand pushing.
+
+Free:
+- Doses for FC, pH, TA, calcium, CYA and salt
+- Liquid chlorine, cal-hypo, dichlor, trichlor, acid, baking soda and more, or your own product
+- TFP-style FC/CYA targets and CSI
+- Gallons, ounces and pounds, or litres and grams
+
+Pro:
+- Unlimited pools, each with its own log
+- Weekly service route with directions
+- PDF report for every client visit
+- CSV export of every test
+
+Free in the browser, same formulas: [Pool chemical calculator](https://andronaft.github.io/dredev-tools/pool/pool-chemical-calculator.html).
+
+### SoftWash Pro: Mix & Quote
+
+Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/softwash.html
+
+For soft wash and pressure washing businesses. Mix sodium hypochlorite right, know the real strength that hits the wall, and send a clean PDF quote before you leave the driveway.
+
+Free:
+- Tank mix: SH, water and surfactant from the SH you actually have
+- One-tap targets for house, roof, concrete, fence and deck
+- Downstream and proportioner math: draw ratio to % at the surface
+- Bucket test for your injector's real draw
+
+Pro:
+- Unlimited quotes with your price
+- PDF quotes with your company name
+- Job history: quoted, booked, done
+- Chemical load list for the truck
+
+### RoofCalc: Roofing Calculator
+
+Roofing calculator: squares from the footprint and pitch, every material and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/roofcalc.html
+
+For roofers who bid jobs every week. Measure from the ground, get the squares and every material, and send a PDF quote before you leave the driveway. No ads, works offline.
+
+Free:
+- Sloped area from length, span, overhang and pitch, gable or hip
+- Eaves, rakes, ridge, hips and valleys worked out for you
+- Shingle bundles with waste by roof type
+- Starter, ridge cap, drip edge, underlayment, ice & water and nails
+
+Pro:
+- PDF quotes with your company name
+- Saved estimates and supplier order list
+- Multi-section roofs: house, garage, porch
+- Tear-off tons and ice barrier by code
+
+### SlabCalc: Concrete & Rebar
+
+Concrete calculator: cubic yards and bags, rebar, mesh and forms on a feet-inch keypad. Pay once, no ads. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/slabcalc.html
+
+For contractors and serious DIYers. Type 12' 6½" in five taps and get yards, bags, rebar and forms while you type. Pro is a one-time purchase.
+
+Free:
+- Slabs, footings, pads, columns, sonotubes and post holes
+- Cubic yards, cubic feet or m³ with waste
+- Ready-mix rounded to the next ¼ yard
+- 80, 60 and 40 lb bags, or 25 and 30 kg
+
+Pro:
+- Walls, stairs and every concrete shape
+- Rebar grid: bars, sticks, laps and weight
+- Wire mesh, form boards and stakes
+- Ready-mix vs bags cost with your prices
+- Jobs: every pour in one order
+
+### SiteLog: Daily Report & Snags
+
+Daily site reports and punch lists with photos. A PDF in one tap. Works offline. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/sitelog.html
+
+The fast, offline site diary for contractors who run their own jobs. Write the daily report in two minutes, walk the site with a punch list, and send a clean PDF before you leave.
+
+Free:
+- Weather, crew and hours with man-hours added up
+- Yesterday's crew already filled in
+- Work done, deliveries, delays, inspections and photos
+- Punch list with photos, locations, trades and due dates
+
+Pro:
+- Unlimited projects (free: 1)
+- Unlimited photos on every report and snag
+- Your logo on every PDF
+- Punch list PDF for one trade at a time
+
+### Lye Calc: Soap Recipes
+
+Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/lye-calc.html
+
+A soap making calculator that gets the lye right and never loses your recipes. Add oils by weight or percent, set superfat and water, and see exactly what to weigh.
+
+Free:
+- NaOH, KOH or dual lye, with lye purity
+- Lye amounts from published SAP values
+- Superfat, water and fragrance
+- Soap qualities and fatty acid profile
+- 78 oils, butters and fats; 8 starter recipes
+- Save up to 5 recipes
+
+Pro:
+- Unlimited saved recipes
+- Batch cost and cost per bar
+- Wholesale and retail prices with your profit per bar
+- Printable recipe sheet (PDF)
+- Resize any recipe to a new batch size
+
+Free in the browser, same formulas: [Lye calculator](https://andronaft.github.io/dredev-tools/soap/lye-calculator.html).
+
+### Focus Sprint: ADHD Timer
+
+An ADHD-friendly focus timer: tiny sprints, a kind buddy and a soft app shield. No guilt. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/focus-sprint.html
+
+Starting is the hard part, so Focus Sprint makes it tiny: tap "Just 5 minutes" and Spark, your focus buddy, keeps you company until the timer ends. Ended early? You keep your XP. Got distracted? Spark says something kind and you try again.
+
+Free:
+- Sprints from "Just 5 minutes" to 50 minutes
+- Energy check that suggests a sprint length
+- Spark, a body-doubling buddy
+- Soft app shield and a parking lot for stray thoughts
+- Forgiving streaks, XP, badges and quests
+- Home screen widget, calm noise, breathing breaks
+
+Pro:
+- Peak-hour insights: when your brain is sharpest
+- Custom sprint lengths
+- Unlimited apps on your shield
+
+### Water Buddy: Drink Reminder
+
+A cute water tracker: fill up Buddy, hit your daily goal, unlock outfits and keep your streak. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://andronaft.github.io/dredev-tools/apps/water-buddy.html
+
+Drinking enough water is easier with a friend. Buddy is a little water drop who fills up every time you drink and gets happier as you go. Log a glass in one tap, hit your goal and celebrate with confetti.
+
+Free:
+- One-tap logging with a glass, a bottle or any amount
+- Daily goal based on your weight and activity
+- Gentle reminders, only while you are awake
+- Streaks, weekly chart, light and dark themes
+
+Pro:
+- 30-day history and insights
+- Your own reminder schedule
+- Custom cup sizes
+- Every Buddy outfit, unlocked
+
+## Free calculators
 
 - [Superheat & subcooling calculator](https://andronaft.github.io/dredev-tools/hvac/superheat-subcooling-calculator.html): R-454B, R-32, R-410A, R-22 with PT lookup.
 - [Refrigerant PT charts](https://andronaft.github.io/dredev-tools/hvac/pt-chart/index.html): 22 refrigerants, bubble and dew columns.
@@ -21,25 +215,14 @@ Made by Andrii Zhukovskyi, an independent developer: https://zhukovskyi.space/ .
 
 Pressure-temperature tables with bubble and dew columns: [R-410A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-410a.html), [R-454B](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-454b.html), [R-32](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-32.html), [R-22](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-22.html), [R-134a](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-134a.html), [R-404A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-404a.html), [R-407C](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-407c.html), [R-407A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-407a.html), [R-448A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-448a.html), [R-449A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-449a.html), [R-452A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-452a.html), [R-513A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-513a.html), [R-1234yf](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-1234yf.html), [R-507A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-507a.html), [R-427A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-427a.html), [R-408A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-408a.html), [R-409A](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-409a.html), [R-290](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-290.html), [R-600a](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-600a.html), [R-744](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-744.html), [R-717](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-717.html), [R-12](https://andronaft.github.io/dredev-tools/hvac/pt-chart/r-12.html).
 
-## Apps
+## Coming soon
 
-- [HVAC Charge: Superheat & PT](https://andronaft.github.io/dredev-tools/apps/hvac-charge.html): Superheat, subcooling and PT charts for R-454B, R-32, R-410A and more. Offline, no account. Status: free closed test on Google Play, App Store coming.
-- [Electrician Calc: Wire & Panel](https://andronaft.github.io/dredev-tools/apps/electrician-calc.html): Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364. Status: coming soon.
-- [CoatCalc: Epoxy Floor Coating](https://andronaft.github.io/dredev-tools/apps/coatcalc.html): Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Status: free closed test on Google Play, App Store coming.
-- [Days Until: Countdown Widget](https://andronaft.github.io/dredev-tools/apps/days-until.html): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too. Status: coming soon.
-- [Focus Sprint: ADHD Timer](https://andronaft.github.io/dredev-tools/apps/focus-sprint.html): An ADHD-friendly focus timer: tiny sprints, a kind buddy and a soft app shield. No guilt. Status: free closed test on Google Play, App Store coming.
-- [Water Buddy: Drink Reminder](https://andronaft.github.io/dredev-tools/apps/water-buddy.html): A cute water tracker: fill up Buddy, hit your daily goal, unlock outfits and keep your streak. Status: free closed test on Google Play, App Store coming.
-- [Fastwise: Fasting Tracker](https://andronaft.github.io/dredev-tools/apps/fastwise.html): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits. Status: coming soon.
-- [PoolPro: Chemistry & Route](https://andronaft.github.io/dredev-tools/apps/poolpro.html): Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route. Status: free closed test on Google Play, App Store coming.
-- [SoftWash Pro: Mix & Quote](https://andronaft.github.io/dredev-tools/apps/softwash.html): Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes. Status: free closed test on Google Play, App Store coming.
-- [RoofCalc: Roofing Calculator](https://andronaft.github.io/dredev-tools/apps/roofcalc.html): Roofing calculator: squares from the footprint and pitch, every material and PDF quotes. Status: free closed test on Google Play, App Store coming.
-- [SlabCalc: Concrete & Rebar](https://andronaft.github.io/dredev-tools/apps/slabcalc.html): Concrete calculator: cubic yards and bags, rebar, mesh and forms on a feet-inch keypad. Pay once, no ads. Status: free closed test on Google Play, App Store coming.
-- [PaintBid: Painting Estimator](https://andronaft.github.io/dredev-tools/apps/paintbid.html): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline. Status: coming soon.
-- [SiteLog: Daily Report & Snags](https://andronaft.github.io/dredev-tools/apps/sitelog.html): Daily site reports and punch lists with photos. A PDF in one tap. Works offline. Status: free closed test on Google Play, App Store coming.
-- [Lye Calc: Soap Recipes](https://andronaft.github.io/dredev-tools/apps/lye-calc.html): Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost. Status: free closed test on Google Play, App Store coming.
-- [Leben in Deutschland: тест UA](https://andronaft.github.io/dredev-tools/apps/leben-in-deutschland.html): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами. Status: coming soon.
+- [Electrician Calc: Wire & Panel](https://andronaft.github.io/dredev-tools/apps/electrician-calc.html): Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364.
+- [PaintBid: Painting Estimator](https://andronaft.github.io/dredev-tools/apps/paintbid.html): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.
+- [Days Until: Countdown Widget](https://andronaft.github.io/dredev-tools/apps/days-until.html): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too.
+- [Fastwise: Fasting Tracker](https://andronaft.github.io/dredev-tools/apps/fastwise.html): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits.
+- [Leben in Deutschland: тест UA](https://andronaft.github.io/dredev-tools/apps/leben-in-deutschland.html): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.
 
 ## Optional
 
-- [All apps and screenshots](https://zhukovskyi.space/apps/): the developer site.
-- [Become a tester](https://zhukovskyi.space/testers/): Google Play closed tests and TestFlight.
+- [All Dre Dev apps](https://zhukovskyi.space/apps/): the developer site, with screenshots.
