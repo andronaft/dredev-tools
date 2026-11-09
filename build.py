@@ -935,19 +935,22 @@ def build_apps():
 
 # ---------- Home ----------
 
+CALCS = [
+    ("hvac/superheat-subcooling-calculator.html", "HVAC", "Superheat & subcooling calculator", "R-454B, R-32, R-410A, R-22 with PT lookup.", "t-hvac"),
+    ("hvac/pt-chart/index.html", "HVAC", "Refrigerant PT charts", f"{len(PT)} refrigerants, bubble and dew columns.", "t-hvac"),
+    ("electrical/voltage-drop-calculator.html", "Electrical", "Voltage drop calculator", "AWG or mm², copper or aluminum, minimum size for 3 %.", "t-elec"),
+    ("coating/epoxy-coverage-calculator.html", "Coatings", "Epoxy coverage calculator", "Gallons and kits from area, mils and solids.", "t-coat"),
+    ("electrical/wire-size-calculator.html", "Electrical", "Wire size calculator", "NEC 310.16 conductor and breaker, with voltage drop.", "t-elec"),
+    ("electrical/awg-to-mm2.html", "Electrical", "AWG to mm² converter", "AWG and kcmil to mm² and back.", "t-elec"),
+    ("pool/pool-chemical-calculator.html", "Pool", "Pool chemical calculator", "Chlorine, baking soda, stabilizer and salt doses.", "t-pool"),
+    ("bread/bakers-percentage-calculator.html", "Baking", "Baker's percentage calculator", "Sourdough flour, water, starter and salt.", "t-bread"),
+    ("soap/lye-calculator.html", "Soap", "Lye calculator", "NaOH and water for cold process soap.", "t-soap"),
+    ("countdown/christmas-countdown.html", "Countdown", "Days until Christmas", "Live countdown to Christmas and New Year.", "t-days"),
+]
+
+
 def build_home():
-    calcs = [
-        ("hvac/superheat-subcooling-calculator.html", "HVAC", "Superheat & subcooling calculator", "R-454B, R-32, R-410A, R-22 with PT lookup.", "t-hvac"),
-        ("hvac/pt-chart/index.html", "HVAC", "Refrigerant PT charts", f"{len(PT)} refrigerants, bubble and dew columns.", "t-hvac"),
-        ("electrical/voltage-drop-calculator.html", "Electrical", "Voltage drop calculator", "AWG or mm², copper or aluminum, minimum size for 3 %.", "t-elec"),
-        ("coating/epoxy-coverage-calculator.html", "Coatings", "Epoxy coverage calculator", "Gallons and kits from area, mils and solids.", "t-coat"),
-        ("electrical/wire-size-calculator.html", "Electrical", "Wire size calculator", "NEC 310.16 conductor and breaker, with voltage drop.", "t-elec"),
-        ("electrical/awg-to-mm2.html", "Electrical", "AWG to mm² converter", "AWG and kcmil to mm² and back.", "t-elec"),
-        ("pool/pool-chemical-calculator.html", "Pool", "Pool chemical calculator", "Chlorine, baking soda, stabilizer and salt doses.", "t-pool"),
-        ("bread/bakers-percentage-calculator.html", "Baking", "Baker's percentage calculator", "Sourdough flour, water, starter and salt.", "t-bread"),
-        ("soap/lye-calculator.html", "Soap", "Lye calculator", "NaOH and water for cold process soap.", "t-soap"),
-        ("countdown/christmas-countdown.html", "Countdown", "Days until Christmas", "Live countdown to Christmas and New Year.", "t-days"),
-    ]
+    calcs = CALCS
     calc_cards = "".join(f'<a class="card {t}" href="{{rel}}{p}"><span class="tag">{tag}</span><h3>{e(h)}</h3><p>{e(d)}</p></a>' for p, tag, h, d, t in calcs)
     def app_cards(group):
         return "".join(
@@ -973,6 +976,42 @@ def build_home():
           body)
 
 
+def write_llms():
+    """llms.txt (llmstxt.org): a plain summary of the site for AI assistants."""
+    calc_lines = "\n".join(f"- [{h}]({BASE}/{p}): {d}" for p, _, h, d, _ in CALCS)
+    pt_lines = ", ".join(f"[{rid}]({BASE}/hvac/pt-chart/{slug(rid)}.html)" for rid in PT)
+    def state(c):
+        if c["google_play_live"] or c["app_store_url"]:
+            return "available"
+        return "free closed test on Google Play, App Store coming" if c.get("status") == "testing" else "coming soon"
+    app_lines = "\n".join(f'- [{CFG["apps"][k]["name"]}]({BASE}/apps/{k}.html): {a["tagline"]} Status: {state(CFG["apps"][k])}.'
+                           for k, a in APPS.items())
+    dev = CFG["developer_site"]
+    (OUT / "llms.txt").write_text(f"""# {CFG["brand"]} Tools
+
+> Free browser calculators for HVAC techs, electricians, floor coating installers, pool techs, bakers and soap makers, plus the {CFG["brand"]} phone apps they come from. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC); formulas match the apps. No account, no ads, no tracking cookies.
+
+Made by Andrii Zhukovskyi, an independent developer: {dev}/ . Support: {CFG["support_email"]}. Apps work offline and keep data on the phone.
+
+## Calculators
+
+{calc_lines}
+
+## Refrigerant PT charts
+
+Pressure-temperature tables with bubble and dew columns: {pt_lines}.
+
+## Apps
+
+{app_lines}
+
+## Optional
+
+- [All apps and screenshots]({dev}/apps/): the developer site.
+- [Become a tester]({dev}/testers/): Google Play closed tests and TestFlight.
+""")
+
+
 def main():
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -992,6 +1031,7 @@ def main():
     (OUT / ".nojekyll").write_text("")
     if CFG.get("indexnow_key"):  # IndexNow (Bing, Yandex): the key file proves the site is ours
         (OUT / f'{CFG["indexnow_key"]}.txt').write_text(CFG["indexnow_key"])
+    write_llms()
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
     urls = "".join(f"<url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in pages)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
