@@ -25,6 +25,26 @@ Pro:
 
 Free in the browser, same formulas: [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html).
 
+### Electrician Calc: Wire & Panel
+
+Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364. Available on the App Store. Page: https://zhukovskyi.space/calculators/apps/electrician-calc.html
+
+Real ampacity tables, correction factors and protection checks with every step shown. NEC (AWG, feet) or IEC 60364 (mm², metres), picked from your region and switched with one tap.
+
+Free:
+- Cable size with ampacity, derating and voltage-drop check
+- Voltage drop: volts, %, end voltage, minimum size
+- Power and Ohm's law for DC, single and three phase
+
+Pro:
+- Panel planner: circuits to breakers, cables and RCD groups
+- Motor circuits, fault level, load schedule, PF correction
+- Earth fault loop, earthing conductors and electrodes
+- Solar PV strings, battery and backup power sizing
+- Unlimited projects with PDF reports
+
+Free in the browser, same formulas: [Voltage drop calculator](https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html).
+
 ### CoatCalc: Epoxy Floor Coating
 
 Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/coatcalc.html
@@ -163,7 +183,7 @@ Free in the browser, same formulas: [Lye calculator](https://zhukovskyi.space/ca
 
 ### Focus Sprint: ADHD Timer
 
-An ADHD-friendly focus timer: tiny sprints, a kind buddy and a soft app shield. No guilt. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/focus-sprint.html
+An ADHD-friendly focus timer: tiny sprints, a kind buddy and a soft app shield. No guilt. Available on Google Play. Page: https://zhukovskyi.space/calculators/apps/focus-sprint.html
 
 Starting is the hard part, so Focus Sprint makes it tiny: tap "Just 5 minutes" and Spark, your focus buddy, keeps you company until the timer ends. Ended early? You keep your XP. Got distracted? Spark says something kind and you try again.
 
@@ -217,7 +237,6 @@ Pressure-temperature tables with bubble and dew columns: [R-410A](https://zhukov
 
 ## Coming soon
 
-- [Electrician Calc: Wire & Panel](https://zhukovskyi.space/calculators/apps/electrician-calc.html): Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364.
 - [PaintBid: Painting Estimator](https://zhukovskyi.space/calculators/apps/paintbid.html): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.
 - [Days Until: Countdown Widget](https://zhukovskyi.space/calculators/apps/days-until.html): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too.
 - [Fastwise: Fasting Tracker](https://zhukovskyi.space/calculators/apps/fastwise.html): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits.

@@ -22,7 +22,7 @@
       "short": "Electrician Calc",
       "package": "com.andrii.electriccalc",
       "repo_dir": "Calculator_for_electrical",
-      "app_store_url": "",
+      "app_store_url": "https://apps.apple.com/app/id6830185126",
       "google_play_live": false,
       "beta_group_url": "",
       "status": "soon"
@@ -53,7 +53,7 @@
       "package": "com.andrii.focus_sprint",
       "repo_dir": "adhd_neurodiversity",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
