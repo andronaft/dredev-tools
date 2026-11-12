@@ -22,6 +22,7 @@ STEP = 5
 # One switch for the question "what is free on the web": refrigerants with a live calculator on their page.
 # None means all of them. The app keeps R-410A, R-454B, R-32 and R-22 free and the rest in Pro; with a smaller set
 # here the other pages keep the worked examples and tables and lose only the live calculator.
+# Decided by Andrii on 12 Nov 2026: all refrigerants and the target superheat calculator stay live and free on the web.
 LIVE_REFRIGERANTS = None
 TARGET_SUPERHEAT_LIVE = True  # same question for the fixed-orifice target superheat calculator (Pro in the app)
 
