@@ -81,7 +81,9 @@ img { max-width: 100%; height: auto; }
 .top nav { display: flex; gap: 18px; font-size: 15px; }
 .top nav a { color: var(--muted); text-decoration: none; }
 .top nav a:hover { color: var(--fg); }
-@media (max-width: 560px) { .top nav a.hide-sm { display: none; } }
+.top nav a[aria-current="page"] { color: var(--fg); font-weight: 600; }
+@media (max-width: 560px) { .top nav a.hide-sm { display: none; } .top nav { gap: 14px; } }
+.top nav.subnav { gap: 6px 16px; font-size: 14px; padding: 0 0 10px; overflow-x: auto; white-space: nowrap; }
 
 .hero { padding: 44px 0 20px; }
 .hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
@@ -167,6 +169,18 @@ ul.ticks li::before { content: "✓"; color: var(--accent); font-weight: 800; ma
 footer { border-top: 1px solid var(--line); margin-top: 56px; padding: 24px 0 40px; color: var(--muted); font-size: 14px; }
 footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
 footer a { color: var(--muted); }
+footer nav { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+
+/* under every page: author, one shared disclaimer, methodology and error report */
+.trust { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); max-width: 760px; }
+.trust .note { margin: 6px 0 0; }
+.byline a, .trust a { color: inherit; }
+.method h3 { font-size: 15px; margin: 16px 0 4px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.method ul, .prose ol { margin: 0; padding-left: 20px; color: var(--muted); max-width: 760px; }
+.method li, .prose ol li { margin: 4px 0; }
+.method h2 a { color: inherit; }
+table.wraps th, table.wraps td { white-space: normal; text-align: left; vertical-align: top; }
+table.wraps small { color: var(--muted); }
 
 [hidden] { display: none !important; }
 #oils { display: grid; gap: 8px; }

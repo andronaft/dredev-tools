@@ -3,11 +3,17 @@
 The numbers are computed here with the same formulas as assets/calc.js, so the page text, the tables and the
 live calculator agree. Crawlers and AI search read this HTML; the live result needs JavaScript.
 """
+import json
 import math
+from datetime import date
 from html import escape as e
+from pathlib import Path
 
-UPDATED = "November 2026"
 AUTHOR = "Andrii Zhukovskyi"
+ABOUT = "https://zhukovskyi.space/about/"  # who makes these tools
+# The day the sources were last read against the checked examples (verification.json).
+CHECKED = date.fromisoformat(json.loads((Path(__file__).resolve().parent / "verification.json").read_text())["checked"])
+CHECKED_TEXT = f"{CHECKED.day} {CHECKED:%B %Y}"
 
 # ---------- shared ----------
 
@@ -29,7 +35,9 @@ def example(title, steps, result):
 
 
 def guide(h2, parts):
-    by = f'<p class="note byline">Made and checked by {AUTHOR}. Formulas and sources are in the questions below. Updated {UPDATED}.</p>'
+    by = (f'<p class="note byline">Made and checked by <a href="{ABOUT}">{AUTHOR}</a>. Formulas and sources are in the questions below '
+          f'and in the <a href="{{rel}}methodology.html">methodology</a>. Checked against the sources on {CHECKED_TEXT}: '
+          f'<a href="{{rel}}verification.html">see the examples</a>.</p>')
     return f'<section class="guide"><h2>{h2}</h2>{"".join(parts)}{by}</section>'
 
 

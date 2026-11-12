@@ -6,6 +6,10 @@
   "policy_base": "https://andronaft-2.github.io/app_politics_and_terms",
   "developer_site": "https://zhukovskyi.space",
   "tester_signup": "https://forms.gle/Vn9wgynXFbegDsWS7",
+  "same_as": [
+    "https://play.google.com/store/apps/developer?id=Dre+Dev",
+    "https://apps.apple.com/developer/id6830184505"
+  ],
   "apps": {
     "hvac-charge": {
       "name": "HVAC Charge: Superheat & PT",
