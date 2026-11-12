@@ -240,7 +240,9 @@ def coat_guide():
     rows = [[f"{m} mils"] + [f"{fmt(SQFT_PER_GAL_1MIL * s / 100 / m)} sq ft" for s in solids] for m in (3, 5, 8, 10, 15, 20, 30)]
     t = table("Coverage per US gallon by dry film thickness and solids by volume",
               ["Thickness (DFT)", "100 % solids", "80 % solids", "70 % solids", "50 % solids"], rows,
-              "Before waste. Porous or profiled concrete takes more on the first coat.")
+              "Before waste. Porous or profiled concrete takes more on the first coat. Source: one US gallon spread 1 mil thick covers "
+              '1,604 sq ft (<a href="https://www.neogard.com/news/id/theoretical-vs-actual-coverage-rates">Neogard, "Theoretical vs. actual coverage rates"</a>); '
+              "coverage = 1,604 × solids ÷ mils. Checked 12 November 2026.")
     gal = 480 * 10 / SQFT_PER_GAL_1MIL * 1.10
     kits = math.ceil(gal / 1.5 - 1e-9)
     ex = example("two-car garage, 480 sq ft at 10 mils", [
@@ -252,8 +254,9 @@ def coat_guide():
                  "a 50 % solids product at the same dry thickness covers 80 sq ft. A 480 sq ft two-car garage at 10 mils needs about "
                  f"{gal:.1f} gallons with 10 % waste.")
     faqs = [("How much epoxy for a 2 car garage?",
-             f"About 400–500 sq ft. At 10 mils with a 100 % solids epoxy and 10 % waste that is {gal:.1f} gallons for 480 sq ft. "
-             "A typical flake system adds a primer coat and a clear topcoat, each sized the same way.")]
+             f"Measure the floor first: garages vary. At 10 mils with a 100 % solids epoxy and 10 % waste, 480 sq ft takes {gal:.1f} gallons. "
+             "A flake system adds a primer coat and a clear topcoat, each sized the same way. The "
+             '<a href="{rel}coating/garage-floor-epoxy-calculator.html">garage floor epoxy calculator</a> has one, two and three car examples by system.')]
     return ans, guide("Coverage chart and worked example", [t, ex]), faqs
 
 
@@ -289,7 +292,9 @@ def pool_guide():
              ["Stabilizer (CYA) +10 ppm", "Cyanuric acid", f"{cya:.2f} lb"],
              ["Salt +500 ppm", "Pool salt", f"{salt:.0f} lb"]]
     t = table("Doses per 10,000 US gallons", ["To raise", "Product", "Amount"], rows,
-              "Scale linearly: 20,000 gallons needs twice as much, a 2 ppm rise twice as much. Add in portions and retest.")
+              "Scale linearly: 20,000 gallons needs twice as much, a 2 ppm rise twice as much. Add in portions and retest. "
+              "Source: stoichiometry (ppm × litres = milligrams, by molar mass and label strength), the same maths as PoolPro, "
+              "cross-checked with Trouble Free Pool's Pool Math (10 % liquid chlorine: 12.79 fl oz). Checked 25 October 2026.")
     amt, _ = fc_dose("Liquid chlorine 10 %", 3, 15000)
     ex = example("15,000 gallons, free chlorine from 2 to 5 ppm", [
         "Rise needed: 5 − 2 = 3 ppm.",
@@ -300,7 +305,10 @@ def pool_guide():
                  f"{fc_dose('Bleach 6 %', 1, 10000)[0]:.0f} fl oz of 6 % bleach or {fc_dose('Cal-hypo 65 %', 1, 10000)[0]:.1f} oz of 65 % cal-hypo. "
                  f"{soda:.1f} lb of baking soda raises total alkalinity by 10 ppm.")
     faqs = [("How much baking soda to raise alkalinity 10 ppm?",
-             f"{soda:.2f} lb (about {soda * 453.592 / 1000:.2f} kg) of baking soda per 10,000 US gallons. For 20,000 gallons, twice that.")]
+             f"{soda:.2f} lb (about {soda * 453.592 / 1000:.2f} kg) of baking soda per 10,000 US gallons. For 20,000 gallons, twice that."),
+            ("How much chlorine do I add for my pool's size?",
+             'See <a href="{rel}pool/how-much-chlorine-to-add.html">how much chlorine to add to a pool</a>: liquid chlorine, cal-hypo, dichlor and trichlor '
+             "by gallons, with what each one leaves behind in the water and the safety rules.")]
     return ans, guide("Dose chart and worked example", [t, ex]), faqs
 
 
@@ -322,7 +330,8 @@ def bread_guide():
         rows.append([f"{h} %", f"{fmt(w)} g", f"{fmt(s)} g", f"{sa:.0f} g", f"{fmt(500 + w + s + sa)} g", f"{true:.1f} %"])
     t = table("500 g flour, 20 % starter at 100 % hydration, 2 % salt",
               ["Hydration", "Water", "Starter", "Salt", "Dough", "True hydration"], rows,
-              "True hydration counts the flour and water inside the starter. With a 100 % starter it stays close to the nominal figure.")
+              "True hydration counts the flour and water inside the starter. With a 100 % starter it stays close to the nominal figure. "
+              "Plain arithmetic from baker's percentages (every ingredient as a share of the flour weight), the same as in the Levain app; no outside data.")
     w, s, sa, true = bread(500, 0.75)
     ex = example("one loaf at 75 % hydration", [
         "Flour is 100 %: 500 g.",
@@ -343,7 +352,8 @@ def lye_guide(oils):
     rows = [[o["name"], f"{o['sap']:.3f}", f"{o['sap'] * KOH_TO_NAOH * 100:.2f} g", f"{o['sap'] * KOH_TO_NAOH * 95:.2f} g"]
             for o in sorted(oils, key=lambda o: o["name"])]
     t = table("Sodium hydroxide per 100 g of oil", ["Oil", "SAP (KOH)", "NaOH at 0 % superfat", "NaOH at 5 % superfat"], rows,
-              "SAP values from the SoapCalc oil list. Suppliers' oils vary, so run your full recipe through the calculator.")
+              'Source: SAP values from the <a href="https://soapcalc.net/oil-list">SoapCalc oil list</a> as shipped in the Lye Calc app, converted to NaOH by '
+              "molar mass (39.997 ÷ 56.106). Snapshot of 25 October 2026. Suppliers' oils vary, so run your full recipe through the calculator.")
     by = {o["id"]: o for o in oils}
     olive, coco = by.get("olive"), by.get("coconut76")
     parts = [t]

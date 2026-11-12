@@ -1,19 +1,167 @@
 {
  "https://zhukovskyi.space/calculators/": {
-  "hash": "f2307c15b3a63d01",
-  "date": "2026-11-12"
+  "hash": "d0f2059bcce883e8",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/bread/bakers-percentage-calculator.html": {
-  "hash": "be62527e43d0209b",
-  "date": "2026-11-12"
+  "hash": "396905921d4c3f58",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/brewing/honey-per-gallon-calculator.html": {
+  "hash": "b6f7becbfb4e15d5",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html": {
+  "hash": "0e64841f7f87cf5a",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/candles/candle-wax-calculator.html": {
+  "hash": "3a325ebc11aa5028",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/candles/fragrance-load-calculator.html": {
+  "hash": "fde07f1fd2caf169",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
-  "hash": "a2b5729668ba246c",
-  "date": "2026-11-12"
+  "hash": "79b31582a5402a81",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
-  "hash": "05ab0414617ae4f2",
-  "date": "2026-11-12"
+  "hash": "c7dcb1a88bb188a6",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/coating/garage-floor-epoxy-calculator.html": {
+  "hash": "7d0af723757d2ba4",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/coffee/espresso-ratio-calculator.html": {
+  "hash": "569779cfc9c6efd5",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/10x10-concrete-slab.html": {
+  "hash": "b85208359c9ad414",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/10x12-concrete-slab.html": {
+  "hash": "3320a50262a8b8a0",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/10x20-concrete-slab.html": {
+  "hash": "373a7aa89f91f25d",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/12x12-concrete-slab.html": {
+  "hash": "cb184d02a9940fbd",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/12x16-concrete-slab.html": {
+  "hash": "043ace689eb3b73b",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/12x20-concrete-slab.html": {
+  "hash": "0e255ab344c60d46",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/12x24-concrete-slab.html": {
+  "hash": "c2a3bbdd8849507c",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/14x20-concrete-slab.html": {
+  "hash": "1a9e92b932fb1766",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/16x16-concrete-slab.html": {
+  "hash": "03a097d22d6f4832",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/16x20-concrete-slab.html": {
+  "hash": "6feba6bb4f614826",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/16x24-concrete-slab.html": {
+  "hash": "b1a5c287baeaf9ca",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/18x20-concrete-slab.html": {
+  "hash": "65c5d74da51c55de",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/20x20-concrete-slab.html": {
+  "hash": "4a870cb32ddbe9fc",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/20x24-concrete-slab.html": {
+  "hash": "fe20d072dcbfc021",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/20x30-concrete-slab.html": {
+  "hash": "7015bdcda123da5f",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/20x40-concrete-slab.html": {
+  "hash": "7f3281fa5f82f734",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/24x24-concrete-slab.html": {
+  "hash": "1dcff630999e2751",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/24x30-concrete-slab.html": {
+  "hash": "b19547da30d1b839",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/24x36-concrete-slab.html": {
+  "hash": "093fa02b7515b7a4",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/24x40-concrete-slab.html": {
+  "hash": "582f6f7004ce91c2",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/30x30-concrete-slab.html": {
+  "hash": "112086b0caac6784",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/30x40-concrete-slab.html": {
+  "hash": "9b5dc449f65f4ff9",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/30x50-concrete-slab.html": {
+  "hash": "39d18bc1089ae24c",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/30x60-concrete-slab.html": {
+  "hash": "719a569df6bff471",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/40x40-concrete-slab.html": {
+  "hash": "cedebf3c2c1d5e54",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/40x50-concrete-slab.html": {
+  "hash": "c3b6c4b557648621",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/40x60-concrete-slab.html": {
+  "hash": "09ab67680b9ebb4e",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/40x80-concrete-slab.html": {
+  "hash": "a5bbcdf1ac8e683a",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/50x100-concrete-slab.html": {
+  "hash": "48dbf08c49ce67c1",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/60x100-concrete-slab.html": {
+  "hash": "a10cfa3bde40c848",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html": {
+  "hash": "4acdb73cc9321335",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/countdown/christmas-countdown.html": {
   "hash": "55101dcd02f27b9e",
@@ -30,6 +178,10 @@
  "https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html": {
   "hash": "41acb2a5c7b49e66",
   "date": "2026-11-12"
+ },
+ "https://zhukovskyi.space/calculators/embed/": {
+  "hash": "4e78659504b4b38d",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/": {
   "hash": "92d1d0795fccf4f2",
@@ -127,17 +279,97 @@
   "hash": "585194bd11df4251",
   "date": "2026-11-12"
  },
+ "https://zhukovskyi.space/calculators/hydroponics/ec-chart-by-crop.html": {
+  "hash": "08ff87fac57f1700",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/hydroponics/ec-to-ppm-converter.html": {
+  "hash": "1a8a6b79ae7d3b6a",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/knitting/gauge-calculator.html": {
+  "hash": "44872e2e02e85257",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/knitting/yarn-yardage-calculator.html": {
+  "hash": "38132220a02a0f3b",
+  "date": "2026-11-13"
+ },
  "https://zhukovskyi.space/calculators/methodology.html": {
-  "hash": "250e9ff1539a6b8e",
-  "date": "2026-11-12"
+  "hash": "ba86e41e8fa7fac7",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/chlorine-for-10000-gallon-pool.html": {
+  "hash": "3220e81cea7a4f11",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/chlorine-for-15000-gallon-pool.html": {
+  "hash": "b3de175987b2aef5",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/chlorine-for-20000-gallon-pool.html": {
+  "hash": "32c499c44c55c6e7",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/chlorine-for-25000-gallon-pool.html": {
+  "hash": "f8954f39509351e9",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/chlorine-for-30000-gallon-pool.html": {
+  "hash": "e11a5b65ff57fbef",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/chlorine-for-5000-gallon-pool.html": {
+  "hash": "2385a929457aa661",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html": {
+  "hash": "dfa270452dad28c9",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/pool/pool-chemical-calculator.html": {
-  "hash": "4da0adb8006a236f",
-  "date": "2026-11-12"
+  "hash": "231bac4a84b6aa5c",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html": {
+  "hash": "67f44e728aade254",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/roofing/shingle-bundles-calculator.html": {
+  "hash": "2f548201cd49d068",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/": {
+  "hash": "62ec524476afbcfa",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/2-2-3-pitman.html": {
+  "hash": "32ba2a0c67006b81",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/3-on-3-off.html": {
+  "hash": "b2bd15f30517d872",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/4-on-3-off.html": {
+  "hash": "e8e17c43e6e87438",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/4-on-4-off.html": {
+  "hash": "7bac7c5ae496be10",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/continental.html": {
+  "hash": "d624eb8b46b521a6",
+  "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/shifts/dupont.html": {
+  "hash": "1748ba8b9f24e108",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/soap/lye-calculator.html": {
-  "hash": "55d1597ce6785436",
-  "date": "2026-11-12"
+  "hash": "e09507dabe31bfeb",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/verification.html": {
   "hash": "31318989def77840",

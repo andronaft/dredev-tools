@@ -230,6 +230,22 @@ Pro:
 - [Baker's percentage calculator](https://zhukovskyi.space/calculators/bread/bakers-percentage-calculator.html): Sourdough flour, water, starter and salt.
 - [Lye calculator](https://zhukovskyi.space/calculators/soap/lye-calculator.html): NaOH and water for cold process soap.
 - [Days until Christmas](https://zhukovskyi.space/calculators/countdown/christmas-countdown.html): Live countdown to Christmas and New Year.
+- [Roof pitch multiplier chart](https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html): Slope factors for 1/12 to 12/12, with roof area and squares.
+- [Shingle bundles calculator](https://zhukovskyi.space/calculators/roofing/shingle-bundles-calculator.html): Squares and bundles from the footprint and pitch.
+- [Concrete slab calculator](https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html): Yards, bags and rebar, with 30 slab sizes worked out.
+- [Garage floor epoxy calculator](https://zhukovskyi.space/calculators/coating/garage-floor-epoxy-calculator.html): Gallons and kits for a 1, 2 or 3 car garage by system.
+- [How much chlorine to add](https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html): Liquid chlorine, cal-hypo or trichlor for your pool's gallons.
+- [Shift pattern calendars](https://zhukovskyi.space/calculators/shifts/): 4 on 4 off, 2-2-3, DuPont and more: calendar, hours and days off.
+- [Mead ABV calculator](https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html): ABV for mead, cider and wine from SG, Brix or Plato.
+- [Honey per gallon calculator](https://zhukovskyi.space/calculators/brewing/honey-per-gallon-calculator.html): Honey for a target gravity, or the gravity from your honey.
+- [EC to ppm converter](https://zhukovskyi.space/calculators/hydroponics/ec-to-ppm-converter.html): EC to ppm on the 500, 640 and 700 scales, and back.
+- [EC and pH chart by crop](https://zhukovskyi.space/calculators/hydroponics/ec-chart-by-crop.html): Target EC, ppm and pH for 23 vegetables, herbs and flowers.
+- [Fragrance load calculator](https://zhukovskyi.space/calculators/candles/fragrance-load-calculator.html): Fragrance oil for your wax weight and load percentage.
+- [Candle wax calculator](https://zhukovskyi.space/calculators/candles/candle-wax-calculator.html): Wax and fragrance for any jar, from the water it holds.
+- [Espresso ratio calculator](https://zhukovskyi.space/calculators/coffee/espresso-ratio-calculator.html): Dose, yield and brew ratio for espresso.
+- [Yarn yardage calculator](https://zhukovskyi.space/calculators/knitting/yarn-yardage-calculator.html): Yarn for a scarf, hat or blanket, from your own swatch.
+- [Knitting gauge calculator](https://zhukovskyi.space/calculators/knitting/gauge-calculator.html): Stitches to cast on and rows to work, from your gauge.
+- [Embed a calculator](https://zhukovskyi.space/calculators/embed/): Free iframe code for your blog or shop. No sign-up.
 
 ## Refrigerant PT charts
 

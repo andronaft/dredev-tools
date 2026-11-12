@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mead ABV calculator</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/calc-more.css">
+</head>
+<body class="t-bread embed" data-calc="abv">
+<main class="wrap">
+<h1 class="embed-title">Mead ABV calculator</h1>
+<div class="calc card"><div class="fields"><div class="full"><div class="seg" id="gunit" role="group" aria-label="Gravity unit"><button data-v="sg" aria-pressed="true">SG</button><button data-v="brix" aria-pressed="false">Brix</button><button data-v="plato" aria-pressed="false">Plato</button></div></div><div id="og-row"><label for="og">Original gravity <small id="og-unit">(SG)</small></label><input id="og" inputmode="decimal" value="1.100"></div><div id="fg-row"><label for="fg">Final gravity <small id="fg-unit">(SG)</small></label><input id="fg" inputmode="decimal" value="1.010"></div></div><div class="result" aria-live="polite"><div class="eyebrow">Alcohol by volume</div><div class="big" id="abv-std">–</div><div class="rows"><div><span>Hall formula (strong meads, wines)</span><span id="abv-alt">–</span></div><div><span>Apparent attenuation</span><span id="abv-att">–</span></div><div><span>Specific gravity</span><span id="abv-sg">–</span></div><div><span>In °Plato</span><span id="abv-deg">–</span></div><div><span>Mead sweetness (BJCP)</span><span id="abv-sweet">–</span></div><div><span>Mead strength (BJCP)</span><span id="abv-strength">–</span></div></div><div id="abv-note" class="verdict"></div><p class="note">An estimate from two gravity readings. Honey or sugar added during fermentation raises the real figure.</p></div></div>
+<p class="powered">Powered by <a href="https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html" target="_blank" rel="noopener">Dre Dev Tools</a></p>
+</main>
+<script src="../assets/calc-more.js"></script>
+</body>
+</html>

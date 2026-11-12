@@ -1,0 +1,47 @@
+/* Extras for the hobby and trade calculator pages (calcs_common.py). Colors come from style.css tokens. */
+
+/* shift calendars: one row per week, Monday first */
+.cal { border-collapse: separate; border-spacing: 3px; width: 100%; font-size: 14px; table-layout: fixed; }
+.cal th, .cal td { text-align: center; padding: 6px 2px; border: 0; white-space: nowrap; }
+.cal thead th { position: static; background: transparent; }
+.cal tbody tr:nth-child(even) { background: transparent; }
+.cal td { border-radius: 8px; background: var(--bg); color: var(--muted); min-width: 34px; }
+.cal td b { display: block; font-size: 15px; color: var(--fg); }
+.cal td small { font-size: 11px; }
+.cal td.s-D, .cal td.s-M, .cal td.s-T { background: #fde9c4; }
+.cal td.s-A { background: #fbd5d0; }
+.cal td.s-N, .cal td.s-X { background: #d9d9f7; }
+.cal td.s-D b, .cal td.s-M b, .cal td.s-T b, .cal td.s-A b, .cal td.s-N b, .cal td.s-X b,
+.cal td.s-D, .cal td.s-M, .cal td.s-T, .cal td.s-A, .cal td.s-N, .cal td.s-X { color: #14181f; }
+.cal td.out { visibility: hidden; }
+@media (max-width: 560px) {
+  .cal { border-spacing: 2px; font-size: 12px; }
+  .cal th, .cal td { padding: 5px 0; min-width: 0; }
+  .cal td b { font-size: 13px; }
+  .cal td small { font-size: 10px; }
+}
+.cal-month { font-weight: 700; margin: 14px 0 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.strip { display: flex; flex-wrap: wrap; gap: 3px; margin: 10px 0; }
+.strip span { width: 30px; text-align: center; padding: 5px 0; border-radius: 7px; font-size: 13px; font-weight: 700; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.strip span.s-D, .strip span.s-M, .strip span.s-T { background: #fde9c4; color: #14181f; border-color: transparent; }
+.strip span.s-A { background: #fbd5d0; color: #14181f; border-color: transparent; }
+.strip span.s-N, .strip span.s-X { background: #d9d9f7; color: #14181f; border-color: transparent; }
+
+/* safety box on the pool pages */
+.safety { border: 2px solid var(--bad); border-radius: var(--radius); padding: 14px 18px; background: var(--card); max-width: 760px; }
+.safety h2 { font-size: 18px; margin: 0 0 6px; color: var(--bad); }
+.safety ul { margin: 0; padding-left: 20px; }
+.safety li { margin: 4px 0; }
+
+/* embed page: code to copy */
+.embed-code { display: block; width: 100%; min-height: 96px; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); resize: vertical; }
+.embed-item { margin: 0 0 28px; }
+.embed-item iframe { border: 1px solid var(--line); border-radius: var(--radius); width: 100%; max-width: 720px; display: block; margin: 10px 0; }
+
+/* bare calculators inside an iframe on another site */
+body.embed { background: transparent; }
+body.embed main.wrap { padding: 12px; max-width: 760px; }
+body.embed .embed-title { font-size: 20px; margin: 0 0 12px; }
+body.embed .powered { font-size: 13px; color: var(--muted); margin: 10px 2px 0; text-align: right; }

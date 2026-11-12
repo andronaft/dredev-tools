@@ -15,7 +15,8 @@ sys.path.insert(0, str(HERE))
 import build  # noqa: E402
 
 SITE = HERE / "site"
-PAGES = sorted(p for p in SITE.rglob("*.html") if p.name != "404.html")
+# embed/<name>.html are bare calculators for iframes on other sites (pages_embed.py): no shell, noindex, not in the sitemap.
+PAGES = sorted(p for p in SITE.rglob("*.html") if p.name != "404.html" and not (p.parent.name == "embed" and p.name != "index.html"))
 
 
 def rel(p):
