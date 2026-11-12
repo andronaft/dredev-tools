@@ -16,6 +16,8 @@ import subprocess
 from datetime import date
 from pathlib import Path
 
+import guides
+
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent  # ~/Desktop/mobile_sub_app
 OUT = HERE / "site"  # the real site, copied into my_space and served at base_url
@@ -455,7 +457,9 @@ def faq(items):
 def webapp_ld(name, path, desc):
     return {"@context": "https://schema.org", "@type": "WebApplication", "name": name, "url": f"{BASE}/{path}",
             "description": desc, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
-            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+            "author": {"@type": "Person", "name": guides.AUTHOR, "url": f'{CFG["developer_site"]}/'},
+            "dateModified": date.today().isoformat()}
 
 
 # ---------- HVAC ----------
@@ -589,7 +593,8 @@ def build_hvac():
 
 def build_vd():
     path = "electrical/voltage-drop-calculator.html"
-    faq_html, faq_ld = faq([
+    ans, guide_html, extra_faq = guides.vd_guide()
+    faq_html, faq_ld = faq(extra_faq + [
         ("What is the voltage drop formula?",
          "For copper under the NEC, VD = 2 × K × I × L / CM for single phase and 1.732 × K × I × L / CM for three phase, with K ≈ 12.9 Ω·cmil/ft, "
          "I the load current, L the one-way length in feet and CM the conductor area in circular mils. This calculator uses the equivalent "
@@ -607,7 +612,7 @@ def build_vd():
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Electrical</div>
 <div class="hero"><div class="eyebrow">Free electrical tool</div>
 <h1>Voltage Drop Calculator</h1>
-<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p></div>
+<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p>{ans}</div>
 
 <div class="calc card">
 <div class="fields">
@@ -636,6 +641,7 @@ def build_vd():
 </div>
 </div>
 
+{guide_html}
 {promo("electrician-calc", "vd-calc", "Wire size with ampacity and derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports.")}
 {faq_html}
 """
@@ -650,7 +656,8 @@ def build_vd():
 
 def build_coat():
     path = "coating/epoxy-coverage-calculator.html"
-    faq_html, faq_ld = faq([
+    ans, guide_html, extra_faq = guides.coat_guide()
+    faq_html, faq_ld = faq(extra_faq + [
         ("How much epoxy do I need per square foot?",
          "One US gallon spread 1 mil thick covers 1,604 sq ft. Divide by the thickness in mils and multiply by the solids by volume: "
          "a 100 % solids epoxy at 10 mils covers about 160 sq ft per gallon, a 50 % solids product at the same dry thickness covers half that."),
@@ -667,7 +674,7 @@ def build_coat():
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Coatings</div>
 <div class="hero"><div class="eyebrow">Free coatings tool</div>
 <h1>Epoxy Floor Coverage Calculator</h1>
-<p class="lead">How many gallons and kits of epoxy, polyaspartic or polyurea you need, from area, thickness in mils and solids by volume.</p></div>
+<p class="lead">How many gallons and kits of epoxy, polyaspartic or polyurea you need, from area, thickness in mils and solids by volume.</p>{ans}</div>
 
 <div class="calc card">
 <div class="fields">
@@ -693,6 +700,7 @@ def build_coat():
 </div>
 </div>
 
+{guide_html}
 {promo("coatcalc", "coat-calc", "Flake, crack filler, cove base, dew point and pot life, then a PDF quote with your client price in one tap.")}
 {faq_html}
 """
@@ -720,13 +728,15 @@ def load_oils():
     return out
 
 
-def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note=""):
-    faq_html, faq_ld = faq(faq_items)
+def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None):
+    ans, guide_html, extra_faq = answer_guide or ("", "", [])
+    faq_html, faq_ld = faq(faq_items + extra_faq)
     body = f"""
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › {crumb}</div>
-<div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p></div>
+<div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p>{ans}</div>
 <div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>
 {note}
+{guide_html}
 {promo_html}
 {faq_html}
 """
@@ -748,8 +758,7 @@ def build_more():
 <div><span>mm² → closest AWG</span><span id="mm2-near">–</span></div></div>""",
         [("Is 2.5 mm² the same as 14 AWG?", "Close but not equal: 14 AWG is 2.08 mm² and 12 AWG is 3.31 mm². When you replace a metric cable with AWG wire, pick the size that is not smaller and check ampacity and voltage drop for your circuit."),
          ("Where do these numbers come from?", "Areas are from NEC Chapter 9, Table 8 (circular mils), converted with 1 cmil = 0.000506707 mm². Metric sizes are the IEC 60228 series.")],
-        "t-elec", "awg",
-        promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."))
+        "t-elec", "awg", answer_guide=guides.awg_guide(), promo_html=promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."))
 
     calc_page(
         "electrical/wire-size-calculator.html", "Wire Size Calculator (NEC 310.16) | What Size Wire Do I Need?",
@@ -773,8 +782,7 @@ def build_more():
         [("What size wire for a 30 amp breaker?", "With copper THHN and 75 °C terminations, 10 AWG (35 A at 75 °C, and 240.4(D) limits 10 AWG copper to 30 A). Long runs may need a larger size for voltage drop."),
          ("Why 125 % for continuous loads?", "NEC 210.19(A)(1) and 215.2 require conductors for continuous loads (3 hours or more, like EV chargers and water heaters) to carry 125 % of the continuous current."),
          ("Why does NM-B use the 60 °C column?", "NEC 334.80 limits NM cable ampacity to the 60 °C column, even though the conductors are rated 90 °C.")],
-        "t-elec", "wire",
-        promo("electrician-calc", "wire-size", "Full cable sizing with ambient and grouping derating, IEC and NEC, step-by-step working and PDF reports."))
+        "t-elec", "wire", answer_guide=guides.wire_guide(), promo_html=promo("electrician-calc", "wire-size", "Full cable sizing with ambient and grouping derating, IEC and NEC, step-by-step working and PDF reports."))
 
     calc_page(
         "pool/pool-chemical-calculator.html", "Pool Chemical Calculator: Chlorine, Baking Soda, Stabilizer, Salt",
@@ -793,7 +801,7 @@ def build_more():
         [("How much liquid chlorine to raise FC by 1 ppm?", "About 12.8 fl oz of 10 % liquid chlorine per 10,000 US gallons. Bleach is weaker: 6 % bleach needs roughly 21 fl oz for the same rise."),
          ("What FC should I aim for?", "It depends on your stabilizer (CYA) level: the higher the CYA, the more free chlorine you need. PoolPro uses Trouble Free Pool's FC/CYA chart for targets."),
          ("Where does the math come from?", "Chlorine strength follows the same bleach density formula as TFP Pool Math; baking soda raises total alkalinity by 1 ppm per 1.68 mg per litre; stabilizer and salt are added at their label purity.")],
-        "t-pool", "pool")
+        "t-pool", "pool", answer_guide=guides.pool_guide())
 
     calc_page(
         "bread/bakers-percentage-calculator.html", "Baker's Percentage Calculator for Sourdough (with True Hydration)",
@@ -815,7 +823,7 @@ def build_more():
         [("What are baker's percentages?", "Every ingredient is written as a percentage of the flour weight, with flour at 100 %. 500 g flour at 75 % hydration means 375 g water."),
          ("What is true hydration?", "The water from both the bowl and the starter divided by all the flour, including the flour in the starter. A 75 % dough with 20 % starter at 100 % hydration is about 75 % either way; stiff starters lower it."),
          ("How much starter should I use?", "Most sourdough recipes use 10–25 % starter. Less starter means a longer, slower rise.")],
-        "t-bread", "bread")
+        "t-bread", "bread", answer_guide=guides.bread_guide())
 
     calc_page(
         "soap/lye-calculator.html", "Lye Calculator for Cold Process Soap (NaOH) | Free",
@@ -834,7 +842,7 @@ def build_more():
         [("How is the lye amount calculated?", "Lye = Σ (oil grams × SAP value) × (1 − superfat) ÷ purity. SAP values are in grams of KOH per gram of oil and are converted to NaOH by molar mass (39.997 / 56.106)."),
          ("What superfat should I use?", "5 % is a common starting point for bar soap: a little oil stays unsaponified for a milder bar. Salt bars and 100 % coconut soaps often use 15–20 %."),
          ("Where do the SAP values come from?", "From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point.")],
-        "t-soap", "lye",
+        "t-soap", "lye", answer_guide=guides.lye_guide(load_oils()),
         extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>')
 
 
