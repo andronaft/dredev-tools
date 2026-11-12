@@ -221,7 +221,7 @@ Pro:
 ## Free calculators
 
 - [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html): R-454B, R-32, R-410A, R-22 with PT lookup.
-- [Refrigerant PT charts](https://zhukovskyi.space/calculators/hvac/pt-chart/index.html): 22 refrigerants, bubble and dew columns.
+- [Refrigerant PT charts](https://zhukovskyi.space/calculators/hvac/pt-chart/): 22 refrigerants, bubble and dew columns.
 - [Voltage drop calculator](https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html): AWG or mm², copper or aluminum, minimum size for 3 %.
 - [Epoxy coverage calculator](https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html): Gallons and kits from area, mils and solids.
 - [Wire size calculator](https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html): NEC 310.16 conductor and breaker, with voltage drop.
@@ -240,8 +240,11 @@ Pressure-temperature tables with bubble and dew columns: [R-410A](https://zhukov
 - [PaintBid: Painting Estimator](https://zhukovskyi.space/apps/paintbid/): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.
 - [Days Until: Countdown Widget](https://zhukovskyi.space/apps/days-until/): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too.
 - [Fastwise: Fasting Tracker](https://zhukovskyi.space/apps/fastwise/): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits.
-- [Leben in Deutschland: тест UA](https://zhukovskyi.space/apps/lid-test/): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.
+- [Leben in Deutschland: тест UA](https://zhukovskyi.space/apps/lid-test/uk/): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.
 
 ## Optional
 
 - [All Dre Dev apps](https://zhukovskyi.space/apps/): the developer site, with screenshots.
+- [Methodology and sources](https://zhukovskyi.space/calculators/methodology.html): which tables and editions the calculators use, their assumptions and limits.
+- [Checked examples](https://zhukovskyi.space/calculators/verification.html): rows from the sources next to the calculators' answers.
+- [About Dre Dev](https://zhukovskyi.space/about/): who makes the apps and the calculators.

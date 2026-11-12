@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checked examples: source rows next to the calculators&#x27; answers</title>
+<meta name="description" content="31 examples from NEC tables, manufacturer PT charts, Pool Math and SoapCalc, each next to the answer the Dre Dev calculator gives for the same input.">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/verification.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dre Dev Tools">
+<meta property="og:title" content="Checked examples: source rows next to the calculators&#x27; answers">
+<meta property="og:description" content="31 examples from NEC tables, manufacturer PT charts, Pool Math and SoapCalc, each next to the answer the Dre Dev calculator gives for the same input.">
+<meta property="og:url" content="https://zhukovskyi.space/calculators/verification.html">
+<meta property="og:image" content="https://zhukovskyi.space/calculators/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "@id": "https://zhukovskyi.space/calculators/verification.html", "url": "https://zhukovskyi.space/calculators/verification.html", "name": "Checked examples: source rows next to the calculators' answers", "description": "31 examples from NEC tables, manufacturer PT charts, Pool Math and SoapCalc, each next to the answer the Dre Dev calculator gives for the same input.", "isPartOf": {"@type": "WebSite", "@id": "https://zhukovskyi.space/calculators/#website", "name": "Dre Dev Tools", "url": "https://zhukovskyi.space/calculators/", "publisher": {"@id": "https://zhukovskyi.space/#dredev"}}, "author": {"@id": "https://zhukovskyi.space/#person"}, "publisher": {"@id": "https://zhukovskyi.space/#dredev"}, "dateModified": "2026-11-12"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://zhukovskyi.space/"}, {"@type": "ListItem", "position": 2, "name": "Free tools", "item": "https://zhukovskyi.space/calculators/"}, {"@type": "ListItem", "position": 3, "name": "Methodology", "item": "https://zhukovskyi.space/calculators/methodology.html"}, {"@type": "ListItem", "position": 4, "name": "Checked examples", "item": "https://zhukovskyi.space/calculators/verification.html"}]}, {"@type": "Organization", "@id": "https://zhukovskyi.space/#dredev", "name": "Dre Dev", "url": "https://zhukovskyi.space/about/"}, {"@type": "Person", "@id": "https://zhukovskyi.space/#person", "name": "Andrii Zhukovskyi", "url": "https://zhukovskyi.space/"}]}</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "83c899454bcd4d139b58edeea34eaac0"}'></script><!-- End Cloudflare Web Analytics -->
+</head>
+<body class="">
+<header class="top"><div class="wrap">
+<a class="brand" href="./"><i></i>Dre Dev Tools</a>
+<nav aria-label="Main">
+<a href="https://zhukovskyi.space/apps/">Apps</a>
+<a href="./" aria-current="page">Free tools</a>
+<a href="https://zhukovskyi.space/blog/" class="hide-sm">Blog</a>
+<a href="https://zhukovskyi.space/about/">About</a>
+</nav>
+</div>
+<div class="wrap"><nav class="subnav" aria-label="Calculators"><a href="hvac/superheat-subcooling-calculator.html">HVAC</a><a href="electrical/voltage-drop-calculator.html">Electrical</a><a href="coating/epoxy-coverage-calculator.html">Coatings</a><a href="pool/pool-chemical-calculator.html">Pool</a><a href="bread/bakers-percentage-calculator.html">Baking</a><a href="soap/lye-calculator.html">Soap</a></nav></div></header>
+<main class="wrap">
+
+<div class="crumbs"><a href="./">Tools</a> › <a href="methodology.html">Methodology</a> › Checked examples</div>
+<div class="hero"><div class="eyebrow">Source row → calculator answer</div>
+<h1>Checked examples</h1>
+<p class="lead">31 rows from the published sources, each next to what the calculator answers for the same input. The answers on this page are produced by the calculators' own code when the site is built.</p></div>
+<section class="prose">
+<p>If an answer falls outside the allowed difference, the build stops and nothing is published. Where the calculator and the source differ on purpose, the row says why. The sources were last read against these rows on 12 November 2026.</p>
+<p>You can repeat any row yourself: open the calculator, enter the example and compare. The same list runs as an automated test in the <a href="https://github.com/andronaft/dredev-tools">public repository</a> (<code>verification.json</code>).</p></section>
+
+<section><h2><a href="hvac/superheat-subcooling-calculator.html">Superheat &amp; subcooling calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>R-410A: temperature at 118.8 psig</td><td>R-410A, 40 °F row: 118.8 psig <sup>[1]</sup></td><td><b>Saturation 40.0 °F (4.4 °C)</b></td><td>within 0.05 °F</td></tr><tr><td>R-22: pressure at 100 °F</td><td>R-22, 100 °F row: 195.9 psig <sup>[1]</sup></td><td><b>Saturation 195.9 psig</b></td><td>within 0.05 psig</td></tr><tr><td>R-32: superheat at 121.0 psig suction, 52 °F line</td><td>R-32, 40 °F row: 121.0 psig, so superheat = 52 − 40 = 12.0 °F <sup>[1]</sup></td><td><b>12.0 °F</b></td><td>within 0.05 °F</td></tr><tr><td>R-454B: subcooling at 300.8 psig liquid, 90 °F line</td><td>R-454B, 100 °F row, liquid (bubble) column: 300.8 psig, so subcooling = 100 − 90 = 10.0 °F <sup>[1]</sup></td><td><b>10.0 °F</b></td><td>within 0.05 °F</td></tr><tr><td>R-454B between chart rows: bubble pressure at 42 °F<br><small>The chart has a row every 5 °F; the calculator interpolates between rows and shows one decimal.</small></td><td>42 °F: 116.35 psig liquid (bubble) <sup>[2]</sup></td><td><b>Bubble (liquid) 116.4 psig Dew (vapour) 111.2 psig</b></td><td>within 0.15 psig</td></tr><tr><td>R-454B between chart rows: dew pressure at 42 °F</td><td>42 °F: 111.22 psig vapor (dew) <sup>[2]</sup></td><td><b>Bubble (liquid) 116.4 psig Dew (vapour) 111.2 psig</b></td><td>within 0.15 psig</td></tr><tr><td>R-410A between chart rows: pressure at 43 °F</td><td>43 °F: 125.777 psig <sup>[3]</sup></td><td><b>Saturation 125.8 psig</b></td><td>within 0.3 psig</td></tr></tbody></table></div></section>
+<section><h2><a href="electrical/awg-to-mm2.html">AWG to mm² converter</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>12 AWG in circular mils</td><td>12 AWG: 6,530 circular mils <sup>[4]</sup></td><td><b>6,530 cmil</b></td><td>exact match</td></tr><tr><td>12 AWG in mm²</td><td>12 AWG: 3.31 mm² <sup>[4]</sup></td><td><b>3.31 mm²</b></td><td>within 0.005 mm²</td></tr><tr><td>4/0 AWG in mm²</td><td>4/0 AWG: 211,600 circular mils, 107.2 mm² <sup>[4]</sup></td><td><b>107.22 mm²</b></td><td>within 0.05 mm²</td></tr></tbody></table></div></section>
+<section><h2><a href="electrical/wire-size-calculator.html">Wire size calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>50 A load, copper THHN, 75 °C terminals</td><td>Copper, 75 °C column: 8 AWG = 50 A <sup>[5]</sup></td><td><b>8 AWG copper</b></td><td>exact match</td></tr><tr><td>30 A load, copper THHN, 75 °C terminals</td><td>Copper, 75 °C column: 10 AWG = 35 A; 240.4(D) limits 10 AWG copper to a 30 A breaker <sup>[5]</sup></td><td><b>10 AWG copper</b></td><td>exact match</td></tr><tr><td>40 A load on NM-B cable</td><td>Copper, 60 °C column (NM-B, NEC 334.80): 8 AWG = 40 A <sup>[5]</sup></td><td><b>8 AWG copper</b></td><td>exact match</td></tr><tr><td>48 A continuous load (EV charger), copper THHN</td><td>125 % of 48 A = 60 A (NEC 210.19); copper, 75 °C column: 6 AWG = 65 A <sup>[5]</sup></td><td><b>6 AWG copper</b></td><td>exact match</td></tr><tr><td>48 A continuous load: breaker</td><td>125 % of 48 A = 60 A (NEC 210.19) <sup>[5]</sup></td><td><b>60 A</b></td><td>exact match</td></tr><tr><td>100 A load, aluminum, 75 °C terminals</td><td>Aluminum, 75 °C column: 1 AWG = 100 A <sup>[5]</sup></td><td><b>1 AWG aluminum</b></td><td>exact match</td></tr></tbody></table></div></section>
+<section><h2><a href="electrical/voltage-drop-calculator.html">Voltage drop calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>20 A on 12 AWG copper, 100 ft, 120 V single phase<br><small>The calculator works from resistivity at operating temperature instead of the rounded K factor, so it lands about 0.5 % higher.</small></td><td>2 × 12.9 × 20 A × 100 ft ÷ 6,530 cmil = 7.90 V <sup>[6]</sup></td><td><b>7.94 V</b></td><td>within 0.08 V</td></tr><tr><td>16 A on 2.5 mm² copper, 30 m, 230 V single phase</td><td>2 × 0.0225 × 30 m × 16 A ÷ 2.5 mm² = 8.64 V <sup>[7]</sup></td><td><b>8.64 V</b></td><td>within 0.005 V</td></tr><tr><td>40 A on 10 mm² copper, 50 m, 400 V three phase</td><td>√3 × 0.0225 × 50 m × 40 A ÷ 10 mm² = 7.79 V <sup>[7]</sup></td><td><b>7.79 V</b></td><td>within 0.01 V</td></tr></tbody></table></div></section>
+<section><h2><a href="coating/epoxy-coverage-calculator.html">Epoxy coverage calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>1,604 sq ft at 1 mil, 100 % solids, no waste</td><td>One US gallon covers 1,604 sq ft at 1 mil <sup>[8]</sup></td><td><b>1.00 gal</b></td><td>within 0.005 gal</td></tr><tr><td>Spread rate of a 50 % solids product at 10 mils dry<br><small>The page shows the spread rate as a whole number.</small></td><td>1,604 × 0.50 ÷ 10 = 80.2 sq ft per gallon <sup>[8]</sup></td><td><b>80 sq ft/gal</b></td><td>within 0.5 sq ft/gal</td></tr></tbody></table></div></section>
+<section><h2><a href="pool/pool-chemical-calculator.html">Pool chemical calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>10 % liquid chlorine, +1 ppm FC in 10,000 gal</td><td>12.79 fl oz <sup>[9]</sup></td><td><b>12.8 fl oz</b></td><td>within 0.05 fl oz</td></tr><tr><td>6 % bleach, +1 ppm FC in 10,000 gal</td><td>20.79 fl oz <sup>[9]</sup></td><td><b>20.8 fl oz</b></td><td>within 0.05 fl oz</td></tr><tr><td>65 % cal-hypo, +1 ppm FC in 10,000 gal</td><td>2.07 oz <sup>[9]</sup></td><td><b>2.1 oz</b></td><td>within 0.05 oz</td></tr><tr><td>Baking soda, total alkalinity +10 ppm in 10,000 gal<br><small>The calculator uses the molar masses (84.007 g of NaHCO3 per 50.04 g of CaCO3) and gives 1.40 lb, about 5 % under Pool Math&#x27;s figure. Add in portions and retest.</small></td><td>1.47 lb <sup>[9]</sup></td><td><b>1.40 lb</b></td><td>within 0.08 lb</td></tr><tr><td>Stabilizer, CYA +10 ppm in 10,000 gal<br><small>The calculator assumes a 99 % pure product, so it asks for 1 % more.</small></td><td>13.35 oz of 100 % cyanuric acid <sup>[9]</sup></td><td><b>13.5 oz</b></td><td>within 0.2 oz</td></tr><tr><td>Salt +1,000 ppm in 10,000 gal<br><small>The calculator assumes 99 % pure salt.</small></td><td>83.7 lb <sup>[9]</sup></td><td><b>84.30 lb</b></td><td>within 1 lb</td></tr></tbody></table></div></section>
+<section><h2><a href="soap/lye-calculator.html">Lye calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>1,000 g olive oil, 5 % superfat</td><td>128.6 g NaOH <sup>[10]</sup></td><td><b>128.7 g NaOH</b></td><td>within 0.2 g</td></tr><tr><td>180 g olive, 144 g coconut, 90 g shea, 36 g castor, 5 % superfat<br><small>Published recipes round to whole grams, and SAP values differ a little between tables.</small></td><td>63 g NaOH <sup>[11]</sup></td><td><b>63.5 g NaOH</b></td><td>within 1 g</td></tr></tbody></table></div></section>
+<section><h2><a href="bread/bakers-percentage-calculator.html">Baker&#x27;s percentage calculator</a></h2>
+<div class="tablewrap"><table class="wraps"><thead><tr><th>Example</th><th>The source says</th><th>The calculator answers</th><th>Allowed difference</th></tr></thead>
+<tbody><tr><td>1,000 g flour at 75 % hydration: water</td><td>75 % of 1,000 g = 750 g <sup>[12]</sup></td><td><b>750 g</b></td><td>within 0.5 g</td></tr><tr><td>1,000 g flour, 750 g water, 200 g starter at 100 %: true hydration</td><td>(750 + 100) ÷ (1,000 + 100) = 77.3 % <sup>[12]</sup></td><td><b>77.3 %</b></td><td>within 0.05 %</td></tr></tbody></table></div></section>
+<section class="prose"><h2>Sources</h2><ol><li>Arkema, Forane® Refrigerants Pressure Temperature Chart, PPC/SDC 05-2025 (NIST REFPROP 10.0). Read 25.10.2026.</li><li>Chemours, Thermodynamic Properties of Opteon™ XL41 (R-454B), Engineering (I/P) Units, 1 °F steps; gauge pressure = table psia − 14.696. Values as pinned in the HVAC Charge app&#x27;s tests.</li><li>CoolProp 8.0 (NIST reference equations of state), saturation pressure. Values as pinned in the HVAC Charge app&#x27;s tests.</li><li>NEC (NFPA 70) 2023, Chapter 9, Table 8, Conductor Properties.</li><li>NEC (NFPA 70) 2023, Table 310.16, ampacities at 30 °C ambient, not more than three current-carrying conductors.</li><li>K-factor voltage drop formula for copper, VD = 2 × K × I × L ÷ CM with K = 12.9 Ω·cmil/ft.</li><li>IEC 60364-5-52, Annex G: u = b × ρ × L × I ÷ S at unity power factor, ρ = 0.0225 Ω·mm²/m for copper.</li><li>US liquid gallon = 231 cubic inches (NIST Handbook 44, Appendix C). 231 in³ spread 0.001 in thick = 1,604 sq ft.</li><li>Trouble Free Pool, Pool Math classic calculator (troublefreepool.com/calc.html). Read 25.10.2026.</li><li>SoapCalc oil list and lye calculator (soapcalc.net). Snapshot of 25.10.2026.</li><li>The Soapery / Low Impact, simple cold process soap recipe without palm oil (lowimpact.org, 2022).</li><li>Baker&#x27;s percentage, total-formula method (King Arthur Baking, Baker&#x27;s percentage; Wikipedia, Baker percentage).</li></ol></section>
+
+<aside class="trust"><p class="note"><a href="methodology.html">Methodology and sources</a> · <a href="changelog.html">Changelog</a> · <a href="mailto:mobile.support@zhukovskyi.space?subject=Calculator%20error%3A%20Checked%20examples&amp;body=Page%3A%20https%3A//zhukovskyi.space/calculators/verification.html%0A%0AWhat%20I%20entered%3A%0A%0AWhat%20the%20page%20showed%3A%0A%0AWhat%20I%20expected%2C%20and%20where%20that%20number%20comes%20from%3A%0A">Found an error? Tell me</a></p></aside>
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev · apps and free tools by <a href="https://zhukovskyi.space/about/">Andrii Zhukovskyi</a>. No account, no tracking cookies.</span>
+<nav aria-label="Footer">
+<a href="https://zhukovskyi.space/about/">About</a>
+<a href="https://zhukovskyi.space/apps/">Apps</a>
+<a href="./">Free tools</a>
+<a href="methodology.html">Methodology</a>
+<a href="https://zhukovskyi.space/privacy/">Privacy</a>
+<a href="https://zhukovskyi.space/testers/">Become a tester</a>
+<a href="https://zhukovskyi.space/blog/">Blog</a>
+<a href="https://github.com/andronaft">GitHub</a>
+<a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a>
+</nav>
+</div></footer>
+
+</body>
+</html>
