@@ -8,13 +8,19 @@ from fastlane), so the site never drifts from the apps. Store links live in conf
     python3 build.py
 """
 
+import hashlib
 import html
 import json
 import re
 import shutil
 import subprocess
+import sys
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote, urljoin
+
+import guides
+import trust
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent  # ~/Desktop/mobile_sub_app
@@ -23,10 +29,24 @@ LEGACY_OUT = HERE / "docs"  # GitHub Pages serves main:/docs: one redirect page 
 CFG = json.loads((HERE / "config.json").read_text())
 BASE = CFG["base_url"].rstrip("/")
 TODAY = date.today().isoformat()
+SITE = CFG["developer_site"].rstrip("/")  # the main site: apps, about, privacy
+SITE_NAME = f'{CFG["brand"]} Tools'
+# Structured data: the same @id as on the main site, so both sites describe one person and one publisher.
+PERSON_ID = f"{SITE}/#person"
+ORG_ID = f"{SITE}/#dredev"
+# Pages the header and the footer of both sites link to.
+ABOUT_URL = f"{SITE}/about/"
+PRIVACY_URL = f"{SITE}/privacy/"
+OG_IMAGE = "assets/og.jpg"  # 1200x630, made by tools/og_image.py
+# lastmod per page: the day its content last changed, kept between builds by content hash (see lastmod()).
+LASTMOD_FILE = HERE / "lastmod.json"
+LASTMOD = json.loads(LASTMOD_FILE.read_text()) if LASTMOD_FILE.exists() else {}
+LASTMOD_TOKEN = "@@LASTMOD@@"  # replaced in the finished page with that page's lastmod date
 FREE_REFRIGERANTS = ["R-410A", "R-454B", "R-32", "R-22"]  # same free set as hvac-charge-app AppConfig
 
 e = html.escape
-pages: list[str] = []
+pages: list[str] = []  # canonical URLs for the sitemap
+page_dates: dict[str, str] = {}  # URL -> lastmod
 
 
 # ---------- data ----------
@@ -342,21 +362,131 @@ APPS = {
 
 
 def prep_images():
+    """App icons for the promo blocks and the home page. Screenshots live on the apps' own pages on the main site."""
     for key, a in APPS.items():
         a["icon"] = image(a["icons"], f"{key}-icon.jpg", 192)
-        d = ROOT / a["shots"]
-        files = sorted(f for f in d.glob("*") if f.suffix.lower() in (".png", ".jpg", ".jpeg") and f.stem != "icon")[:6] if d.exists() else []
-        a["screens"] = [image([str(f.relative_to(ROOT))], f"{key}-{i + 1}.jpg", 440) for i, f in enumerate(files)]
 
 
 # ---------- page shell ----------
 
-def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en"):
+# Category links under the main menu. HVAC and Electrical go to their hub page once that module is in the repo.
+SUBNAV = [
+    ("HVAC", "hvac/" if (HERE / "pages_hvac.py").exists() else "hvac/superheat-subcooling-calculator.html"),
+    ("Electrical", "electrical/" if (HERE / "pages_electrical.py").exists() else "electrical/voltage-drop-calculator.html"),
+    ("Coatings", "coating/epoxy-coverage-calculator.html"),
+    ("Pool", "pool/pool-chemical-calculator.html"),
+    ("Baking", "bread/bakers-percentage-calculator.html"),
+    ("Soap", "soap/lye-calculator.html"),
+]
+TRUST_PAGES = {"methodology.html", "verification.html", "changelog.html"}
+DISCLAIMER = ("Reference only. A result depends on what you enter and on the published tables named on this page. "
+              "Before you buy materials, size a circuit, charge a system or dose chemicals, check it against the code in force "
+              "where you work, the product label and the manufacturer's instructions. These tools come with no warranty.")
+
+
+def clean_links(text):
+    """Internal links go to /dir/, never to /dir/index.html, so every page has one address."""
+    def fix(m):
+        pre, frag = m.group(1), m.group(2) or ""
+        if "://" in pre and not pre.startswith(SITE):
+            return m.group(0)
+        return f'href="{pre or "./"}{frag}"'
+    return re.sub(r'href="((?:[^"#?]*/)?)index\.html(#[^"]*)?"', fix, text)
+
+
+def script_sources(scripts):
+    """The text of the local scripts a page loads: a change in calc.js changes what the page answers."""
+    out = []
+    for name in re.findall(r'src="(?:\.\./)*assets/([^"]+)"', scripts):
+        f = next((d / name for d in (OUT / "assets", HERE / "assets") if (d / name).exists()), None)
+        out.append(f.read_text() if f else name)
+    return out
+
+
+def lastmod(url, *parts):
+    """The day this page's content last changed, for the sitemap and dateModified. The hash covers the title,
+    description, body, structured data and scripts; the shared header and footer are left out, so a menu change
+    moves no dates. lastmod.json keeps hash and date between builds."""
+    digest = hashlib.sha256("\x00".join(parts).encode()).hexdigest()[:16]
+    if LASTMOD.get(url, {}).get("hash") != digest:
+        LASTMOD[url] = {"hash": digest, "date": TODAY}
+    page_dates[url] = LASTMOD[url]["date"]
+    return page_dates[url]
+
+
+def page_name(body, title):
+    h1 = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
+    return html.unescape(re.sub("<[^>]+>", "", h1.group(1))).strip() if h1 else title
+
+
+def breadcrumb_ld(path, url, body, title):
+    """BreadcrumbList from the crumbs people see on the page, ending with the page itself."""
+    items = [("Home", f"{SITE}/"), ("Free tools", f"{BASE}/")]
+    m = re.search(r'<div class="crumbs">(.*?)</div>', body, re.S)
+    for href, name in re.findall(r'<a href="([^"]+)">([^<]+)</a>', m.group(1)) if m else []:
+        target = urljoin(f"{BASE}/{path}", href)
+        if target not in [u for _, u in items]:
+            items.append((html.unescape(name), target))
+    if url != f"{BASE}/":
+        items.append((page_name(body, title), url))
+    return {"@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": i, "name": name, "item": target} for i, (name, target) in enumerate(items, 1)]}
+
+
+def site_graph(url, title, desc, crumbs, mod, index):
+    """Nodes every page shares: the page, its breadcrumbs, the publisher (Dre Dev) and the author.
+    Index pages carry the full publisher record; the rest point to it by @id."""
+    org = {"@type": "Organization", "@id": ORG_ID, "name": CFG["brand"], "url": ABOUT_URL}
+    if index:
+        org.update({"email": CFG["support_email"], "founder": {"@id": PERSON_ID}, "sameAs": CFG["same_as"]})
+    person = {"@type": "Person", "@id": PERSON_ID, "name": guides.AUTHOR, "url": f"{SITE}/"}
+    page = {"@type": "CollectionPage" if index else "WebPage", "@id": url, "url": url, "name": title, "description": desc,
+            "isPartOf": {"@type": "WebSite", "@id": f"{BASE}/#website", "name": SITE_NAME, "url": f"{BASE}/",
+                         "publisher": {"@id": ORG_ID}},
+            "author": {"@id": PERSON_ID}, "publisher": {"@id": ORG_ID}, "dateModified": mod}
+    return {"@context": "https://schema.org", "@graph": [page, crumbs, org, person]}
+
+
+def error_mailto(url, name):
+    """'Found an error?': an email with the page and the three things needed to check a report already laid out."""
+    body = (f"Page: {url}\n\nWhat I entered:\n\nWhat the page showed:\n\n"
+            "What I expected, and where that number comes from:\n")
+    return f'mailto:{CFG["support_email"]}?subject={quote("Calculator error: " + name)}&amp;body={quote(body)}'
+
+
+def trust_block(path, url, body, title, calc, rel):
+    """Under every page: who made it, one shared disclaimer, and the way to the methodology, the checked
+    examples, the changelog and an error report."""
+    plain = path == "index.html" or path in TRUST_PAGES or calc == "xmas"
+    by = ("" if plain or 'class="note byline"' in body else
+          f'<p class="note">Made by <a href="{ABOUT_URL}">{guides.AUTHOR}</a> ({e(CFG["brand"])}). '
+          f'How the numbers are checked: <a href="{rel}methodology.html">methodology and sources</a>.</p>')
+    disclaimer = "" if plain else f'<p class="note disclaimer">{DISCLAIMER}</p>'
+    links = " · ".join(f'<a href="{rel}{p}">{t}</a>' for p, t in (
+        ("methodology.html", "Methodology and sources"), ("verification.html", "Checked examples"),
+        ("changelog.html", "Changelog")) if p != path)
+    return (f'<aside class="trust">{by}{disclaimer}<p class="note">{links} · '
+            f'<a href="{error_mailto(url, page_name(body, title))}">Found an error? Tell me</a></p></aside>')
+
+
+def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en", canonical=None):
     depth = path.count("/")
     rel = "../" * depth
-    canonical = f"{BASE}/{path}".replace("/index.html", "/")
-    ld = "".join(f'<script type="application/ld+json">{json.dumps(j, ensure_ascii=False)}</script>' for j in (jsonld or []))
+    home = rel or "./"
+    own = f"{BASE}/{path}".replace("/index.html", "/")
+    canonical = canonical or own
+    body = clean_links(body.replace("{rel}", rel))
+    scripts = scripts.replace("{rel}", rel)
+    page_ld = "".join(f'<script type="application/ld+json">{json.dumps(j, ensure_ascii=False)}</script>' for j in (jsonld or []))
+    mod = lastmod(own, title, desc, body, page_ld, scripts, *script_sources(scripts))
+    graph = site_graph(own, title, desc, breadcrumb_ld(path, own, body, title), mod, path.endswith("index.html"))
+    ld = f'<script type="application/ld+json">{json.dumps(graph, ensure_ascii=False)}</script>' + page_ld.replace(LASTMOD_TOKEN, mod)
     calc_attr = f' data-calc="{calc}"' if calc else ""
+    # Smart App Banner on iPhone, only where the page promotes an app that is on the App Store.
+    ids = [m.group(1) for k in re.findall(r"<!-- app:([\w-]+) -->", body)
+           if (m := re.search(r"/id(\d+)", CFG["apps"][k]["app_store_url"] or ""))]
+    itunes = f'<meta name="apple-itunes-app" content="app-id={ids[0]}">\n' if ids else ""
+    subnav = "".join(f'<a href="{rel}{p}">{t}</a>' for t, p in SUBNAV)
     doc = f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -366,39 +496,58 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
 <meta name="description" content="{e(desc)}">
 <link rel="canonical" href="{canonical}">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="{e(SITE_NAME)}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{canonical}">
-<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<meta property="og:image" content="{BASE}/{OG_IMAGE}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+{itunes}<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="{rel}assets/style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
 {ld}
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{{"token": "83c899454bcd4d139b58edeea34eaac0"}}'></script><!-- End Cloudflare Web Analytics -->
 </head>
 <body class="{theme}"{calc_attr}>
 <header class="top"><div class="wrap">
-<a class="brand" href="{rel}index.html"><i></i>{e(CFG["brand"])} Tools</a>
-<nav>
-<a href="{rel}hvac/superheat-subcooling-calculator.html">HVAC</a>
-<a href="{rel}electrical/voltage-drop-calculator.html">Electrical</a>
-<a href="{rel}coating/epoxy-coverage-calculator.html" class="hide-sm">Coatings</a>
-<a href="{rel}index.html#apps">Apps</a>
+<a class="brand" href="{home}"><i></i>{e(SITE_NAME)}</a>
+<nav aria-label="Main">
+<a href="{SITE}/apps/">Apps</a>
+<a href="{home}" aria-current="page">Free tools</a>
+<a href="{SITE}/blog/" class="hide-sm">Blog</a>
+<a href="{ABOUT_URL}">About</a>
 </nav>
-</div></header>
+</div>
+<div class="wrap"><nav class="subnav" aria-label="Calculators">{subnav}</nav></div></header>
 <main class="wrap">
-{body.replace("{rel}", rel)}
+{body}
+{trust_block(path, own, body, title, calc, rel)}
 </main>
 <footer><div class="wrap">
-<span>© 2026 {e(CFG["brand"])}. Free tools and offline apps. No account, no tracking cookies.</span>
-<span>Made by <a href="{CFG["developer_site"]}/">Andrii Zhukovskyi</a> · <a href="{CFG["developer_site"]}/apps/">all apps</a> · <a href="{CFG["developer_site"]}/testers/">become a tester</a> · <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a></span>
+<span>© 2026 {e(CFG["brand"])} · apps and free tools by <a href="{ABOUT_URL}">{guides.AUTHOR}</a>. No account, no tracking cookies.</span>
+<nav aria-label="Footer">
+<a href="{ABOUT_URL}">About</a>
+<a href="{SITE}/apps/">Apps</a>
+<a href="{home}">Free tools</a>
+<a href="{rel}methodology.html">Methodology</a>
+<a href="{PRIVACY_URL}">Privacy</a>
+<a href="{SITE}/testers/">Become a tester</a>
+<a href="{SITE}/blog/">Blog</a>
+<a href="https://github.com/andronaft">GitHub</a>
+<a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>
+</nav>
 </div></footer>
-{scripts.replace("{rel}", rel)}
+{scripts}
 </body>
 </html>
 """
     dest = OUT / path
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(doc)
-    pages.append(canonical)
+    if canonical == own:  # pages that point elsewhere stay out of the sitemap
+        pages.append(canonical)
 
 
 # ---------- shared blocks ----------
@@ -434,10 +583,10 @@ def store_buttons(key, source, lang="en"):
 def promo(key, source, pitch):
     a, c = APPS[key], CFG["apps"][key]
     icon = f'<img class="icon" src="{{rel}}{a["icon"]}" alt="" width="72" height="72">' if a["icon"] else ""
-    return f"""<section class="promo">{icon}<div>
+    return f"""<!-- app:{key} --><section class="promo">{icon}<div>
 <div class="eyebrow">The whole job, on your phone</div>
 <h3>{e(c["name"])}</h3>
-<p>{e(pitch)} <a href="{{rel}}apps/{key}.html">See what's inside</a>.</p>
+<p>{e(pitch)} <a href="{app_href(key)}">See what's inside</a>.</p>
 {store_buttons(key, source)}
 </div></section>"""
 
@@ -454,7 +603,9 @@ def faq(items):
 def webapp_ld(name, path, desc):
     return {"@context": "https://schema.org", "@type": "WebApplication", "name": name, "url": f"{BASE}/{path}",
             "description": desc, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
-            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+            "author": {"@type": "Person", "@id": PERSON_ID, "name": guides.AUTHOR, "url": f"{SITE}/"},
+            "publisher": {"@id": ORG_ID}, "dateModified": LASTMOD_TOKEN}
 
 
 # ---------- HVAC ----------
@@ -588,7 +739,8 @@ def build_hvac():
 
 def build_vd():
     path = "electrical/voltage-drop-calculator.html"
-    faq_html, faq_ld = faq([
+    ans, guide_html, extra_faq = guides.vd_guide()
+    faq_html, faq_ld = faq(extra_faq + [
         ("What is the voltage drop formula?",
          "For copper under the NEC, VD = 2 × K × I × L / CM for single phase and 1.732 × K × I × L / CM for three phase, with K ≈ 12.9 Ω·cmil/ft, "
          "I the load current, L the one-way length in feet and CM the conductor area in circular mils. This calculator uses the equivalent "
@@ -606,7 +758,7 @@ def build_vd():
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Electrical</div>
 <div class="hero"><div class="eyebrow">Free electrical tool</div>
 <h1>Voltage Drop Calculator</h1>
-<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p></div>
+<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p>{ans}</div>
 
 <div class="calc card">
 <div class="fields">
@@ -635,6 +787,7 @@ def build_vd():
 </div>
 </div>
 
+{guide_html}
 {promo("electrician-calc", "vd-calc", "Wire size with ampacity and derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports.")}
 {faq_html}
 """
@@ -649,7 +802,8 @@ def build_vd():
 
 def build_coat():
     path = "coating/epoxy-coverage-calculator.html"
-    faq_html, faq_ld = faq([
+    ans, guide_html, extra_faq = guides.coat_guide()
+    faq_html, faq_ld = faq(extra_faq + [
         ("How much epoxy do I need per square foot?",
          "One US gallon spread 1 mil thick covers 1,604 sq ft. Divide by the thickness in mils and multiply by the solids by volume: "
          "a 100 % solids epoxy at 10 mils covers about 160 sq ft per gallon, a 50 % solids product at the same dry thickness covers half that."),
@@ -666,7 +820,7 @@ def build_coat():
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Coatings</div>
 <div class="hero"><div class="eyebrow">Free coatings tool</div>
 <h1>Epoxy Floor Coverage Calculator</h1>
-<p class="lead">How many gallons and kits of epoxy, polyaspartic or polyurea you need, from area, thickness in mils and solids by volume.</p></div>
+<p class="lead">How many gallons and kits of epoxy, polyaspartic or polyurea you need, from area, thickness in mils and solids by volume.</p>{ans}</div>
 
 <div class="calc card">
 <div class="fields">
@@ -692,6 +846,7 @@ def build_coat():
 </div>
 </div>
 
+{guide_html}
 {promo("coatcalc", "coat-calc", "Flake, crack filler, cove base, dew point and pot life, then a PDF quote with your client price in one tap.")}
 {faq_html}
 """
@@ -713,19 +868,23 @@ def load_oils():
     src = (ROOT / "soapcalc-app/lib/feature/oil_data.dart").read_text()
     out = []
     for oid in LYE_OILS:
-        m = re.search(rf"Oil\('{oid}', sapKoh: ([\d.]+).*?'en': '([^']+)'", src)
+        m = re.search(rf"Oil\('{oid}',\s*sapKoh: ([\d.]+).*?'en': '([^']+)'", src, re.S)
         if m:
             out.append({"id": oid, "sap": float(m.group(1)), "name": m.group(2)})
+    # An empty list would publish a lye calculator with no oils to pick: stop the build instead.
+    assert len(out) == len(LYE_OILS), f"oil_data.dart: found {len(out)} of {len(LYE_OILS)} oils"
     return out
 
 
-def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note=""):
-    faq_html, faq_ld = faq(faq_items)
+def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None):
+    ans, guide_html, extra_faq = answer_guide or ("", "", [])
+    faq_html, faq_ld = faq(faq_items + extra_faq)
     body = f"""
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › {crumb}</div>
-<div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p></div>
+<div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p>{ans}</div>
 <div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>
 {note}
+{guide_html}
 {promo_html}
 {faq_html}
 """
@@ -747,8 +906,7 @@ def build_more():
 <div><span>mm² → closest AWG</span><span id="mm2-near">–</span></div></div>""",
         [("Is 2.5 mm² the same as 14 AWG?", "Close but not equal: 14 AWG is 2.08 mm² and 12 AWG is 3.31 mm². When you replace a metric cable with AWG wire, pick the size that is not smaller and check ampacity and voltage drop for your circuit."),
          ("Where do these numbers come from?", "Areas are from NEC Chapter 9, Table 8 (circular mils), converted with 1 cmil = 0.000506707 mm². Metric sizes are the IEC 60228 series.")],
-        "t-elec", "awg",
-        promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."))
+        "t-elec", "awg", answer_guide=guides.awg_guide(), promo_html=promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."))
 
     calc_page(
         "electrical/wire-size-calculator.html", "Wire Size Calculator (NEC 310.16) | What Size Wire Do I Need?",
@@ -772,8 +930,7 @@ def build_more():
         [("What size wire for a 30 amp breaker?", "With copper THHN and 75 °C terminations, 10 AWG (35 A at 75 °C, and 240.4(D) limits 10 AWG copper to 30 A). Long runs may need a larger size for voltage drop."),
          ("Why 125 % for continuous loads?", "NEC 210.19(A)(1) and 215.2 require conductors for continuous loads (3 hours or more, like EV chargers and water heaters) to carry 125 % of the continuous current."),
          ("Why does NM-B use the 60 °C column?", "NEC 334.80 limits NM cable ampacity to the 60 °C column, even though the conductors are rated 90 °C.")],
-        "t-elec", "wire",
-        promo("electrician-calc", "wire-size", "Full cable sizing with ambient and grouping derating, IEC and NEC, step-by-step working and PDF reports."))
+        "t-elec", "wire", answer_guide=guides.wire_guide(), promo_html=promo("electrician-calc", "wire-size", "Full cable sizing with ambient and grouping derating, IEC and NEC, step-by-step working and PDF reports."))
 
     calc_page(
         "pool/pool-chemical-calculator.html", "Pool Chemical Calculator: Chlorine, Baking Soda, Stabilizer, Salt",
@@ -792,7 +949,7 @@ def build_more():
         [("How much liquid chlorine to raise FC by 1 ppm?", "About 12.8 fl oz of 10 % liquid chlorine per 10,000 US gallons. Bleach is weaker: 6 % bleach needs roughly 21 fl oz for the same rise."),
          ("What FC should I aim for?", "It depends on your stabilizer (CYA) level: the higher the CYA, the more free chlorine you need. PoolPro uses Trouble Free Pool's FC/CYA chart for targets."),
          ("Where does the math come from?", "Chlorine strength follows the same bleach density formula as TFP Pool Math; baking soda raises total alkalinity by 1 ppm per 1.68 mg per litre; stabilizer and salt are added at their label purity.")],
-        "t-pool", "pool")
+        "t-pool", "pool", answer_guide=guides.pool_guide())
 
     calc_page(
         "bread/bakers-percentage-calculator.html", "Baker's Percentage Calculator for Sourdough (with True Hydration)",
@@ -814,7 +971,7 @@ def build_more():
         [("What are baker's percentages?", "Every ingredient is written as a percentage of the flour weight, with flour at 100 %. 500 g flour at 75 % hydration means 375 g water."),
          ("What is true hydration?", "The water from both the bowl and the starter divided by all the flour, including the flour in the starter. A 75 % dough with 20 % starter at 100 % hydration is about 75 % either way; stiff starters lower it."),
          ("How much starter should I use?", "Most sourdough recipes use 10–25 % starter. Less starter means a longer, slower rise.")],
-        "t-bread", "bread")
+        "t-bread", "bread", answer_guide=guides.bread_guide())
 
     calc_page(
         "soap/lye-calculator.html", "Lye Calculator for Cold Process Soap (NaOH) | Free",
@@ -833,7 +990,7 @@ def build_more():
         [("How is the lye amount calculated?", "Lye = Σ (oil grams × SAP value) × (1 − superfat) ÷ purity. SAP values are in grams of KOH per gram of oil and are converted to NaOH by molar mass (39.997 / 56.106)."),
          ("What superfat should I use?", "5 % is a common starting point for bar soap: a little oil stays unsaponified for a milder bar. Salt bars and 100 % coconut soaps often use 15–20 %."),
          ("Where do the SAP values come from?", "From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point.")],
-        "t-soap", "lye",
+        "t-soap", "lye", answer_guide=guides.lye_guide(load_oils()),
         extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>')
 
 
@@ -894,46 +1051,21 @@ def build_countdown():
 
 
 # ---------- App pages ----------
+# The apps have one page each, on the main site (/apps/<slug>/). This site used to keep its own copies at
+# /calculators/apps/<key>.html: thin duplicates, removed. docs/ and the nginx config redirect the old addresses.
 
-APP_LABELS = {
-    "en": {"free": "Free", "pro": "Pro", "private": "No account. Your data stays on your device.", "privacy": "Privacy",
-           "terms": "Terms", "support": "Support", "title": "app for iPhone and Android"},
-    "uk": {"free": "Безкоштовно", "pro": "Pro", "private": "Без акаунта. Ваші дані лишаються на пристрої.", "privacy": "Конфіденційність",
-           "terms": "Умови", "support": "Підтримка", "title": "застосунок для iPhone і Android"},
-}
+MAIN_SLUG = {"leben-in-deutschland": "lid-test"}
 
 
-def build_apps():
-    for key, a in APPS.items():
-        c = CFG["apps"][key]
-        path = f"apps/{key}.html"
-        icon = f'<img class="appicon" src="{{rel}}{a["icon"]}" alt="{e(c["short"])} icon" width="72" height="72">' if a["icon"] else ""
-        shots = "".join(f'<img src="{{rel}}{s}" alt="{e(c["short"])} screenshot {i + 1}" loading="lazy" width="220">' for i, s in enumerate(a["screens"]))
-        privacy = a.get("privacy") or f'{CFG["policy_base"]}/{key}/privacy.html'
-        terms = a.get("terms") or f'{CFG["policy_base"]}/{key}/terms.html'
-        calc = (f'<section><h2>Try it in your browser</h2><p><a class="btn ghost" href="{{rel}}{a["calc"][0]}">{a["calc"][1]} →</a></p></section>'
-                if a.get("calc") else "")
-        note = f' {e(a["note"])}' if a.get("note") else ""
-        lang = a.get("lang", "en")
-        L = APP_LABELS[lang]
-        ld = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": c["name"], "operatingSystem": "iOS, Android",
-              "applicationCategory": a["category"], "description": a["tagline"], "url": f"{BASE}/{path}",
-              "publisher": {"@type": "Organization", "name": CFG["brand"]}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
-        body = f"""
-<div class="hero">{icon}
-<h1 style="margin-top:14px">{e(c["name"])}</h1>
-<p class="lead">{e(a["tagline"])}</p>
-<div style="margin-top:20px">{store_buttons(key, "app-page", lang)}</div></div>
-{f'<section class="shots">{shots}</section>' if shots else ""}
-<section class="prose"><p>{e(a["intro"])}</p></section>
-<section class="grid">
-<div class="card"><span class="tag">{L["free"]}</span><ul class="ticks">{"".join(f"<li>{e(x)}</li>" for x in a["free"])}</ul></div>
-<div class="card"><span class="tag">{L["pro"]}</span><ul class="ticks">{"".join(f"<li>{e(x)}</li>" for x in a["pro"])}</ul></div>
-</section>
-{calc}
-<p class="note">{L["private"]}{note} <a href="{privacy}">{L["privacy"]}</a> · <a href="{terms}">{L["terms"]}</a> · <a href="mailto:{CFG["support_email"]}">{L["support"]}</a></p>
-"""
-        shell(path, f"{c['name']} — {L['title']}", a["tagline"], body, a["theme"], jsonld=[ld], lang=lang)
+def main_app_url(key):
+    """The app's page on the main site; the Ukrainian page of an app described here in Ukrainian."""
+    lang = APPS[key].get("lang", "en")
+    return f'{SITE}/apps/{MAIN_SLUG.get(key, key)}/' + ("" if lang == "en" else f"{lang}/")
+
+
+def app_href(key):
+    """Where links to an app go."""
+    return main_app_url(key)
 
 
 # ---------- Home ----------
@@ -957,7 +1089,7 @@ def build_home():
     calc_cards = "".join(f'<a class="card {t}" href="{{rel}}{p}"><span class="tag">{tag}</span><h3>{e(h)}</h3><p>{e(d)}</p></a>' for p, tag, h, d, t in calcs)
     def app_cards(group):
         return "".join(
-            f'<a class="card {a["theme"]}" href="{{rel}}apps/{k}.html">'
+            f'<a class="card {a["theme"]}" href="{app_href(k)}">'
             + (f'<img class="appicon" src="{{rel}}{a["icon"]}" alt="" width="56" height="56" style="width:56px;height:56px;border-radius:14px;margin-bottom:10px">' if a["icon"] else "")
             + f'<h3>{e(CFG["apps"][k]["name"])}</h3><p>{e(a["tagline"])}</p></a>'
             for k, a in APPS.items() if a.get("group", "trades") == group)
@@ -971,7 +1103,8 @@ def build_home():
 <section><h2>Everyday apps</h2><div class="grid">{app_cards("everyday")}</div>
 <p><a href="{{rel}}countdown/christmas-countdown.html">How many days until Christmas? Live countdown →</a></p></section>
 <section class="prose"><h2>Why these tools</h2>
-<p>No account, no ads, no data leaving your phone. Built by an independent developer, <a href="{CFG["developer_site"]}/">Andrii Zhukovskyi</a>, who answers every email: <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>.</p>
+<p>No account, no ads, no data leaving your phone. Built by an independent developer, <a href="{ABOUT_URL}">Andrii Zhukovskyi</a>, who answers every email: <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>.</p>
+<p>Every table and formula names its source. The <a href="{{rel}}methodology.html">methodology</a> lists the editions and the limits, and the <a href="{{rel}}verification.html">checked examples</a> put a row from each source next to what the calculator answers.</p>
 <p>Most of the apps are in a free closed test on Google Play right now, with the App Store next. <a href="{CFG["developer_site"]}/testers/">Become a tester</a> and get them before release.</p></section>
 """
     shell("index.html", f"{CFG['brand']} Tools: free calculators for HVAC, electrical and floor coating",
@@ -997,7 +1130,7 @@ def write_llms():
         free = "\n".join(f"- {x}" for x in a["free"])
         pro = "\n".join(f"- {x}" for x in a["pro"])
         calc = f"\nFree in the browser, same formulas: [{a['calc'][1]}]({BASE}/{a['calc'][0]}).\n" if a.get("calc") else ""
-        return (f"### {c['name']}\n\n{a['tagline']} {state(c)} Page: {BASE}/apps/{k}.html\n\n{a['intro']}\n\n"
+        return (f"### {c['name']}\n\n{a['tagline']} {state(c)} Page: {main_app_url(k)}\n\n{a['intro']}\n\n"
                 f"Free:\n{free}\n\nPro:\n{pro}\n{calc}")
 
     rank = {"trades": 0, "makers": 1, "everyday": 2}  # trades first: Pro tiers and calculators next to them
@@ -1005,8 +1138,8 @@ def write_llms():
     ready = [(k, a) for k, a in ordered if live(CFG["apps"][k]) or CFG["apps"][k].get("status") == "testing"]
     later = [(k, a) for k, a in ordered if (k, a) not in ready]
     now = "\n".join(block(k, a) for k, a in ready)
-    soon = "\n".join(f'- [{CFG["apps"][k]["name"]}]({BASE}/apps/{k}.html): {a["tagline"]}' for k, a in later)
-    calc_lines = "\n".join(f"- [{h}]({BASE}/{p}): {d}" for p, _, h, d, _ in CALCS)
+    soon = "\n".join(f'- [{CFG["apps"][k]["name"]}]({main_app_url(k)}): {a["tagline"]}' for k, a in later)
+    calc_lines = "\n".join(f"- [{h}]({BASE}/{p.removesuffix('index.html')}): {d}" for p, _, h, d, _ in CALCS)
     pt_lines = ", ".join(f"[{rid}]({BASE}/hvac/pt-chart/{slug(rid)}.html)" for rid in PT)
     (OUT / "llms.txt").write_text(f"""# {CFG["brand"]} apps and free calculators for the trades
 
@@ -1032,7 +1165,14 @@ Pressure-temperature tables with bubble and dew columns: {pt_lines}.
 ## Optional
 
 - [All {CFG["brand"]} apps]({dev}/apps/): the developer site, with screenshots.
+- [Methodology and sources]({BASE}/methodology.html): which tables and editions the calculators use, their assumptions and limits.
+- [Checked examples]({BASE}/verification.html): rows from the sources next to the calculators' answers.
+- [About {CFG["brand"]}]({ABOUT_URL}): who makes the apps and the calculators.
 """)
+
+
+# Search and answer crawlers, named so that a later rule for "*" cannot shut them out by accident.
+SEARCH_BOTS = "".join(f"User-agent: {b}\n" for b in ("OAI-SearchBot", "Claude-SearchBot", "PerplexityBot", "Bingbot"))
 
 
 def main():
@@ -1049,15 +1189,18 @@ def main():
     build_coat()
     build_countdown()
     build_more()
-    build_apps()
+    trust.build(sys.modules[__name__])
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
     if CFG.get("indexnow_key"):  # IndexNow (Bing, Yandex): the key file proves the site is ours
         (OUT / f'{CFG["indexnow_key"]}.txt').write_text(CFG["indexnow_key"])
     write_llms()
-    (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
-    urls = "".join(f"<url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>" for u in pages)
+    # The live robots.txt is the main site's (my_space/build.py); this copy keeps the same rules.
+    (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\n{SEARCH_BOTS}Allow: /\n\nSitemap: {BASE}/sitemap.xml\n")
+    urls = "".join(f"<url><loc>{u}</loc><lastmod>{page_dates[u]}</lastmod></url>" for u in pages)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
+    # Keep hash and date only for pages that still exist.
+    LASTMOD_FILE.write_text(json.dumps({u: LASTMOD[u] for u in sorted(page_dates)}, indent=1) + "\n")
     build_legacy()
     print(f"{len(pages)} pages, {len(PT)} PT charts -> {OUT}; redirects -> {LEGACY_OUT}")
 
@@ -1093,6 +1236,8 @@ def build_legacy():
         if rel == "404.html":
             continue
         stub(rel, f"{BASE}/{rel}".replace("/index.html", "/"))
+    for key in APPS:  # the app pages this site no longer has
+        stub(f"apps/{key}.html", main_app_url(key))
     stub("404.html", f"{BASE}/")
     (LEGACY_OUT / ".nojekyll").write_text("")
     (LEGACY_OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n")

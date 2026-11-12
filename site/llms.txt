@@ -8,7 +8,7 @@ Android apps are in closed testing on Google Play and anyone can join for free: 
 
 ### HVAC Charge: Superheat & PT
 
-Superheat, subcooling and PT charts for R-454B, R-32, R-410A and more. Offline, no account. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/hvac-charge.html
+Superheat, subcooling and PT charts for R-454B, R-32, R-410A and more. Offline, no account. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/hvac-charge/
 
 Built for service techs on the roof, not in the office. Enter gauge pressure and line temperature; saturation, superheat and subcooling update as you type, from published manufacturer PT charts.
 
@@ -25,9 +25,29 @@ Pro:
 
 Free in the browser, same formulas: [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html).
 
+### Electrician Calc: Wire & Panel
+
+Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364. Available on the App Store. Page: https://zhukovskyi.space/apps/electrician-calc/
+
+Real ampacity tables, correction factors and protection checks with every step shown. NEC (AWG, feet) or IEC 60364 (mm², metres), picked from your region and switched with one tap.
+
+Free:
+- Cable size with ampacity, derating and voltage-drop check
+- Voltage drop: volts, %, end voltage, minimum size
+- Power and Ohm's law for DC, single and three phase
+
+Pro:
+- Panel planner: circuits to breakers, cables and RCD groups
+- Motor circuits, fault level, load schedule, PF correction
+- Earth fault loop, earthing conductors and electrodes
+- Solar PV strings, battery and backup power sizing
+- Unlimited projects with PDF reports
+
+Free in the browser, same formulas: [Voltage drop calculator](https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html).
+
 ### CoatCalc: Epoxy Floor Coating
 
-Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/coatcalc.html
+Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/coatcalc/
 
 For garage-floor and concrete-coating installers. Order the right number of kits, check if you can coat today, and send a professional quote before you leave the driveway.
 
@@ -47,7 +67,7 @@ Free in the browser, same formulas: [Epoxy coverage calculator](https://zhukovsk
 
 ### PoolPro: Chemistry & Route
 
-Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/poolpro.html
+Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/poolpro/
 
 PoolPro turns a pool test into exact doses for the chemicals already on your shelf, in the order to add them. For pool owners and pool service techs. Offline, no account, no ads and no brand pushing.
 
@@ -67,7 +87,7 @@ Free in the browser, same formulas: [Pool chemical calculator](https://zhukovsky
 
 ### SoftWash Pro: Mix & Quote
 
-Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/softwash.html
+Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/softwash/
 
 For soft wash and pressure washing businesses. Mix sodium hypochlorite right, know the real strength that hits the wall, and send a clean PDF quote before you leave the driveway.
 
@@ -85,7 +105,7 @@ Pro:
 
 ### RoofCalc: Roofing Calculator
 
-Roofing calculator: squares from the footprint and pitch, every material and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/roofcalc.html
+Roofing calculator: squares from the footprint and pitch, every material and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/roofcalc/
 
 For roofers who bid jobs every week. Measure from the ground, get the squares and every material, and send a PDF quote before you leave the driveway. No ads, works offline.
 
@@ -103,7 +123,7 @@ Pro:
 
 ### SlabCalc: Concrete & Rebar
 
-Concrete calculator: cubic yards and bags, rebar, mesh and forms on a feet-inch keypad. Pay once, no ads. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/slabcalc.html
+Concrete calculator: cubic yards and bags, rebar, mesh and forms on a feet-inch keypad. Pay once, no ads. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/slabcalc/
 
 For contractors and serious DIYers. Type 12' 6½" in five taps and get yards, bags, rebar and forms while you type. Pro is a one-time purchase.
 
@@ -122,7 +142,7 @@ Pro:
 
 ### SiteLog: Daily Report & Snags
 
-Daily site reports and punch lists with photos. A PDF in one tap. Works offline. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/sitelog.html
+Daily site reports and punch lists with photos. A PDF in one tap. Works offline. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/sitelog/
 
 The fast, offline site diary for contractors who run their own jobs. Write the daily report in two minutes, walk the site with a punch list, and send a clean PDF before you leave.
 
@@ -140,7 +160,7 @@ Pro:
 
 ### Lye Calc: Soap Recipes
 
-Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/lye-calc.html
+Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/lye-calc/
 
 A soap making calculator that gets the lye right and never loses your recipes. Add oils by weight or percent, set superfat and water, and see exactly what to weigh.
 
@@ -163,7 +183,7 @@ Free in the browser, same formulas: [Lye calculator](https://zhukovskyi.space/ca
 
 ### Focus Sprint: ADHD Timer
 
-An ADHD-friendly focus timer: tiny sprints, a kind buddy and a soft app shield. No guilt. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/focus-sprint.html
+An ADHD-friendly focus timer: tiny sprints, a kind buddy and a soft app shield. No guilt. Available on Google Play. Page: https://zhukovskyi.space/apps/focus-sprint/
 
 Starting is the hard part, so Focus Sprint makes it tiny: tap "Just 5 minutes" and Spark, your focus buddy, keeps you company until the timer ends. Ended early? You keep your XP. Got distracted? Spark says something kind and you try again.
 
@@ -182,7 +202,7 @@ Pro:
 
 ### Water Buddy: Drink Reminder
 
-A cute water tracker: fill up Buddy, hit your daily goal, unlock outfits and keep your streak. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/calculators/apps/water-buddy.html
+A cute water tracker: fill up Buddy, hit your daily goal, unlock outfits and keep your streak. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/water-buddy/
 
 Drinking enough water is easier with a friend. Buddy is a little water drop who fills up every time you drink and gets happier as you go. Log a glass in one tap, hit your goal and celebrate with confetti.
 
@@ -201,7 +221,7 @@ Pro:
 ## Free calculators
 
 - [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html): R-454B, R-32, R-410A, R-22 with PT lookup.
-- [Refrigerant PT charts](https://zhukovskyi.space/calculators/hvac/pt-chart/index.html): 22 refrigerants, bubble and dew columns.
+- [Refrigerant PT charts](https://zhukovskyi.space/calculators/hvac/pt-chart/): 22 refrigerants, bubble and dew columns.
 - [Voltage drop calculator](https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html): AWG or mm², copper or aluminum, minimum size for 3 %.
 - [Epoxy coverage calculator](https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html): Gallons and kits from area, mils and solids.
 - [Wire size calculator](https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html): NEC 310.16 conductor and breaker, with voltage drop.
@@ -217,12 +237,14 @@ Pressure-temperature tables with bubble and dew columns: [R-410A](https://zhukov
 
 ## Coming soon
 
-- [Electrician Calc: Wire & Panel](https://zhukovskyi.space/calculators/apps/electrician-calc.html): Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364.
-- [PaintBid: Painting Estimator](https://zhukovskyi.space/calculators/apps/paintbid.html): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.
-- [Days Until: Countdown Widget](https://zhukovskyi.space/calculators/apps/days-until.html): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too.
-- [Fastwise: Fasting Tracker](https://zhukovskyi.space/calculators/apps/fastwise.html): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits.
-- [Leben in Deutschland: тест UA](https://zhukovskyi.space/calculators/apps/leben-in-deutschland.html): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.
+- [PaintBid: Painting Estimator](https://zhukovskyi.space/apps/paintbid/): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.
+- [Days Until: Countdown Widget](https://zhukovskyi.space/apps/days-until/): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too.
+- [Fastwise: Fasting Tracker](https://zhukovskyi.space/apps/fastwise/): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits.
+- [Leben in Deutschland: тест UA](https://zhukovskyi.space/apps/lid-test/uk/): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.
 
 ## Optional
 
 - [All Dre Dev apps](https://zhukovskyi.space/apps/): the developer site, with screenshots.
+- [Methodology and sources](https://zhukovskyi.space/calculators/methodology.html): which tables and editions the calculators use, their assumptions and limits.
+- [Checked examples](https://zhukovskyi.space/calculators/verification.html): rows from the sources next to the calculators' answers.
+- [About Dre Dev](https://zhukovskyi.space/about/): who makes the apps and the calculators.
