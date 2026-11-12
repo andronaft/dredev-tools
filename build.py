@@ -353,10 +353,11 @@ def prep_images():
 
 # ---------- page shell ----------
 
-def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en"):
+def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en", canonical=None):
     depth = path.count("/")
     rel = "../" * depth
-    canonical = f"{BASE}/{path}".replace("/index.html", "/")
+    own = f"{BASE}/{path}".replace("/index.html", "/")
+    canonical = canonical or own
     ld = "".join(f'<script type="application/ld+json">{json.dumps(j, ensure_ascii=False)}</script>' for j in (jsonld or []))
     calc_attr = f' data-calc="{calc}"' if calc else ""
     doc = f"""<!doctype html>
@@ -401,7 +402,8 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
     dest = OUT / path
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(doc)
-    pages.append(canonical)
+    if canonical == own:  # pages that point elsewhere stay out of the sitemap
+        pages.append(canonical)
 
 
 # ---------- shared blocks ----------
@@ -440,7 +442,7 @@ def promo(key, source, pitch):
     return f"""<section class="promo">{icon}<div>
 <div class="eyebrow">The whole job, on your phone</div>
 <h3>{e(c["name"])}</h3>
-<p>{e(pitch)} <a href="{{rel}}apps/{key}.html">See what's inside</a>.</p>
+<p>{e(pitch)} <a href="{app_href(key)}">See what's inside</a>.</p>
 {store_buttons(key, source)}
 </div></section>"""
 
@@ -912,6 +914,19 @@ APP_LABELS = {
 }
 
 
+MAIN_SLUG = {"leben-in-deutschland": "lid-test"}
+
+
+def main_app_url(key):
+    """The app's page on the main site, which is the canonical one for the English app pages here."""
+    return f'{CFG["developer_site"]}/apps/{MAIN_SLUG.get(key, key)}/'
+
+
+def app_href(key):
+    """Where links to an app go: the main site's page, or the local page for apps whose page here is in another language."""
+    return main_app_url(key) if APPS[key].get("lang", "en") == "en" else f"{{rel}}apps/{key}.html"
+
+
 def build_apps():
     for key, a in APPS.items():
         c = CFG["apps"][key]
@@ -926,7 +941,8 @@ def build_apps():
         lang = a.get("lang", "en")
         L = APP_LABELS[lang]
         ld = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": c["name"], "operatingSystem": "iOS, Android",
-              "applicationCategory": a["category"], "description": a["tagline"], "url": f"{BASE}/{path}",
+              "applicationCategory": a["category"], "description": a["tagline"],
+              "url": main_app_url(key) if lang == "en" else f"{BASE}/{path}",
               "publisher": {"@type": "Organization", "name": CFG["brand"]}, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
         body = f"""
 <div class="hero">{icon}
@@ -942,7 +958,9 @@ def build_apps():
 {calc}
 <p class="note">{L["private"]}{note} <a href="{privacy}">{L["privacy"]}</a> · <a href="{terms}">{L["terms"]}</a> · <a href="mailto:{CFG["support_email"]}">{L["support"]}</a></p>
 """
-        shell(path, f"{c['name']} — {L['title']}", a["tagline"], body, a["theme"], jsonld=[ld], lang=lang)
+        # English app pages duplicate the main site's /apps/<slug>/ pages: point Google there.
+        shell(path, f"{c['name']} — {L['title']}", a["tagline"], body, a["theme"], jsonld=[ld], lang=lang,
+              canonical=main_app_url(key) if lang == "en" else None)
 
 
 # ---------- Home ----------
@@ -966,7 +984,7 @@ def build_home():
     calc_cards = "".join(f'<a class="card {t}" href="{{rel}}{p}"><span class="tag">{tag}</span><h3>{e(h)}</h3><p>{e(d)}</p></a>' for p, tag, h, d, t in calcs)
     def app_cards(group):
         return "".join(
-            f'<a class="card {a["theme"]}" href="{{rel}}apps/{k}.html">'
+            f'<a class="card {a["theme"]}" href="{app_href(k)}">'
             + (f'<img class="appicon" src="{{rel}}{a["icon"]}" alt="" width="56" height="56" style="width:56px;height:56px;border-radius:14px;margin-bottom:10px">' if a["icon"] else "")
             + f'<h3>{e(CFG["apps"][k]["name"])}</h3><p>{e(a["tagline"])}</p></a>'
             for k, a in APPS.items() if a.get("group", "trades") == group)
@@ -1006,7 +1024,7 @@ def write_llms():
         free = "\n".join(f"- {x}" for x in a["free"])
         pro = "\n".join(f"- {x}" for x in a["pro"])
         calc = f"\nFree in the browser, same formulas: [{a['calc'][1]}]({BASE}/{a['calc'][0]}).\n" if a.get("calc") else ""
-        return (f"### {c['name']}\n\n{a['tagline']} {state(c)} Page: {BASE}/apps/{k}.html\n\n{a['intro']}\n\n"
+        return (f"### {c['name']}\n\n{a['tagline']} {state(c)} Page: {main_app_url(k)}\n\n{a['intro']}\n\n"
                 f"Free:\n{free}\n\nPro:\n{pro}\n{calc}")
 
     rank = {"trades": 0, "makers": 1, "everyday": 2}  # trades first: Pro tiers and calculators next to them
@@ -1014,7 +1032,7 @@ def write_llms():
     ready = [(k, a) for k, a in ordered if live(CFG["apps"][k]) or CFG["apps"][k].get("status") == "testing"]
     later = [(k, a) for k, a in ordered if (k, a) not in ready]
     now = "\n".join(block(k, a) for k, a in ready)
-    soon = "\n".join(f'- [{CFG["apps"][k]["name"]}]({BASE}/apps/{k}.html): {a["tagline"]}' for k, a in later)
+    soon = "\n".join(f'- [{CFG["apps"][k]["name"]}]({main_app_url(k)}): {a["tagline"]}' for k, a in later)
     calc_lines = "\n".join(f"- [{h}]({BASE}/{p}): {d}" for p, _, h, d, _ in CALCS)
     pt_lines = ", ".join(f"[{rid}]({BASE}/hvac/pt-chart/{slug(rid)}.html)" for rid in PT)
     (OUT / "llms.txt").write_text(f"""# {CFG["brand"]} apps and free calculators for the trades
