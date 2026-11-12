@@ -20,6 +20,8 @@ from pathlib import Path
 from urllib.parse import quote, urljoin
 
 import guides
+import pages_electrical
+import pages_hvac
 import trust
 
 HERE = Path(__file__).resolve().parent
@@ -702,29 +704,8 @@ def build_hvac():
           [webapp_ld("Superheat & Subcooling Calculator", path, "Superheat, subcooling and PT lookup for common refrigerants."), faq_ld],
           '<script src="{rel}assets/pt-data.js"></script><script src="{rel}assets/calc.js"></script>')
 
-    for rid, r in PT.items():
-        p = f"hvac/pt-chart/{slug(rid)}.html"
-        glide = (f"<p>{rid} is a zeotropic blend with temperature glide, so the chart has two columns: use the <b>vapor (dew)</b> column "
-                 "for superheat and the <b>liquid (bubble)</b> column for subcooling.</p>") if r["dew"] else ""
-        a2l = SAFETY_NOTES.get(r["safety"], "")
-        in_calc = rid in FREE_REFRIGERANTS
-        cta = (f'<p><a class="btn" href="{{rel}}hvac/superheat-subcooling-calculator.html">Calculate superheat &amp; subcooling with {rid}</a></p>'
-               if in_calc else "")
-        body = f"""
-<div class="crumbs"><a href="{{rel}}index.html">Tools</a> › <a href="{{rel}}hvac/superheat-subcooling-calculator.html">HVAC</a> › PT charts</div>
-<div class="hero"><div class="eyebrow">PT chart · ASHRAE {r["safety"]}</div>
-<h1>{rid} PT Chart</h1>
-<p class="lead">{rid} pressure–temperature chart in psig and °F/°C. {e(r["use"])}.{a2l}</p></div>
-<div class="prose">{glide}<p>Vacuum readings are shown in inches of mercury (″ Hg) below atmospheric pressure.</p></div>
-{cta}
-{pt_table(r)}
-<p class="note">Source: {e(r["source"])}.{" Converted from absolute pressure (psia) to psig." if r["bubble"].get("converted") else ""} Reference only; verify against the equipment manufacturer's data.</p>
-{promo("hvac-charge", "pt-" + slug(rid), f"Look up {rid} offline in the field and get superheat, subcooling and a charge call in seconds.")}
-<section><h2>Other refrigerants</h2>{chips(rid)}</section>
-"""
-        shell(p, f"{rid} PT Chart: Pressure Temperature Chart (psig, °F, °C)",
-              f"{rid} pressure-temperature chart from -50 °F to 150 °F in psig with °C.{' Bubble and dew columns for the glide.' if r['dew'] else ''} Free, printable.",
-              body, "t-hvac")
+    for rid, r in PT.items():  # the page body lives in pages_hvac.py, next to the other refrigerant pages
+        pages_hvac.pt_page(sys.modules[__name__], rid, r)
 
     index_rows = "".join(
         f'<a class="card" href="{{rel}}hvac/pt-chart/{slug(rid)}.html"><span class="tag">{r["safety"]}</span><h3>{rid} PT chart</h3><p>{e(r["use"])}</p></a>'
@@ -1189,6 +1170,8 @@ def main():
     build_coat()
     build_countdown()
     build_more()
+    pages_hvac.build(sys.modules[__name__])
+    pages_electrical.build(sys.modules[__name__])
     trust.build(sys.modules[__name__])
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
