@@ -195,7 +195,10 @@ class PtChartPages(unittest.TestCase):
             self.assertIn("ref-pages.js", h)
             self.assertIn("equipment manufacturer", h)
             self.assertIn("local codes", h)
-            self.assertIn(f'href="../../{ph.sh_path(rid)}"', h)
+            # Six refrigerants have a calculator page of their own; the rest open the shared calculator on themselves.
+            want = ph.sh_path(rid) if rid in ph.OWN_PAGES else f"hvac/superheat-subcooling-calculator.html#{ph.slug(rid)}"
+            self.assertEqual(ph.calc_href(rid), want)
+            self.assertTrue(f'href="../../{want}"' in h, rid)
 
     def test_facts_are_sourced(self):
         for rid in build.PT:
@@ -240,10 +243,85 @@ class PtChartPages(unittest.TestCase):
         self.assertLessEqual(used | set(refdata.SAFETY_SOURCE.values()), set(refdata.SOURCES))
 
 
+def shared_text(a, b, n=5):
+    """Share of page a's words that sit in runs of n words also found on page b (main content only)."""
+    def words(h):
+        h = re.search(r"<main[^>]*>(.*?)</main>", h, re.S).group(1)
+        h = re.sub(r"<script.*?</script>", " ", h, flags=re.S)
+        return re.findall(r"[A-Za-z0-9°.\-]+", text(re.sub(r"<[^>]+>", " ", h)))
+
+    wa, wb = words(a), words(b)
+    runs = {tuple(wb[i:i + n]) for i in range(len(wb) - n + 1)}
+    hit = set()
+    for i in range(len(wa) - n + 1):
+        if tuple(wa[i:i + n]) in runs:
+            hit.update(range(i, i + n))
+    return len(hit) / len(wa)
+
+
+class SharedCalculator(unittest.TestCase):
+    """hvac/superheat-subcooling-calculator.html: one calculator for every refrigerant."""
+
+    def setUp(self):
+        self.h = page(ph.MAIN_CALC)
+
+    def test_every_refrigerant_is_in_the_select_and_in_the_data(self):
+        select = re.search(r'<select id="ref">(.*?)</select>', self.h, re.S).group(1)
+        self.assertEqual(re.findall(r'<option value="([^"]+)"', select), list(build.PT))
+        data = (SITE / "assets/pt-data.js").read_text()
+        self.assertEqual(json.loads(data[len("window.PT_DATA = "):].rstrip().rstrip(";")), build.PT)
+        self.assertIn("assets/pt-data.js", self.h)
+        self.assertIn('data-calc="hvac"', self.h)
+        self.assertEqual(sorted(d["@type"] for d in jsonld(self.h)), ["FAQPage", "WebApplication"])
+        self.assertEqual(crumb_names(self.h)[2:], ["HVAC", "Superheat & Subcooling Calculator"])
+        self.assertIn("equipment manufacturer", self.h)
+
+    def test_example_readings_match_the_live_calculator(self):
+        shown_ = json.loads(re.search(r"window\.HVAC_EXAMPLES = (\{.*?\});", self.h).group(1))
+        self.assertEqual(list(shown_), list(build.PT))
+        ops = []
+        for rid, r in build.PT.items():
+            ex = ph.example(r)
+            self.assertEqual(shown_[rid], {"sh": [ex["p_s"], ex["line_s"]], "sc": [ex["p_l"], ex["line_l"]]})
+            ops.append({"op": "hvac", "rid": rid, "data": r, "mode": "sh", "p": ex["p_s"], "t": ex["line_s"]})
+            ops.append({"op": "hvac", "rid": rid, "data": r, "mode": "sc", "p": ex["p_l"], "t": ex["line_l"]})
+        res = js(ops)
+        tbl = next(x for x in tables(self.h) if x[0][0] == "Refrigerant")
+        self.assertEqual([row[0] for row in tbl[1:]], list(build.PT))
+        for i, (rid, r) in enumerate(build.PT.items()):
+            ex, row = ph.example(r), tbl[1 + i]
+            sat_s, sat_l = (res[2 * i + k]["sat"].split(" °F")[0] for k in (0, 1))
+            self.assertEqual(row[3], f"{ex['p_s']} psig → {sat_s} °F" + (" dew" if r["dew"] else ""), rid)
+            self.assertEqual(row[4], f"{ex['p_l']} psig → {sat_l} °F" + (" bubble" if r["dew"] else ""), rid)
+            self.assertEqual(row[2], r["safety"], rid)
+            self.assertIn(f'href="#{ph.slug(rid)}"', self.h)
+        # The fields start with the first refrigerant's example.
+        first = ph.example(next(iter(build.PT.values())))
+        self.assertIn(f'id="p" inputmode="decimal" value="{first["p_s"]}"', self.h)
+        self.assertIn(f'id="t" inputmode="decimal" value="{first["line_s"]}"', self.h)
+
+    def test_refrigerant_from_the_address(self):
+        ids = json.dumps(list(build.PT))
+        cases = [("#r-454b", "", "R-454B"), ("#R-1234YF", "", "R-1234yf"), ("", "?ref=R-134a", "R-134a"),
+                 ("", "?x=1&ref=r-744", "R-744"), ("#r-32", "?ref=R-22", "R-32"), ("#nothing", "?ref=R-22", "R-22"),
+                 ("#nothing", "", None), ("", "", None), ("#%zz", "", None)]
+        res = js([{"op": "eval", "code": f"RefPages.refFromAddress({json.dumps(h)}, {json.dumps(q)}, {ids})"} for h, q, _ in cases])
+        self.assertEqual(res, [want for _, _, want in cases])
+
+
 class SuperheatPages(unittest.TestCase):
+    """The six refrigerants with a calculator page of their own."""
+
+    def test_only_six_refrigerants_have_a_page(self):
+        self.assertEqual(ph.OWN_PAGES, ["R-410A", "R-454B", "R-32", "R-22", "R-134a", "R-404A"])
+        made = sorted(f.name for f in (SITE / "hvac/superheat-calculator").iterdir())
+        self.assertEqual(made, sorted(f"{ph.slug(rid)}.html" for rid in ph.OWN_PAGES))
+        self.assertEqual((SITE / "sitemap.xml").read_text().count("/hvac/superheat-calculator/"), len(ph.OWN_PAGES))
+
     def test_examples_and_tables_match_the_live_calculator(self):
         ops, plan = [], []
-        for rid, r in build.PT.items():
+        for rid in ph.OWN_PAGES:
+            r = build.PT[rid]
             ex = ph.example(r)
             ops.append({"op": "hvac", "rid": rid, "data": r, "mode": "sh", "p": ex["p_s"], "t": ex["line_s"]})
             ops.append({"op": "hvac", "rid": rid, "data": r, "mode": "sc", "p": ex["p_l"], "t": ex["line_l"]})
@@ -261,6 +339,7 @@ class SuperheatPages(unittest.TestCase):
                 continue
             value = text(out["out"]).replace(" °F", "")
             sat = out["sat"].split(" °F")[0]
+            answer = text(re.search(r'<p class="answer">(.*?)</p>', h, re.S).group(1))
             if kind == "sh":
                 self.assertEqual(value, ph.t1(x["sh"]), rid)
                 self.assertIn(f"Saturation temperature at {x['p_s']} psig in the", h)
@@ -269,12 +348,19 @@ class SuperheatPages(unittest.TestCase):
                 self.assertIn(f"Result: {value} °F of superheat.", h)
                 self.assertIn(f'id="p" inputmode="decimal" value="{x["p_s"]}"', h)
                 self.assertIn(f'id="t" inputmode="decimal" value="{x["line_s"]}"', h)
+                self.assertIn(f"{x['p_s']} psig", answer)
+                self.assertIn(f"{sat} °F", answer)
+                self.assertIn(f"{value} °F", answer)
             else:
                 self.assertEqual(value, ph.t1(x["sc"]), rid)
                 self.assertIn(f"Subcooling = {sat} − {x['line_l']} = {value} °F.", h)
                 self.assertIn(f"Result: {value} °F of subcooling.", h)
+                self.assertIn(f"{x['p_l']} psig", answer)
+                self.assertIn(f"{sat} °F", answer)
+                self.assertIn(f"{value} °F", answer)
             self.assertGreater(float(value), 0, rid)
-        for rid, r in build.PT.items():
+        for rid in ph.OWN_PAGES:
+            r = build.PT[rid]
             tbl = next(t for t in tables(page(ph.sh_path(rid))) if t[0][0] == "Pressure, psig")
             self.assertGreaterEqual(len(tbl), 6, rid)
             for row in tbl[1:]:
@@ -292,11 +378,95 @@ class SuperheatPages(unittest.TestCase):
                     self.assertEqual(row[1], f("Saturation"), f"{rid} at {row[0]} psig")
                     self.assertEqual(row[2], got["Saturation"].split("(")[1].split(" °C")[0])
 
-    def test_inline_data_is_the_pt_table(self):
-        for rid, r in build.PT.items():
+    def test_typical_pressures_are_source_cells(self):
+        src = dart_pt()
+        for rid in ph.OWN_PAGES:
+            evap, cond = ph.TYPICAL[ph.PROFILE_OF[rid]]
+            typ = [t for t in tables(page(ph.sh_path(rid))) if t[0][0] == "Saturation temperature"]
+            self.assertEqual(len(typ), 2, rid)
+            for tbl, temps, phase, where in ((typ[0], evap, "dew", "Evaporator"), (typ[1], cond, "bubble", "Condenser")):
+                self.assertEqual([row[0] for row in tbl[1:]], [f"{where} at {t} °F" for t in temps], rid)
+                self.assertEqual([row[1] for row in tbl[1:]], [shown(source_cell(src, rid, phase, t)) for t in temps], rid)
+
+    def test_text_about_the_refrigerant_matches_the_live_calculator(self):
+        """Readings on another refrigerant's chart, quoted in the text written for each page."""
+        quoted = {  # page: [(chart, mode, which example pressure, or a literal psig)]
+            "R-410A": [("R-22", "sh", "p_s"), ("R-454B", "sh", "p_s"), ("R-32", "sh", "p_s")],
+            "R-454B": [("R-454B", "sc", "p_s"), ("R-410A", "sh", "p_s")],
+            "R-32": [("R-410A", "sc", "p_l")],
+            "R-22": [("R-410A", "sh", "p_s"), ("R-407C", "sh", "p_s"), ("R-407C", "sc", "p_s"), ("R-427A", "sh", "p_s"), ("R-427A", "sc", "p_s")],
+            "R-134a": [("R-513A", "sh", "p_s"), ("R-134a", "sh", round(-10 * INHG, 1))],
+            "R-404A": [("R-448A", "sh", "p_s"), ("R-448A", "sc", "p_s"), ("R-449A", "sh", "p_s"), ("R-449A", "sc", "p_s"), ("R-507A", "sh", "p_s")],
+        }
+        self.assertEqual(list(quoted), ph.OWN_PAGES)
+        ops, plan = [], []
+        for rid, cases in quoted.items():
+            ex = ph.example(build.PT[rid])
+            for chart, mode, p in cases:
+                p = ex[p] if isinstance(p, str) else p
+                ops.append({"op": "hvac", "rid": chart, "data": build.PT[chart], "mode": mode, "p": p, "t": 0})
+                plan.append((rid, chart, p))
+        for (rid, chart, p), out in zip(plan, js(ops)):
+            about = text(re.search(r"<h2>What is particular about.*?</section>", page(ph.sh_path(rid)), re.S).group(0))
+            self.assertIn(f"{out['sat'].split(' °F')[0]} °F", about, f"{rid}: {chart} at {p} psig")
+            self.assertIn(f"{p} psig" if p > 0 else f"typed as {p}", about, rid)
+
+    def test_cells_quoted_in_the_text_are_source_cells(self):
+        src = dart_pt()
+        quoted = {
+            "R-410A": [("R-410A", "dew", 40), ("R-22", "dew", 40), ("R-410A", "bubble", 105), ("R-22", "bubble", 105)],
+            "R-454B": [("R-454B", "dew", 40), ("R-410A", "dew", 40), ("R-454B", "bubble", 105), ("R-410A", "bubble", 105)],
+            "R-32": [("R-32", "dew", 40), ("R-410A", "dew", 40), ("R-32", "bubble", 105), ("R-410A", "bubble", 105), ("R-454B", "dew", 40)],
+            "R-22": [("R-22", "dew", 40), ("R-22", "bubble", 105), ("R-410A", "dew", 40), ("R-410A", "bubble", 105)],
+            "R-134a": [("R-134a", "bubble", -15), ("R-134a", "bubble", -20), ("R-134a", "bubble", -40), ("R-513A", "dew", 40),
+                       ("R-134a", "dew", 40), ("R-513A", "bubble", 105), ("R-134a", "bubble", 105)],
+            "R-404A": [("R-404A", "dew", -50), ("R-404A", "dew", -10), ("R-404A", "dew", 20)],
+        }
+        for rid, cells in quoted.items():
+            about = text(re.search(r"<h2>What is particular about.*?</section>", page(ph.sh_path(rid)), re.S).group(0))
+            for chart, phase, t in cells:
+                p = source_cell(src, chart, phase, t)
+                self.assertIn(f"{abs(p):.1f}″ Hg vacuum" if p < 0 else f"{p:.1f} psig", about, f"{rid}: {chart} {phase} at {t} °F")
+        # R-134a crosses atmospheric pressure where the text says it does.
+        self.assertEqual(source_cell(src, "R-134a", "bubble", -15), 0.0)
+        self.assertLess(source_cell(src, "R-134a", "bubble", -20), 0)
+
+    def test_facts_in_the_text_are_the_sourced_ones(self):
+        for rid in ph.OWN_PAGES:
             h = page(ph.sh_path(rid))
-            data = json.loads(re.search(r"window\.PT_DATA = (\{.*?\});window\.HVAC_EXAMPLE", h).group(1))
+            about = text(re.search(r"<h2>What is particular about.*?</section>", h, re.S).group(0))
+            self.assertIn(f"GWP of {refdata.GWP[rid][0]}" if rid != "R-410A" else f"GWP is {refdata.GWP[rid][0]}", about, rid)
+            self.assertIn(f"safety class {build.PT[rid]['safety']}", about, rid)
+            self.assertIn(refdata.SOURCES[refdata.GWP[rid][1]][1], h, rid)
+            self.assertIn(refdata.SOURCES[refdata.SAFETY_SOURCE[rid]][1], h, rid)
+        self.assertIn(refdata.ODP["R-22"][0], page(ph.sh_path("R-22")))
+        self.assertIn(refdata.SOURCES["epa_hcfc22"][1], page(ph.sh_path("R-22")))
+        self.assertIn(text(refdata.COMPOSITION["R-454B"][0]), text(page(ph.sh_path("R-454B"))))
+        self.assertEqual(max(ph.OWN_PAGES, key=lambda x: num(refdata.GWP[x][0])), "R-404A")
+
+    def test_each_page_has_its_own_text(self):
+        """These pages were 80 % the same text with other numbers. What they still share is the calculator's labels,
+        the app banner, the site's disclaimers and the caveat about targets; the rest is written per refrigerant."""
+        pages_ = {rid: page(ph.sh_path(rid)) for rid in ph.OWN_PAGES}
+        heads = [re.findall(r"<h3>(.*?)</h3>", re.search(r"<h2>What is particular about.*?</section>", h, re.S).group(0)) for h in pages_.values()]
+        self.assertTrue(all(len(x) >= 3 for x in heads))
+        questions = [q for h in pages_.values() for q in re.findall(r"<summary>(.*?)</summary>", h)]
+        own_q = [q for q in questions if q != "Where does the data come from?"]
+        self.assertEqual(len(own_q), len(set(own_q)))
+        self.assertGreaterEqual(len(own_q), 3 * len(pages_))
+        shares = [shared_text(pages_[a], pages_[b]) for a in pages_ for b in pages_ if a != b]
+        self.assertLess(max(shares), 0.65)
+        self.assertLess(sum(shares) / len(shares), 0.55)
+
+    def test_inline_data_is_the_pt_table(self):
+        for rid in ph.OWN_PAGES:
+            r = build.PT[rid]
+            h = page(ph.sh_path(rid))
+            data = json.loads(re.search(r"window\.PT_DATA = (\{.*?\});window\.HVAC_EXAMPLES", h).group(1))
             self.assertEqual(data, {rid: r})
+            ex = ph.example(r)
+            self.assertEqual(json.loads(re.search(r"window\.HVAC_EXAMPLES = (\{.*?\});", h).group(1)),
+                             {rid: {"sh": [ex["p_s"], ex["line_s"]], "sc": [ex["p_l"], ex["line_l"]]}})
             self.assertIn('data-calc="hvac"', h)
             self.assertIn("assets/calc.js", h)
             self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["FAQPage", "WebApplication"])
@@ -549,11 +719,11 @@ class Electrical(unittest.TestCase):
 
 class Site(unittest.TestCase):
     NEW = ([ph.HUB, ph.CMP_INDEX, ph.TSH, ph.BUBBLE_DEW, ph.CHARGE_454B, pe.HUB, pe.AMPACITY_PAGE, pe.BY_DISTANCE, pe.VD_12AWG, pe.VD_3PH, pe.VD_12V]
-           + [ph.sh_path(rid) for rid in build.PT] + [ph.cmp_path(a, c) for a, c in ph.PAIRS])
+           + [ph.sh_path(rid) for rid in ph.OWN_PAGES] + [ph.cmp_path(a, c) for a, c in ph.PAIRS])
 
     def test_new_pages_exist_and_are_in_the_sitemap(self):
         sitemap = (SITE / "sitemap.xml").read_text()
-        self.assertEqual(len(self.NEW), 41)
+        self.assertEqual(len(self.NEW), 25)
         for path in self.NEW + [ph.pt_path(rid) for rid in build.PT]:
             self.assertTrue((SITE / path).exists(), path)
             self.assertIn(f"<loc>{build.BASE}/{path}</loc>".replace("/index.html<", "/<"), sitemap)

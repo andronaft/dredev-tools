@@ -44,7 +44,6 @@ OG_IMAGE = "assets/og.jpg"  # 1200x630, made by tools/og_image.py
 LASTMOD_FILE = HERE / "lastmod.json"
 LASTMOD = json.loads(LASTMOD_FILE.read_text()) if LASTMOD_FILE.exists() else {}
 LASTMOD_TOKEN = "@@LASTMOD@@"  # replaced in the finished page with that page's lastmod date
-FREE_REFRIGERANTS = ["R-410A", "R-454B", "R-32", "R-22"]  # same free set as hvac-charge-app AppConfig
 
 e = html.escape
 pages: list[str] = []  # canonical URLs for the sitemap
@@ -638,71 +637,7 @@ def chips(current=None):
 
 
 def build_hvac():
-    path = "hvac/superheat-subcooling-calculator.html"
-    options = "".join(f'<option value="{rid}">{rid}{" (glide)" if PT[rid]["dew"] else ""}</option>' for rid in FREE_REFRIGERANTS)
-    faq_html, faq_ld = faq([
-        ("How do you calculate superheat?",
-         "Read the suction (low-side) pressure and convert it to the saturation temperature with the refrigerant's PT chart. "
-         "Measure the suction line temperature near the service valve. Superheat = suction line temperature − saturation temperature. "
-         "For blends with glide such as R-454B or R-407C, use the <b>dew point</b> (vapor) column."),
-        ("How do you calculate subcooling?",
-         "Read the liquid (high-side) pressure and convert it to the saturation temperature. Measure the liquid line temperature near the "
-         "service valve. Subcooling = saturation temperature − liquid line temperature. For blends with glide, use the <b>bubble point</b> (liquid) column."),
-        ("Should I charge by superheat or subcooling?",
-         "Fixed-orifice (piston) systems are charged by superheat against a target from the outdoor and indoor conditions. TXV and EEV systems "
-         "are charged by subcooling against the target on the outdoor unit's nameplate or the manufacturer's charging chart. Always follow the "
-         "manufacturer's instructions for the specific unit."),
-        ("Is R-454B a drop-in for R-410A?",
-         "No. R-454B is an A2L (mildly flammable) refrigerant for equipment designed for it, with its own pressures, glide and safety requirements. "
-         "Use the R-454B chart, not the R-410A one, and follow the A2L handling rules."),
-        ("Where does this PT data come from?",
-         "From the published Arkema Forane® pressure–temperature charts (NIST REFPROP data). Between the printed 5 °F points the calculator "
-         "interpolates along the vapor-pressure curve. It is a reference tool: verify against the equipment manufacturer's data."),
-    ])
-    body = f"""
-<div class="crumbs"><a href="{{rel}}index.html">Tools</a> › HVAC</div>
-<div class="hero"><div class="eyebrow">Free HVAC tool</div>
-<h1>Superheat &amp; Subcooling Calculator</h1>
-<p class="lead">Enter gauge pressure and line temperature. Get saturation, superheat or subcooling instantly for R-410A, R-454B, R-32 and R-22, from published PT charts.</p></div>
-
-<div class="calc card">
-<div class="fields">
-<div class="full"><div class="seg" id="mode" role="group" aria-label="Measurement">
-<button data-v="sh" aria-pressed="true">Superheat</button><button data-v="sc" aria-pressed="false">Subcooling</button></div></div>
-<div class="full"><label for="ref">Refrigerant</label><select id="ref">{options}</select></div>
-<div><label for="p" id="p-label">Suction pressure <small>(psig)</small></label><input id="p" inputmode="decimal" value="130"></div>
-<div><label for="t" id="t-label">Suction line temp <small>(°F)</small></label><input id="t" inputmode="decimal" value="55"></div>
-</div>
-<div class="result" aria-live="polite">
-<div id="out-title" class="eyebrow">Superheat</div>
-<div class="big" id="out">–</div>
-<div class="rows"><div><span>In kelvin</span><span id="out-c"></span></div>
-<div><span id="sat-label">Saturation temp</span><span id="sat">–</span></div></div>
-<div id="hvac-warn" class="verdict"></div>
-</div>
-</div>
-
-<section class="calc card" style="margin-top:20px">
-<div class="fields">
-<div class="full"><h2 style="margin:0">PT lookup</h2></div>
-<div class="full"><div class="seg" id="ptmode" role="group" aria-label="Lookup direction">
-<button data-v="p2t" aria-pressed="true">Pressure → temp</button><button data-v="t2p" aria-pressed="false">Temp → pressure</button></div></div>
-<div class="full"><label for="pt-in" id="pt-in-label">Pressure <small>(psig)</small></label><input id="pt-in" inputmode="decimal" value="120"></div>
-</div>
-<div class="result"><div class="eyebrow">Saturation</div><div class="rows" id="pt-out"></div></div>
-</section>
-
-{promo("hvac-charge", "hvac-calc", f"Same numbers on your phone, offline on the roof, plus {len(PT)} refrigerants, piston target superheat and an add/recover call.")}
-
-<section><h2>PT charts</h2><p class="muted">Full pressure–temperature tables, −50 °F to 150 °F.</p>{chips()}</section>
-{faq_html}
-<p class="note">Reference only. Verify against the equipment manufacturer's charging instructions. Handling refrigerants requires EPA Section 608 certification in the US.</p>
-"""
-    shell(path, "Superheat & Subcooling Calculator (R-454B, R-32, R-410A) | Free",
-          "Free superheat and subcooling calculator with PT lookup for R-454B, R-32, R-410A and R-22. Bubble and dew points from published PT charts.",
-          body, "t-hvac", "hvac",
-          [webapp_ld("Superheat & Subcooling Calculator", path, "Superheat, subcooling and PT lookup for common refrigerants."), faq_ld],
-          '<script src="{rel}assets/pt-data.js"></script><script src="{rel}assets/calc.js"></script>')
+    pages_hvac.calc_page(sys.modules[__name__])  # the calculator page lives in pages_hvac.py too
 
     for rid, r in PT.items():  # the page body lives in pages_hvac.py, next to the other refrigerant pages
         pages_hvac.pt_page(sys.modules[__name__], rid, r)
@@ -1052,7 +987,7 @@ def app_href(key):
 # ---------- Home ----------
 
 CALCS = [
-    ("hvac/superheat-subcooling-calculator.html", "HVAC", "Superheat & subcooling calculator", "R-454B, R-32, R-410A, R-22 with PT lookup.", "t-hvac"),
+    ("hvac/superheat-subcooling-calculator.html", "HVAC", "Superheat & subcooling calculator", f"{len(PT)} refrigerants, including R-454B, R-32 and R-410A, with PT lookup.", "t-hvac"),
     ("hvac/pt-chart/index.html", "HVAC", "Refrigerant PT charts", f"{len(PT)} refrigerants, bubble and dew columns.", "t-hvac"),
     ("electrical/voltage-drop-calculator.html", "Electrical", "Voltage drop calculator", "AWG or mm², copper or aluminum, minimum size for 3 %.", "t-elec"),
     ("coating/epoxy-coverage-calculator.html", "Coatings", "Epoxy coverage calculator", "Gallons and kits from area, mils and solids.", "t-coat"),
@@ -1161,8 +1096,8 @@ def main():
         shutil.rmtree(OUT)
     OUT.mkdir()
     shutil.copytree(HERE / "assets", OUT / "assets")
-    free = {rid: PT[rid] for rid in FREE_REFRIGERANTS}
-    (OUT / "assets/pt-data.js").write_text(f"window.PT_DATA = {json.dumps(free, separators=(',', ':'))};\n")
+    # Every refrigerant is free in the web calculator (the app keeps four free and the rest in Pro).
+    (OUT / "assets/pt-data.js").write_text(f"window.PT_DATA = {json.dumps(PT, separators=(',', ':'))};\n")
     prep_images()
     build_home()
     build_hvac()

@@ -14,6 +14,9 @@ SOURCES = {
                "https://www.epa.gov/climate-hfcs-reduction/technology-transitions-gwp-reference-table"),
     "epa_ods": ("US EPA, Ozone-Depleting Substances (page updated 9 April 2026)",
                 "https://www.epa.gov/ozone-layer-protection/ozone-depleting-substances"),
+    "epa_hcfc22": ("US EPA, Homeowners and Consumers: Frequently Asked Questions on the HCFC-22 phaseout "
+                   "(page updated 1 April 2026, read 13 November 2026)",
+                   "https://www.epa.gov/ods-phaseout/homeowners-and-consumers-frequently-asked-questions"),
     "snap_ac": ("US EPA SNAP, Substitutes in Residential and Light Commercial Air Conditioning and Heat Pumps (page updated 19 March 2026)",
                 "https://www.epa.gov/snap/substitutes-residential-and-light-commercial-air-conditioning-and-heat-pumps"),
     "snap_food": ("US EPA SNAP, Substitutes in Refrigerated Food Processing and Dispensing Equipment (page updated 20 March 2026)",

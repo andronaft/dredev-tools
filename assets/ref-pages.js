@@ -1,6 +1,6 @@
-// Extras for the reference pages (pages_hvac.py, pages_electrical.py): the print button, example readings on the
-// per-refrigerant calculators and the target superheat lookup. Loaded after calc.js where a page has a calculator;
-// everything lives inside one function so no name here can clash with calc.js.
+// Extras for the reference pages (pages_hvac.py, pages_electrical.py): the print button, example readings and the
+// refrigerant from the address on the superheat calculators, and the target superheat lookup. Loaded after calc.js
+// where a page has a calculator; everything lives inside one function so no name here can clash with calc.js.
 (function () {
   const byId = (id) => document.getElementById(id);
   const val = (id) => parseFloat(String(byId(id).value).replace(',', '.'));
@@ -58,28 +58,91 @@
     run();
   }
 
-  // On a per-refrigerant calculator, switching between superheat and subcooling swaps in that mode's example
-  // readings, unless the user has already typed their own.
-  function initExamples() {
-    const ex = window.HVAC_EXAMPLE, p = byId('p'), t = byId('t');
-    byId('mode').addEventListener('click', (ev) => {
-      const b = ev.target.closest('button');
-      if (!b) return;
-      const to = ex[b.dataset.v], from = ex[b.dataset.v === 'sh' ? 'sc' : 'sh'];
-      if (to && from && p.value === String(from[0]) && t.value === String(from[1])) {
-        p.value = to[0];
-        t.value = to[1];
-        p.dispatchEvent(new Event('input'));
-      }
-    });
+  // The refrigerant named in the address, for the shared calculator: #r-454b, or ?ref=R-454B.
+  function refFromAddress(hash, search, ids) {
+    const query = (String(search || '').match(/[?&]ref=([^&#]*)/) || [])[1] || '';
+    for (const raw of [String(hash || '').replace(/^#/, ''), query]) {
+      let want = raw;
+      try { want = decodeURIComponent(raw); } catch (err) { /* keep it as typed */ }
+      want = want.trim().toLowerCase();
+      const hit = want && ids.find((id) => id.toLowerCase() === want);
+      if (hit) return hit;
+    }
+    return null;
   }
 
-  window.RefPages = { targetSuperheat };
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // Superheat and subcooling calculators. The fields start with example readings; changing the refrigerant or the
+  // mode swaps in that example, unless the user has already typed their own. On the shared calculator the
+  // refrigerant can come from the address, and the line under the select says where its data comes from.
+  function initExamples() {
+    const all = window.HVAC_EXAMPLES, pages = window.HVAC_PAGES || {};
+    const sel = byId('ref'), p = byId('p'), t = byId('t'), pt = byId('pt-in'), info = byId('ref-info');
+    let rid = sel.value, mode = 'sh';
+
+    function show(nextRid, nextMode) {
+      const from = all[rid], to = all[nextRid];
+      if (from && to) {
+        if (p.value === String(from[mode][0]) && t.value === String(from[mode][1])) {
+          p.value = to[nextMode][0];
+          t.value = to[nextMode][1];
+        }
+        const lookup = byId('ptmode').querySelector('button[aria-pressed="true"]');
+        if (nextRid !== rid && lookup && lookup.dataset.v === 'p2t' && pt.value === String(from.sh[0])) pt.value = to.sh[0];
+      }
+      rid = nextRid;
+      mode = nextMode;
+      p.dispatchEvent(new Event('input'));
+      pt.dispatchEvent(new Event('input'));
+    }
+
+    function describe() {
+      const r = info && window.PT_DATA[rid];
+      if (!r) return;
+      const columns = r.dew ? 'two columns: dew point for superheat, bubble point for subcooling' : 'one pressure column';
+      const slug = rid.toLowerCase();
+      let html = `${esc(rid)} · ASHRAE ${esc(r.safety)} · ${columns}. Data: ${esc(r.source)}. `
+        + `<a href="${info.dataset.charts}${slug}.html">${esc(rid)} PT chart</a>`;
+      if (pages[rid]) html += ` · <a href="${pages[rid]}">${esc(rid)} worked examples</a>`;
+      info.innerHTML = html;
+    }
+
+    byId('mode').addEventListener('click', (ev) => {
+      const b = ev.target.closest('button');
+      if (b) show(rid, b.dataset.v);
+    });
+    if (sel.tagName !== 'SELECT') return;
+
+    const ids = Array.from(sel.options).map((o) => o.value);
+    function fromAddress(scroll) {
+      const want = refFromAddress(window.location.hash, window.location.search, ids);
+      if (!want) return;
+      if (want !== sel.value) {
+        sel.value = want;
+        show(want, mode);
+        describe();
+        sel.dispatchEvent(new Event('change'));
+      }
+      if (scroll) sel.closest('.calc').scrollIntoView({ block: 'start' });
+    }
+    sel.addEventListener('change', () => {
+      if (sel.value === rid) return;
+      show(sel.value, mode);
+      describe();
+      if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + sel.value.toLowerCase());
+    });
+    window.addEventListener('hashchange', () => fromAddress(true));
+    describe();
+    fromAddress(false);
+  }
+
+  window.RefPages = { targetSuperheat, refFromAddress };
 
   if (typeof document === 'undefined' || !document.addEventListener) return;
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-print]').forEach((b) => b.addEventListener('click', () => window.print()));
-    if (window.HVAC_EXAMPLE && byId('mode')) initExamples();
+    if (window.HVAC_EXAMPLES && byId('mode')) initExamples();
     if (window.TSH_TABLE && byId('tsh-out')) initTargetSuperheat();
   });
 })();
