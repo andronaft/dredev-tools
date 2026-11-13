@@ -220,7 +220,7 @@ Pro:
 
 ## Free calculators
 
-- [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html): R-454B, R-32, R-410A, R-22 with PT lookup.
+- [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html): 22 refrigerants, including R-454B, R-32 and R-410A, with PT lookup.
 - [Refrigerant PT charts](https://zhukovskyi.space/calculators/hvac/pt-chart/): 22 refrigerants, bubble and dew columns.
 - [Voltage drop calculator](https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html): AWG or mm², copper or aluminum, minimum size for 3 %.
 - [Epoxy coverage calculator](https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html): Gallons and kits from area, mils and solids.

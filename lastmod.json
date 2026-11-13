@@ -1,15 +1,15 @@
 {
  "https://zhukovskyi.space/calculators/": {
-  "hash": "f2307c15b3a63d01",
-  "date": "2026-11-12"
+  "hash": "964935712597c130",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/bread/bakers-percentage-calculator.html": {
   "hash": "be62527e43d0209b",
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
-  "hash": "a2b5729668ba246c",
-  "date": "2026-11-12"
+  "hash": "53a9a69369d9f2cc",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
   "hash": "05ab0414617ae4f2",
@@ -24,15 +24,15 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/electrical/12-awg-voltage-drop-per-foot.html": {
-  "hash": "5a78be3e6071afd5",
+  "hash": "91fa85d7b5544deb",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html": {
-  "hash": "2f77b64540ca2b3a",
+  "hash": "5b6e47b396d41de1",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/electrical/ampacity-chart-nec-310-16.html": {
-  "hash": "6712259bd586d211",
+  "hash": "864254ddfe51b3f7",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/electrical/awg-to-mm2.html": {
@@ -40,7 +40,7 @@
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html": {
-  "hash": "70e72ba50ac46de7",
+  "hash": "83b1995c284076df",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html": {
@@ -48,7 +48,7 @@
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-by-amps-and-distance.html": {
-  "hash": "2ba8b27b83499e1b",
+  "hash": "5fd4604716a7f394",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html": {
@@ -56,11 +56,11 @@
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/hvac/": {
-  "hash": "e511711d80d3538e",
+  "hash": "e8cef85b514df55d",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/bubble-point-vs-dew-point.html": {
-  "hash": "f79bfc7694616305",
+  "hash": "1292cceec910243c",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/": {
@@ -68,39 +68,39 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-32-vs-r-410a.html": {
-  "hash": "89fd4463ea7900c5",
+  "hash": "7c3fd84b88b686a0",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-407c-vs-r-22.html": {
-  "hash": "9aada9398405075d",
+  "hash": "997d9a8daacc705a",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-448a-vs-r-404a.html": {
-  "hash": "d8533de2e1266189",
+  "hash": "dc9ec9ee1694f854",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-448a-vs-r-449a.html": {
-  "hash": "ad932ddf0396799e",
+  "hash": "216634e5d72a4032",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-449a-vs-r-404a.html": {
-  "hash": "caa8afa260f502cf",
+  "hash": "c5776a0bb46a5572",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-454b-vs-r-32.html": {
-  "hash": "53bd7e2a1b777ac2",
+  "hash": "4056573960ad3e0a",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-454b-vs-r-410a.html": {
-  "hash": "996362b696396326",
+  "hash": "2210a83f81796c10",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-513a-vs-r-134a.html": {
-  "hash": "a99549176c8081da",
+  "hash": "d9871e2c794122f6",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/how-to-charge-r-454b-by-subcooling.html": {
-  "hash": "f604d7c641495e06",
+  "hash": "230c316ff7f609da",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/": {
@@ -108,187 +108,123 @@
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-12.html": {
-  "hash": "9c4efabfd1d643d1",
+  "hash": "db30a4de766534a3",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-1234yf.html": {
-  "hash": "e8f8cf6b143491cd",
+  "hash": "6c113601b50792ce",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-134a.html": {
-  "hash": "558f5a35a168c3e3",
+  "hash": "dd9ad37d07773f35",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-22.html": {
-  "hash": "c68ec96eea62419b",
+  "hash": "77d2d48b0018f830",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-290.html": {
-  "hash": "d4d815cf95c2e4ed",
+  "hash": "bc83dae8311e94fd",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-32.html": {
-  "hash": "d2eb324063ef0fd4",
+  "hash": "2ec4fbd4266d6575",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-404a.html": {
-  "hash": "994f872f25dc0bd8",
+  "hash": "3c0b0aa0c4d8dcb2",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-407a.html": {
-  "hash": "5ccb9e5ce4ad3670",
+  "hash": "168e7f7441b2b936",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-407c.html": {
-  "hash": "139904879f8bd343",
+  "hash": "6e3c17037a09ca65",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-408a.html": {
-  "hash": "e733e4dfa3d22145",
+  "hash": "0bcf49d5966e4c8f",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-409a.html": {
-  "hash": "4aa7b879fa5b0e24",
+  "hash": "83e1f541c2ca617e",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-410a.html": {
-  "hash": "3ebef5d211abc45d",
+  "hash": "a65db2361ee953f6",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-427a.html": {
-  "hash": "1725c736c0ef28b8",
+  "hash": "8eb615c636f27b16",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-448a.html": {
-  "hash": "bd0e297892f476f1",
+  "hash": "e0d3dd5293bc8949",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-449a.html": {
-  "hash": "d64c2302e42f3eec",
+  "hash": "f58187da64d05541",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-452a.html": {
-  "hash": "da55154a1f4e706b",
+  "hash": "7d62eaa80c7828d6",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-454b.html": {
-  "hash": "77f6f6b5dde8f2b5",
+  "hash": "afd41a1c69d3b16a",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-507a.html": {
-  "hash": "04e04ac1a74bd52a",
+  "hash": "72c7acdb165ba72f",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-513a.html": {
-  "hash": "6b5817276885549e",
+  "hash": "78555a652a46a552",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-600a.html": {
-  "hash": "1445a0afa904549b",
+  "hash": "db34b2a57ee8e834",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-717.html": {
-  "hash": "da464136a938098e",
+  "hash": "a2248b636aa3d98b",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-744.html": {
-  "hash": "fcddb7dcdeca22ac",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-12.html": {
-  "hash": "eebbd08b74bb5a02",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-1234yf.html": {
-  "hash": "7fd00a7a2fe5129d",
+  "hash": "531c11541ca013ad",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-134a.html": {
-  "hash": "d8c7e24a1432e85a",
+  "hash": "729ba6bb9af4fddc",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-22.html": {
-  "hash": "0daa0c21b65d9c56",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-290.html": {
-  "hash": "4b2e78ff25da5621",
+  "hash": "53c4def1d458742c",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-32.html": {
-  "hash": "a4cad8293b02053c",
+  "hash": "21b606a311de1279",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-404a.html": {
-  "hash": "6354b0c7177f1416",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-407a.html": {
-  "hash": "96ebe2ed419ee8e4",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-407c.html": {
-  "hash": "7a586b6b0dc26e7b",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-408a.html": {
-  "hash": "7b75f20562f50b0a",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-409a.html": {
-  "hash": "977c57e1efd4edf8",
+  "hash": "d220b592f3f408f0",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-410a.html": {
-  "hash": "a343eaf8ac348e84",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-427a.html": {
-  "hash": "934a4debdf90250b",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-448a.html": {
-  "hash": "7e70a9e637abba60",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-449a.html": {
-  "hash": "5a98016ca9e24c31",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-452a.html": {
-  "hash": "e4cf63b2c60fefdd",
+  "hash": "c6ef01116de0a81c",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-454b.html": {
-  "hash": "0393f341925d23e0",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-507a.html": {
-  "hash": "f57621f662e2fc84",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-513a.html": {
-  "hash": "2723756c0aae1184",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-600a.html": {
-  "hash": "083d8c511c619e17",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-717.html": {
-  "hash": "f78cc5671a0c221e",
-  "date": "2026-11-13"
- },
- "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-744.html": {
-  "hash": "537e99ecf21061f5",
+  "hash": "c44fda0026971eb9",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html": {
-  "hash": "585194bd11df4251",
-  "date": "2026-11-12"
+  "hash": "1f6d1e88c35c5203",
+  "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/target-superheat-calculator.html": {
-  "hash": "ee2ebe30e5db2f79",
+  "hash": "ce9113b420103cfb",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/methodology.html": {
