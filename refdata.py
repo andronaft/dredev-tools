@@ -48,12 +48,19 @@ SOURCES = {
                     "https://www.opteon.com/en/-/media/files/opteon/a2l/optxlptac-0522-printable.pdf?rev=745c0b46b0524377a315c8a9c606d238&sc_lang=en"),
     "chemours_xl41": ("Chemours, Opteon™ XL41 (R-454B) product information (C-11001, 7/24)",
                       "https://www.opteon.com/en/-/media/files/opteon/opteon-xl41-product-information.pdf?la=en"),
+    "arkema_pt_2019": ("Arkema, Forane® Pressure-Temperature Chart, wall chart for the Americas (2019)",
+                       "https://forane.arkema.com/files/live/sites/fluorogases_forane_arkema/files/downloads/literature/general-forane-literature/forane-wall-chart-americas.pdf"),
+    "arkema_pt_2025": ("Arkema, Forane® Refrigerants Pressure Temperature Chart (PPC/SDC 05-2025)",
+                       "https://forane.arkema.com/files/live/sites/shared_arkema/files/downloads/fluorochemicals/Forane%20Ref%20PT%20Regular%20Chart%20EN"),
     "bryant_tsh": ("Bryant 563C/563G split-system air conditioners, wiring diagram 324476-101 Rev. B (2-04), "
                    "Table I: Superheat Charging Table",
                    "https://inspectapedia.com/aircond/Bryant-split-system-ac-wiring.pdf"),
 }
 
 # 100-year GWP exactly as printed: refrigerant -> (value, source key, basis the page states).
+# One publisher for every page: US EPA. Its Technology Transitions table where the refrigerant is listed, otherwise
+# EPA's ozone-depleting substances list (R-22, R-12) or its SNAP list. Makers' literature differs by a unit or two
+# (Arkema's digest prints 466 for R-454B, 2,138 for R-427A, 1,397 for R-449A, 631 for R-513A): not mixed in.
 GWP = {
     "R-410A": ("2,088", "epa_tt", "AR4, calculated for the blend"),
     "R-454B": ("465", "epa_tt", "AR4, calculated for the blend"),
@@ -62,16 +69,16 @@ GWP = {
     "R-134a": ("1,430", "epa_tt", "IPCC 2007 (AR4)"),
     "R-404A": ("3,922", "epa_tt", "AR4, calculated for the blend"),
     "R-407C": ("1,774", "epa_tt", "AR4, calculated for the blend"),
-    "R-407A": ("2,110", "snap_food", "as listed by EPA SNAP"),
+    "R-407A": ("2,110", "snap_food", "SNAP list"),
     "R-448A": ("1,386", "epa_tt", "AR4, calculated for the blend"),
     "R-449A": ("1,396", "epa_tt", "AR4, calculated for the blend"),
     "R-452A": ("2,140", "epa_tt", "AR4, calculated for the blend"),
     "R-513A": ("630", "epa_tt", "AR4, calculated for the blend"),
     "R-1234yf": ("1", "epa_tt", "WMO 2022"),
     "R-507A": ("3,985", "epa_tt", "AR4, calculated for the blend"),
-    "R-427A": ("2,140", "snap_food", "as listed by EPA SNAP"),
-    "R-408A": ("3,152", "snap_food", "as listed by EPA SNAP"),
-    "R-409A": ("1,558", "snap_food", "as listed by EPA SNAP"),
+    "R-427A": ("2,140", "snap_food", "SNAP list"),
+    "R-408A": ("3,152", "snap_food", "SNAP list"),
+    "R-409A": ("1,558", "snap_food", "SNAP list"),
     "R-290": ("3.3", "epa_tt", "IPCC 2007 (AR4)"),
     "R-600a": ("1", "epa_tt", "WMO 2022"),
     "R-744": ("1", "epa_tt", "IPCC 2007 (AR4)"),
@@ -145,4 +152,12 @@ REPLACES = {
 # Blend composition as the maker prints it: refrigerant -> (text, source key). Only where a maker document was read.
 COMPOSITION = {
     "R-454B": ("R-32 / R-1234yf, 68.9 / 31.1 % by weight", "chemours_xl41"),
+}
+
+# A page note where the table on the site knowingly differs from a printed chart: refrigerant -> (text, source keys).
+PT_NOTES = {
+    "R-427A": ("At 150 °F the 2025 edition of Arkema's chart prints 456.8 and 467.4 psig for R-427A. Those are the R-404A and "
+               "R-507A cells of the same row, and a vapor pressure above the liquid pressure cannot be right. This page uses the "
+               "2019 edition, which prints 418.9 and 388.8 psig; every other R-427A row is the same in both editions.",
+               ("arkema_pt_2019", "arkema_pt_2025")),
 }

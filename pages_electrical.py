@@ -24,7 +24,12 @@ VD_3PH = "electrical/three-phase-voltage-drop.html"
 VD_12V = "electrical/12v-dc-voltage-drop.html"
 
 NEC_EDITION = "NFPA 70, National Electrical Code, 2023 edition"
-K_AL = guides.RHO20["al"] * 1.25 * 0.3048 / guides.MM2_PER_CMIL  # Ω·cmil/ft, from the resistivity calc.js uses
+# The K factor (Ω·cmil/ft) behind every number here: calc.js takes resistivity at 20 °C and adds 25 % for operating
+# temperature. Handbooks round copper to 12.9, which gives about 0.5 % less.
+K_CU = guides.RHO20["cu"] * 1.25 * 0.3048 / guides.MM2_PER_CMIL
+K_AL = guides.RHO20["al"] * 1.25 * 0.3048 / guides.MM2_PER_CMIL
+K_NOTE = (f"K = {K_CU:.2f} Ω·cmil/ft for copper: resistivity 0.017241 Ω·mm²/m at 20 °C plus 25 % for operating temperature, "
+          "the resistance the voltage drop calculator on this site uses")
 ALL_SIZES = [s for s, _ in guides.NEC]  # 18 AWG to 500 kcmil, for voltage drop only
 
 
@@ -85,7 +90,7 @@ def short(s):
 
 def ampacity_page(b):
     path = AMPACITY_PAGE
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("Electrical", HUB), ("Ampacity chart", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("Ampacity chart", path)])
     ambient, adj = load_factors(b)
     rows = []
     for i, s in enumerate(NEC_SIZES):
@@ -171,7 +176,7 @@ def ampacity_page(b):
             "with ambient and conductor-count correction factors and worked examples. Printable.")
     ld = dataset_ld(b, path, "Conductor ampacity chart (NEC Table 310.16)", desc, f"{NEC_EDITION}, Table 310.16",
                     [("Conductor size", "AWG or kcmil"), ("Allowable ampacity, copper", "A"), ("Allowable ampacity, aluminum", "A")])
-    b.shell(path, "Ampacity Chart: NEC Table 310.16 (Copper & Aluminum, 60/75/90 °C)", desc, body, "t-elec", None, [ld, crumb_ld, faq_ld], JS)
+    b.shell(path, "Ampacity Chart: NEC Table 310.16 (Copper & Aluminum, 60/75/90 °C)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
 # ---------- wire size by amps and distance ----------
@@ -205,7 +210,7 @@ def reach(amps, volts, cond="cu", groups=3):
 
 def by_distance_page(b):
     path = BY_DISTANCE
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("Electrical", HUB), ("Wire size by amps and distance", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("Wire size by amps and distance", path)])
     s, pick, pct = size_for(30, 150, 240)
     pct_pick = drop_volts("single", "cu", mm2_of(pick), 150 * 0.3048, 30) / 240 * 100
     ex = guides.example("30 A at 240 V, 150 ft one way, copper", [
@@ -229,7 +234,7 @@ def by_distance_page(b):
          "When you upsize the ungrounded conductors, NEC 250.122(B) has the equipment grounding conductor upsized in proportion."),
         ("How are these sizes worked out?",
          "First the smallest conductor whose ampacity in the 75 °C column of NEC Table 310.16 covers the load and its breaker, with the 240.4(D) limits for small conductors. "
-         "Then the size goes up until the voltage drop at full load is 3 % or less, using copper or aluminum resistance at operating temperature (K = 12.9 for copper)."),
+         f"Then the size goes up until the voltage drop at full load is 3 % or less, using copper or aluminum resistance at operating temperature (K = {K_CU:.2f} Ω·cmil/ft for copper, {K_AL:.1f} for aluminum)."),
     ])
     body = f"""{CSS}
 {crumb_html}
@@ -259,7 +264,7 @@ On 240 V, 30 A needs {reach(30, 240)}, and 50 A needs {reach(50, 240)}.</p></div
             "sized for NEC Table 310.16 ampacity and 3 % voltage drop, with a worked example.")
     ld = dataset_ld(b, path, "Wire size by amps and distance", desc, f"{NEC_EDITION}, Table 310.16",
                     [("Load", "A"), ("One-way length", "ft"), ("Conductor size", "AWG or kcmil")])
-    b.shell(path, "Wire Size Chart by Amps and Distance (120 V and 240 V)", desc, body, "t-elec", None, [ld, crumb_ld, faq_ld], JS)
+    b.shell(path, "Wire Size Chart by Amps and Distance (120 V and 240 V)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
 # ---------- 12 AWG voltage drop per foot ----------
@@ -271,7 +276,7 @@ def per_amp_foot(size, cond="cu", supply="single"):
 
 def vd_12awg_page(b):
     path = VD_12AWG
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("Electrical", HUB), ("12 AWG voltage drop per foot", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("12 AWG voltage drop per foot", path)])
     k = per_amp_foot("12")
     loads, feet = [5, 10, 15, 20], [25, 50, 75, 100, 150, 200]
 
@@ -303,8 +308,9 @@ def vd_12awg_page(b):
          "For most circuits it is a recommendation in the NEC's informational notes (3 % on a branch circuit, 5 % for feeder and branch together), not a rule. "
          "Some equipment and some local codes do require it."),
         ("How is this calculated?",
-         "VD = 2 × K × I × L ÷ CM with K = 12.9 Ω·cmil/ft for copper at operating temperature and 6,530 circular mils for 12 AWG (NEC Chapter 9, Table 8). "
-         "It is the same formula as the voltage drop calculator on this site."),
+         f"VD = 2 × K × I × L ÷ CM, with 6,530 circular mils for 12 AWG (NEC Chapter 9, Table 8) and {K_NOTE}. "
+         f"That is 2 × {K_CU:.3f} ÷ 6,530 = {k * 1000:.3f} mV per amp per foot. Handbooks often round K to 12.9, which gives "
+         f"{2 * 12.9 / 6530 * 1000:.3f} mV, about 0.5 % less."),
     ])
     body = f"""{CSS}
 {crumb_html}
@@ -313,7 +319,7 @@ def vd_12awg_page(b):
 <p class="lead">How many volts 12 AWG copper loses per foot at 5 to 20 A, how far you can run it, and the same figure for 14 to 2 AWG.</p>
 <p class="answer"><strong>Quick answer:</strong> 12 AWG copper drops about {k * 1000:.2f} mV per amp per foot of one-way length (single phase or DC).
 At 20 A that is {k * 20 * 100:.2f} V per 100 ft, so a 120 V circuit reaches 3 % at about {fmt(max_feet('12', 20, 120))} ft.</p></div>
-{byline("Computed with the same formula as the voltage drop calculator on this site (K = 12.9 for copper).")}
+{byline(f"Computed with {K_NOTE}.")}
 {printbar()}
 <section class="guide"><h2>12 AWG copper: voltage drop at 120 V</h2>
 <p class="muted">Volts lost and percent of 120 V. Length is one way; the formula counts both conductors. On 240 V the volts are the same and the percent is half.</p>
@@ -330,9 +336,9 @@ At 20 A that is {k * 20 * 100:.2f} V per 100 ft, so a 120 V circuit reaches 3 % 
 """
     desc = ("12 AWG voltage drop per foot: millivolts per amp per foot for copper and aluminum, drop at 5 to 20 A over 25 to 200 ft at 120 V, "
             "maximum run length and a worked example.")
-    ld = dataset_ld(b, path, "12 AWG voltage drop per foot", desc, "NEC Chapter 9, Table 8 conductor areas; K = 12.9 Ω·cmil/ft for copper",
+    ld = dataset_ld(b, path, "12 AWG voltage drop per foot", desc, f"NEC Chapter 9, Table 8 conductor areas; copper resistance K = {K_CU:.2f} Ω·cmil/ft",
                     [("Load", "A"), ("One-way length", "ft"), ("Voltage drop", "V")])
-    b.shell(path, "12 AWG Voltage Drop per Foot: Chart and Maximum Distance", desc, body, "t-elec", None, [ld, crumb_ld, faq_ld], JS)
+    b.shell(path, "12 AWG Voltage Drop per Foot: Chart and Maximum Distance", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
 # ---------- three-phase voltage drop ----------
@@ -342,7 +348,7 @@ THREE_PH = [("12", 20), ("10", 30), ("8", 50), ("6", 65), ("4", 85), ("2", 115),
 
 def vd_3ph_page(b):
     path = VD_3PH
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("Electrical", HUB), ("Three-phase voltage drop", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("Three-phase voltage drop", path)])
     rows = [[awg(s), f"{a} A"] + [f"{fmt(max_feet(s, a, v, supply='three'))} ft" for v in (208, 240, 480)]
             + [f"{fmt(max_feet(s, a, 480, 'al', 'three'))} ft" if ampacity("al", 75, s) else "–"] for s, a in THREE_PH]
     t = table(["Wire", "Load", "208 V copper", "240 V copper", "480 V copper", "480 V aluminum"], rows, "wide")
@@ -351,13 +357,13 @@ def vd_3ph_page(b):
     k = 1.732 * 12.9 * amps * ft / dict(guides.NEC)[size]
     single = drop_volts("single", "cu", mm2_of(size), ft * 0.3048, amps)
     ex = guides.example(f"{amps} A on {awg(size)} copper, {volts} V three phase, {ft} ft", [
-        f"K-factor method: VD = 1.732 × K × I × L ÷ CM = 1.732 × 12.9 × {amps} A × {ft} ft ÷ {fmt(dict(guides.NEC)[size])} cmil = {k:.2f} V.",
-        f"The calculator's resistance method gives {vd:.2f} V line to line, which is {vd / volts * 100:.2f} % of {volts} V.",
+        f"Handbook K-factor (K = 12.9): VD = 1.732 × K × I × L ÷ CM = 1.732 × 12.9 × {amps} A × {ft} ft ÷ {fmt(dict(guides.NEC)[size])} cmil = {k:.2f} V.",
+        f"The calculator on this site uses K = {K_CU:.2f} and gives {vd:.2f} V line to line, which is {vd / volts * 100:.2f} % of {volts} V.",
         f"The same wire, current and length on a single-phase circuit would drop {single:.2f} V: three phase is 0.866 of that.",
     ], f"Result: {vd:.2f} V, {vd / volts * 100:.2f} %, within 3 %.")
     faq_html, faq_ld = b.faq([
         ("What is the three-phase voltage drop formula?",
-         f"VD = 1.732 × K × I × L ÷ CM, with K ≈ 12.9 Ω·cmil/ft for copper ({K_AL:.1f} for aluminum in this calculator), I the line current, L the one-way length in feet and CM the conductor area in circular mils. "
+         f"VD = 1.732 × K × I × L ÷ CM, with K ≈ 12.9 Ω·cmil/ft for copper in handbooks (this site's calculator uses {K_CU:.2f} for copper and {K_AL:.1f} for aluminum), I the line current, L the one-way length in feet and CM the conductor area in circular mils. "
          "The result is the drop between lines; divide by the line-to-line voltage for percent."),
         ("Why 1.732 instead of 2?",
          "In a balanced three-phase circuit the currents in the three conductors cancel in the return path, so the line-to-line drop is √3 times the drop of one conductor, "
@@ -374,9 +380,9 @@ def vd_3ph_page(b):
 <div class="hero"><div class="eyebrow">Electrical reference</div>
 <h1>Three-phase voltage drop: formula and chart</h1>
 <p class="lead">The 1.732 formula, the longest run at 3 % for 208, 240 and 480 V, and a worked example.</p>
-<p class="answer"><strong>Quick answer:</strong> three-phase voltage drop is 1.732 × K × I × L ÷ CM, with K = 12.9 for copper. It is 0.866 of the single-phase drop for the same wire, current and length.
+<p class="answer"><strong>Quick answer:</strong> three-phase voltage drop is 1.732 × K × I × L ÷ CM, with K ≈ 12.9 for copper. It is 0.866 of the single-phase drop for the same wire, current and length.
 Example: {amps} A on {awg(size)} copper over {ft} ft at {volts} V drops {vd:.1f} V ({vd / volts * 100:.1f} %).</p></div>
-{byline("Computed with the same formula as the voltage drop calculator on this site.")}
+{byline(f"Computed with {K_NOTE}.")}
 {printbar()}
 <section class="guide"><h2>Longest three-phase run at 3 % voltage drop</h2>
 <p class="muted">One-way length at the load shown (the 75 °C ampacity of each size from NEC Table 310.16), power factor 1.</p>
@@ -393,7 +399,7 @@ Example: {amps} A on {awg(size)} copper over {ft} ft at {volts} V drops {vd:.1f}
     desc = ("Three-phase voltage drop formula (1.732 × K × I × L ÷ CM) with a chart of the longest run at 3 % for 208, 240 and 480 V, "
             "copper and aluminum, and a worked example.")
     b.shell(path, "Three-Phase Voltage Drop: Formula, Chart and Example", desc, body, "t-elec", None,
-            [article_ld(b, path, "Three-phase voltage drop: formula and chart", desc), crumb_ld, faq_ld], JS)
+            [article_ld(b, path, "Three-phase voltage drop: formula and chart", desc), faq_ld], JS)
 
 
 # ---------- 12 V DC voltage drop ----------
@@ -415,7 +421,7 @@ def dc_table(limit):
 
 def vd_12v_page(b):
     path = VD_12V
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("Electrical", HUB), ("12 V DC voltage drop", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("12 V DC voltage drop", path)])
     a, ft = 20, 15
     s3, p3 = vd_size(a, ft, 12, 3)
     s10, p10 = vd_size(a, ft, 12, 10)
@@ -440,7 +446,7 @@ def vd_12v_page(b):
          "No. These tables check voltage drop only. The wire must also be rated for the current, and the fuse or breaker must protect the wire. "
          "Vehicles and boats have their own wiring standards; follow the one that applies."),
         ("How is this calculated?",
-         "VD = 2 × K × I × L ÷ CM with K = 12.9 Ω·cmil/ft for copper at operating temperature, the same formula as the voltage drop calculator on this site set to DC. "
+         f"VD = 2 × K × I × L ÷ CM with {K_NOTE}, set to DC. "
          "Cooler wire has slightly less resistance, so real drops are a little lower."),
     ])
     body = f"""{CSS}
@@ -466,15 +472,15 @@ def vd_12v_page(b):
 """
     desc = ("12 V DC wire size chart by amps and length for 3 % and 10 % voltage drop, 5 to 50 A over 5 to 50 ft, copper, "
             "with a worked example. Voltage drop only: check ampacity and fusing separately.")
-    ld = dataset_ld(b, path, "12 V DC wire size by current and length", desc, "NEC Chapter 9, Table 8 conductor areas; K = 12.9 Ω·cmil/ft for copper",
+    ld = dataset_ld(b, path, "12 V DC wire size by current and length", desc, f"NEC Chapter 9, Table 8 conductor areas; copper resistance K = {K_CU:.2f} Ω·cmil/ft",
                     [("Current", "A"), ("One-way length", "ft"), ("Conductor size", "AWG")])
-    b.shell(path, "12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)", desc, body, "t-elec", None, [ld, crumb_ld, faq_ld], JS)
+    b.shell(path, "12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
 # ---------- hub ----------
 
 def hub_page(b):
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("Electrical", HUB)])
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB)])
     cards = [
         (VD_CALC, "Calculator", "Voltage drop calculator", "AWG or mm², copper or aluminum, single phase, three phase and DC."),
         (WIRE_CALC, "Calculator", "Wire size calculator", "Conductor and breaker by NEC Table 310.16, with a voltage drop check."),
@@ -496,7 +502,7 @@ def hub_page(b):
 """
     b.shell(HUB, "Electrical Calculators and Charts: Voltage Drop, Wire Size, Ampacity | Free",
             "Free electrical tools: voltage drop and wire size calculators, the NEC 310.16 ampacity chart, wire size by amps and distance, and voltage drop references.",
-            body, "t-elec", None, [crumb_ld])
+            body, "t-elec", None)
 
 
 # Cards in the same shape as build.CALCS (path, tag, title, text, theme), for the home page and llms.txt.

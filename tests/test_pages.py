@@ -57,8 +57,17 @@ def tables(h):
             for t in re.findall(r"<table>(.*?)</table>", h, re.S)]
 
 
-def jsonld(h):
-    return [json.loads(x) for x in re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S)]
+def jsonld(h, graph=False):
+    """The page's own JSON-LD blocks; with graph=True, the nodes of the @graph block build.shell() adds to every page."""
+    blocks = [json.loads(x) for x in re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S)]
+    if graph:
+        return [n for blk in blocks for n in blk.get("@graph", [])]
+    return [blk for blk in blocks if "@graph" not in blk]
+
+
+def crumb_names(h):
+    crumbs = next(n for n in jsonld(h, graph=True) if n["@type"] == "BreadcrumbList")
+    return [i["name"] for i in crumbs["itemListElement"]]
 
 
 def num(s):
@@ -178,7 +187,8 @@ class PtChartPages(unittest.TestCase):
         for rid in build.PT:
             h = page(ph.pt_path(rid))
             types = [d["@type"] for d in jsonld(h)]
-            self.assertEqual(sorted(types), ["BreadcrumbList", "Dataset", "FAQPage"], rid)
+            self.assertEqual(sorted(types), ["Dataset", "FAQPage"], rid)
+            self.assertEqual(crumb_names(h)[2:], ["HVAC", "PT charts", f"{rid} PT Chart"], rid)
             self.assertIn(f'<time datetime="{refdata.CHECKED_ISO}">{refdata.CHECKED}</time> by {guides.AUTHOR}', h)
             self.assertIn("data-print", h)
             self.assertIn("ref-pages.css", h)
@@ -202,6 +212,26 @@ class PtChartPages(unittest.TestCase):
                 else:
                     self.assertNotIn(label, rows, f"{rid}: {label} shown without a source")
             self.assertTrue(rows["Safety class"].startswith(build.PT[rid]["safety"]), rid)
+
+    def test_gwp_names_one_publisher_next_to_the_number(self):
+        for rid in build.PT:
+            rows = {r[0]: r[1] for t in tables(page(ph.pt_path(rid))) for r in t if len(r) == 2}
+            self.assertRegex(rows["GWP (100-year)"], r"^[\d,.]+ per US EPA \(", rid)
+            self.assertTrue(refdata.SOURCES[refdata.GWP[rid][1]][0].startswith("US EPA"), rid)
+
+    def test_r427a_explains_the_150_f_row(self):
+        # The 2025 chart prints the R-404A and R-507A cells in the R-427A row at 150 °F; the page uses the 2019 edition.
+        self.assertEqual(source_cell(self.src, "R-427A", "bubble", 150), 418.9)
+        self.assertEqual(source_cell(self.src, "R-427A", "dew", 150), 388.8)
+        self.assertEqual(source_cell(self.src, "R-404A", "bubble", 150), 456.8)
+        self.assertEqual(source_cell(self.src, "R-507A", "bubble", 150), 467.4)
+        h = page(ph.pt_path("R-427A"))
+        note = text(re.search(r"<p class=\"note\"><strong>Why this differs.*?</p>", h, re.S).group(0))
+        for value in ("456.8", "467.4", "418.9", "388.8", "2019 edition"):
+            self.assertIn(value, note)
+        for key in ("arkema_pt_2019", "arkema_pt_2025"):
+            self.assertIn(html.escape(refdata.SOURCES[key][1]), h)
+        self.assertNotIn("Why this differs", page(ph.pt_path("R-410A")))
 
     def test_every_source_is_https_and_has_a_title(self):
         for key, (title, link) in refdata.SOURCES.items():
@@ -269,7 +299,8 @@ class SuperheatPages(unittest.TestCase):
             self.assertEqual(data, {rid: r})
             self.assertIn('data-calc="hvac"', h)
             self.assertIn("assets/calc.js", h)
-            self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["BreadcrumbList", "FAQPage", "WebApplication"])
+            self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["FAQPage", "WebApplication"])
+            self.assertEqual(crumb_names(h)[2:4], ["HVAC", "Superheat & subcooling"], rid)
             self.assertIn("equipment manufacturer", h)
 
     def test_example_pressures_are_positive_gauge(self):
@@ -317,7 +348,8 @@ class Comparisons(unittest.TestCase):
         idx = page(ph.CMP_INDEX)
         for a, c in ph.PAIRS:
             h = page(ph.cmp_path(a, c))
-            self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["BreadcrumbList", "Dataset", "FAQPage"])
+            self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["Dataset", "FAQPage"])
+            self.assertEqual(crumb_names(h)[2:4], ["HVAC", "Comparisons"])
             self.assertIn("Checked <time", h)
             self.assertIn("local codes", h)
             self.assertIn(f"{ph.slug(a)}-vs-{ph.slug(c)}.html", idx)
@@ -347,7 +379,7 @@ class TargetSuperheat(unittest.TestCase):
         self.assertEqual(json.loads(re.search(r"window\.TSH_TABLE = (\{.*?\});</script>", h).group(1)), self.tbl)
         self.assertIn(refdata.SOURCES["bryant_tsh"][1], h)
         self.assertIn("Your unit's own charging chart", h)
-        self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["BreadcrumbList", "Dataset", "FAQPage", "WebApplication"])
+        self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["Dataset", "FAQPage", "WebApplication"])
 
     def test_lookup_matches_ref_pages_js(self):
         points = [(o / 2, w / 4) for o in range(100, 241, 7) for w in range(190, 313, 5)]
@@ -384,7 +416,7 @@ class Guides(unittest.TestCase):
         self.assertIn("rating plate", h)
         for key in ("carrier_ph5", "lennox_ml13", "carrier_llg", "chemours_pt", "york_yh9"):
             self.assertIn(html.escape(refdata.SOURCES[key][1]), h)
-        self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["BreadcrumbList", "FAQPage", "TechArticle"])
+        self.assertEqual(sorted(d["@type"] for d in jsonld(h)), ["FAQPage", "TechArticle"])
 
     def test_bubble_dew_guide(self):
         h = page(ph.BUBBLE_DEW)
@@ -466,6 +498,11 @@ class Electrical(unittest.TestCase):
             if row[2] != "–":
                 self.assertEqual(row[2], f"{per[2 * i + 1] * 1000:.3f}")
         self.assertIn(f"{per[2] * 1000:.2f} mV per amp per foot", text(h))
+        # One method on the page: the K it names is the K behind its numbers (12 AWG is 6,530 cmil).
+        self.assertAlmostEqual(2 * pe.K_CU / 6530, per[2], places=12)
+        self.assertIn(f"K = {pe.K_CU:.2f} Ω·cmil/ft for copper", text(h))
+        self.assertIn(f"2 × {pe.K_CU:.3f} ÷ 6,530 = {per[2] * 1000:.3f} mV per amp per foot", text(h))
+        self.assertNotIn("K = 12.9 ", text(h))
 
     def test_three_phase_lengths_reach_three_percent(self):
         h = page(pe.VD_3PH)
@@ -502,7 +539,7 @@ class Electrical(unittest.TestCase):
         for path in (pe.AMPACITY_PAGE, pe.BY_DISTANCE, pe.VD_12AWG, pe.VD_3PH, pe.VD_12V):
             h = page(path)
             types = [d["@type"] for d in jsonld(h)]
-            self.assertIn("BreadcrumbList", types)
+            self.assertEqual(crumb_names(h)[2], "Electrical", path)
             self.assertIn("FAQPage", types)
             self.assertIn("Checked <time", h)
             self.assertIn("data-print", h)
@@ -527,11 +564,16 @@ class Site(unittest.TestCase):
             if path in (ph.HUB, pe.HUB):
                 continue
             hub = elec_hub if path.startswith("electrical/") else hvac_hub
-            self.assertTrue(f'href="../{path}"' in hub or f'href="../../{path}"' in cmp_idx, path)
+            link = path.removesuffix("index.html")
+            self.assertTrue(f'href="../{link}"' in hub or f'href="../../{link}"' in cmp_idx, path)
         # ...and the hubs are reachable from pages that already existed: every PT chart links to the HVAC hub.
-        self.assertIn('href="../../hvac/index.html"', page(ph.pt_path("R-410A")))
+        self.assertIn('href="../../hvac/"', page(ph.pt_path("R-410A")))
         for path in (pe.AMPACITY_PAGE, pe.VD_12V):
-            self.assertIn('href="../electrical/index.html"', page(path))
+            self.assertIn('href="../electrical/"', page(path))
+        # The menu under the header goes to the two hubs on every page.
+        home = page("index.html")
+        self.assertIn('href="hvac/"', home)
+        self.assertIn('href="electrical/"', home)
 
     def test_no_broken_internal_links(self):
         broken = []
@@ -548,7 +590,8 @@ class Site(unittest.TestCase):
 
     def test_json_ld_parses_everywhere(self):
         for f in SITE.rglob("*.html"):
-            for block in jsonld(f.read_text()):
+            h = f.read_text()
+            for block in jsonld(h) + jsonld(h, graph=True):
                 self.assertIn("@type", block, f)
 
     def test_cards_point_at_real_pages(self):

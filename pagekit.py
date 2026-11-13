@@ -23,13 +23,11 @@ def url(b, path):
     return f"{b.BASE}/{path}".replace("/index.html", "/")
 
 
-def crumbs(b, trail):
-    """trail: [(name, path or None)], the last item is the page itself. Returns (html, BreadcrumbList JSON-LD)."""
-    parts = [f'<a href="{REL}{p}">{e(n)}</a>' if p and i < len(trail) - 1 else e(n) for i, (n, p) in enumerate(trail)]
-    ld = {"@context": "https://schema.org", "@type": "BreadcrumbList",
-          "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n, **({"item": url(b, p)} if p else {})}
-                              for i, (n, p) in enumerate(trail)]}
-    return f'<div class="crumbs">{" › ".join(parts)}</div>', ld
+def crumbs(trail):
+    """trail: [(name, path)], the last item is the page itself. build.shell() turns these crumbs into the page's
+    BreadcrumbList, so the visible trail and the structured one cannot drift apart."""
+    parts = [f'<a href="{REL}{p}">{e(n)}</a>' if i < len(trail) - 1 else e(n) for i, (n, p) in enumerate(trail)]
+    return f'<div class="crumbs">{" › ".join(parts)}</div>'
 
 
 def src(key):
@@ -65,12 +63,12 @@ def related(title, links):
 
 
 def person(b):
-    return {"@type": "Person", "name": guides.AUTHOR, "url": f'{b.CFG["developer_site"]}/'}
+    return {"@type": "Person", "@id": b.PERSON_ID, "name": guides.AUTHOR, "url": f"{b.SITE}/"}
 
 
 def article_ld(b, path, headline, desc):
     return {"@context": "https://schema.org", "@type": "TechArticle", "headline": headline, "description": desc,
-            "url": url(b, path), "author": person(b), "dateModified": refdata.CHECKED_ISO, "inLanguage": "en"}
+            "url": url(b, path), "author": person(b), "publisher": {"@id": b.ORG_ID}, "dateModified": refdata.CHECKED_ISO, "inLanguage": "en"}
 
 
 def dataset_ld(b, path, name, desc, based_on, variables):

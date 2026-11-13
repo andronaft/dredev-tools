@@ -240,7 +240,8 @@ def fact_rows(b, r, with_source=True):
         rows.append(("Composition", e(t), src(k)))
     if rid in refdata.GWP:
         v, k, basis = refdata.GWP[rid]
-        rows.append(("GWP (100-year)", f"{v} <span class=\"muted\">({e(basis)})</span>", src(k)))
+        rows.append(("GWP (100-year)", f"{v} <span class=\"muted\">per US EPA ({e(basis)})</span>",
+                     f"{src(k)}. Every GWP on this site is EPA's figure; refrigerant makers' literature can differ by a unit or two."))
     if rid in refdata.ODP:
         v, k = refdata.ODP[rid]
         rows.append(("Ozone depletion potential", v, src(k)))
@@ -266,7 +267,7 @@ def pt_page(b, rid, r):
     path = pt_path(rid)
     two = bool(r["dew"])
     lo, hi = trange(r)
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("PT charts", PT_INDEX), (f"{rid} PT chart", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("PT charts", PT_INDEX), (f"{rid} PT chart", path)])
 
     def both(t):
         return printed(r, "bubble", t), printed(r, "dew", t)
@@ -330,8 +331,13 @@ def pt_page(b, rid, r):
                   "Yes. Use the Print button: the page prints as a clean table without the menus, with the source and the check date at the bottom."))
     items.append(("Where does the data come from?",
                   f"{e(r['source'])}, copied cell for cell every 5 °F." + (" Converted from absolute pressure (psia) to psig." if r["bubble"].get("converted") else "")
-                  + " The calculator interpolates between the printed points along the vapor-pressure curve."))
+                  + " The calculator interpolates between the printed points along the vapor-pressure curve."
+                  + (f" {refdata.PT_NOTES[rid][0]}" if rid in refdata.PT_NOTES else "")))
     faq_html, faq_ld = b.faq(items)
+    pt_note = ""
+    if rid in refdata.PT_NOTES:
+        text_, keys = refdata.PT_NOTES[rid]
+        pt_note = f'\n<p class="note"><strong>Why this differs from the newest printed chart.</strong> {text_} Sources: {"; ".join(src(k) for k in keys)}.</p>'
 
     body = f"""{CSS}
 {crumb_html}
@@ -346,7 +352,7 @@ def pt_page(b, rid, r):
 <section class="fulltable"><h2>Full {rid} pressure–temperature table</h2>
 <div class="prose">{glide_p}<p>Vacuum readings are shown in inches of mercury (″ Hg) below atmospheric pressure.</p></div>
 {b.pt_table(r)}
-<p class="note">Source: {e(r["source"])}.{" Converted from absolute pressure (psia) to psig." if r["bubble"].get("converted") else ""} {HVAC_NOTE}</p>
+<p class="note">Source: {e(r["source"])}.{" Converted from absolute pressure (psia) to psig." if r["bubble"].get("converted") else ""} {HVAC_NOTE}</p>{pt_note}
 <p class="note print-only">{b.BASE}/{path} · checked {refdata.CHECKED}</p></section>
 {b.promo("hvac-charge", "pt-" + slug(rid), f"Look up {rid} offline in the field and get superheat, subcooling and a charge call in seconds.")}
 {faq_html}
@@ -361,7 +367,7 @@ def pt_page(b, rid, r):
     b.shell(path, f"{rid} PT Chart: Pressure Temperature Chart (psig, °F, °C)",
             f"{rid} pressure-temperature chart from {lo} °F to {hi} °F in psig with °C.{' Bubble and dew columns for the glide.' if two else ''} "
             f"Pressures at 70 to 105 °F, safety class and GWP with sources. Free, printable.",
-            body, "t-hvac", None, [ld, crumb_ld, faq_ld], JS)
+            body, "t-hvac", None, [ld, faq_ld], JS)
 
 
 # ---------- superheat and subcooling calculator per refrigerant ----------
@@ -374,7 +380,7 @@ def sh_page(b, rid):
     ex = example(r)
     dew_name = "dew point" if two else "saturation temperature"
     bub_name = "bubble point" if two else "saturation temperature"
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("Superheat & subcooling", MAIN_CALC), (rid, path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("Superheat & subcooling", MAIN_CALC), (rid, path)])
 
     ans = (f"with {rid}, superheat = suction line temperature − {dew_name} at the suction pressure, and subcooling = {bub_name} at the "
            f"liquid pressure − liquid line temperature. Example: {ex['p_s']} psig on the suction side is {t1(ex['sat_s'])} °F saturated"
@@ -503,7 +509,7 @@ target subcooling on the unit's data plate. Always use the manufacturer's number
     desc = (f"Free {rid} superheat and subcooling calculator: enter gauge pressure and line temperature. "
             f"Saturation from the published {rid} PT chart{', dew for superheat and bubble for subcooling' if two else ''}, "
             "with worked examples and a pressure table.")
-    lds = ([b.webapp_ld(f"{rid} Superheat & Subcooling Calculator", path, desc)] if live else [article_ld(b, path, plain(h1), desc)]) + [crumb_ld, faq_ld]
+    lds = ([b.webapp_ld(f"{rid} Superheat & Subcooling Calculator", path, desc)] if live else [article_ld(b, path, plain(h1), desc)]) + [faq_ld]
     b.shell(path, title, desc, body, "t-hvac", "hvac" if live else None, lds, scripts)
 
 
@@ -562,7 +568,7 @@ def cmp_page(b, a, c):
     ra, rc = b.PT[a], b.PT[c]
     path = cmp_path(a, c)
     d = cmp_data(b, a, c)
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("Comparisons", CMP_INDEX), (f"{a} vs {c}", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("Comparisons", CMP_INDEX), (f"{a} vs {c}", path)])
 
     def at(rows, t):
         return next(x for x in rows if x[0] == t)
@@ -652,11 +658,11 @@ def cmp_page(b, a, c):
             f"temperature glide, ASHRAE safety class and GWP, with sources.")
     ld = dataset_ld(b, path, f"{a} vs {c} pressure comparison", desc, ra["source"],
                     [("Saturation temperature", "°F"), (f"{a} pressure", "psig"), (f"{c} pressure", "psig"), ("Pressure difference", "psi")])
-    b.shell(path, f"{a} vs {c}: Pressure Difference, Glide and Safety Class", desc, body, "t-hvac", None, [ld, crumb_ld, faq_ld], JS)
+    b.shell(path, f"{a} vs {c}: Pressure Difference, Glide and Safety Class", desc, body, "t-hvac", None, [ld, faq_ld], JS)
 
 
 def cmp_index(b):
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("Comparisons", CMP_INDEX)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("Comparisons", CMP_INDEX)])
     cards = ""
     for a, c in PAIRS:
         d = cmp_data(b, a, c)
@@ -673,7 +679,7 @@ def cmp_index(b):
 """
     b.shell(CMP_INDEX, "Refrigerant Comparisons: R-454B vs R-410A, R-32 vs R-410A and more",
             "Side-by-side refrigerant comparisons from published PT charts: R-454B vs R-410A, R-32 vs R-410A, R-407C vs R-22, R-448A and R-449A vs R-404A, R-513A vs R-134a.",
-            body, "t-hvac", None, [crumb_ld])
+            body, "t-hvac", None)
 
 
 # ---------- target superheat (fixed orifice) ----------
@@ -722,7 +728,7 @@ def tsh_page(b):
     path = TSH
     tbl = load_tsh(b)
     od, wb, cells = tbl["outdoorF"], tbl["wetBulbF"], tbl["superheatF"]
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("Target superheat", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("Target superheat", path)])
     ex_od, ex_wb = TSH_EXAMPLE
     _, ex_v = tsh_lookup(tbl, ex_od, ex_wb)
     r0, r1, _ = _bracket(od, ex_od)
@@ -806,7 +812,7 @@ The source document also ties the table to indoor airflow close to the rated val
             "Values from a manufacturer's superheat charging table, with the full chart and a worked example.")
     lds = ([b.webapp_ld("Target Superheat Calculator (Fixed Orifice)", path, desc)] if TARGET_SUPERHEAT_LIVE else []) + [
         dataset_ld(b, path, "Target superheat charging table for fixed-orifice air conditioners", desc, refdata.SOURCES["bryant_tsh"][0],
-                   [("Outdoor dry bulb temperature", "°F"), ("Indoor wet bulb temperature", "°F"), ("Target superheat", "°F")]), crumb_ld, faq_ld]
+                   [("Outdoor dry bulb temperature", "°F"), ("Indoor wet bulb temperature", "°F"), ("Target superheat", "°F")]), faq_ld]
     b.shell(path, "Target Superheat Calculator and Chart (Fixed Orifice / Piston)", desc, body, "t-hvac", "tsh", lds, scripts)
 
 
@@ -814,7 +820,7 @@ The source document also ties the table to indoor airflow close to the rated val
 
 def bubble_dew_page(b):
     path = BUBBLE_DEW
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("Bubble point vs dew point", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("Bubble point vs dew point", path)])
     r = b.PT["R-407C"]
     ex = example(r)
     wrong_s = sat_temp(r, "bubble", ex["p_s"])
@@ -881,7 +887,7 @@ so at one pressure it boils over a range of temperatures.</p>
     desc = ("Bubble point vs dew point on a refrigerant PT chart: use dew for superheat and bubble for subcooling. "
             "Worked R-407C example and the temperature glide of common blends, computed from published charts.")
     b.shell(path, "Bubble Point vs Dew Point: Reading a PT Chart for Blends (R-454B, R-407C)", desc, body, "t-hvac", None,
-            [article_ld(b, path, "Bubble point vs dew point: how to read a PT chart for a blend", desc), crumb_ld, faq_ld], JS)
+            [article_ld(b, path, "Bubble point vs dew point: how to read a PT chart for a blend", desc), faq_ld], JS)
 
 
 # ---------- article: charging R-454B by subcooling ----------
@@ -892,7 +898,7 @@ def charge_454b_page(b):
     ex = example(r)
     wrong = sat_temp(r, "dew", ex["p_l"])
     target = 12  # the rating-plate value assumed in the worked example
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB), ("Charging R-454B by subcooling", path)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB), ("Charging R-454B by subcooling", path)])
     items = [
         ("What subcooling should an R-454B system have?",
          "The value on the outdoor unit's rating plate or charging label. It differs from model to model, so there is no number that fits every R-454B unit."),
@@ -966,13 +972,13 @@ See <a href="{REL}{cmp_path("R-454B", "R-410A")}">R-454B vs R-410A</a> for the p
     desc = ("How to charge an R-454B air conditioner or heat pump by subcooling: the steps, which PT column to use and a worked example, "
             "with manufacturer sources. Targets always come from the unit's rating plate.")
     b.shell(path, "How to Charge an R-454B System by Subcooling (Step by Step)", desc, body, "t-hvac", None,
-            [article_ld(b, path, "How to charge an R-454B system by subcooling", desc), crumb_ld, faq_ld], JS)
+            [article_ld(b, path, "How to charge an R-454B system by subcooling", desc), faq_ld], JS)
 
 
 # ---------- hub ----------
 
 def hub_page(b):
-    crumb_html, crumb_ld = crumbs(b, [("Tools", "index.html"), ("HVAC", HUB)])
+    crumb_html = crumbs([("Tools", "index.html"), ("HVAC", HUB)])
     cards = [
         (MAIN_CALC, "Calculator", "Superheat & subcooling calculator", "R-410A, R-454B, R-32 and R-22 in one tool, with PT lookup."),
         (TSH, "Calculator", "Target superheat (fixed orifice)", "From outdoor temperature and indoor wet bulb, with the full charging table."),
@@ -995,7 +1001,7 @@ def hub_page(b):
 """
     b.shell(HUB, "HVAC Calculators and Refrigerant PT Charts | Free",
             f"Free HVAC tools: superheat and subcooling calculators for {len(b.PT)} refrigerants, target superheat for fixed-orifice systems, PT charts and refrigerant comparisons.",
-            body, "t-hvac", None, [crumb_ld])
+            body, "t-hvac", None)
 
 
 # Cards in the same shape as build.CALCS (path, tag, title, text, theme), for the home page and llms.txt.
