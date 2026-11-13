@@ -19,6 +19,7 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import quote, urljoin
 
+import calcs_more
 import guides
 import pages_electrical
 import pages_hvac
@@ -379,6 +380,7 @@ SUBNAV = [
     ("Baking", "bread/bakers-percentage-calculator.html"),
     ("Soap", "soap/lye-calculator.html"),
 ]
+SUBNAV += calcs_more.SUBNAV  # roofing, concrete, shifts and the hobby categories
 TRUST_PAGES = {"methodology.html", "verification.html", "changelog.html"}
 DISCLAIMER = ("Reference only. A result depends on what you enter and on the published tables named on this page. "
               "Before you buy materials, size a circuit, charge a system or dose chemicals, check it against the code in force "
@@ -865,7 +867,8 @@ def build_more():
         [("How much liquid chlorine to raise FC by 1 ppm?", "About 12.8 fl oz of 10 % liquid chlorine per 10,000 US gallons. Bleach is weaker: 6 % bleach needs roughly 21 fl oz for the same rise."),
          ("What FC should I aim for?", "It depends on your stabilizer (CYA) level: the higher the CYA, the more free chlorine you need. PoolPro uses Trouble Free Pool's FC/CYA chart for targets."),
          ("Where does the math come from?", "Chlorine strength follows the same bleach density formula as TFP Pool Math; baking soda raises total alkalinity by 1 ppm per 1.68 mg per litre; stabilizer and salt are added at their label purity.")],
-        "t-pool", "pool", answer_guide=guides.pool_guide())
+        "t-pool", "pool", answer_guide=guides.pool_guide(),
+        promo_html=calcs_more.app_promo("poolpro", "pool-calc", "Turn a pool test into exact doses for the chemicals already on your shelf, in the order to add them, with CSI and a test log."))
 
     calc_page(
         "bread/bakers-percentage-calculator.html", "Baker's Percentage Calculator for Sourdough (with True Hydration)",
@@ -887,7 +890,8 @@ def build_more():
         [("What are baker's percentages?", "Every ingredient is written as a percentage of the flour weight, with flour at 100 %. 500 g flour at 75 % hydration means 375 g water."),
          ("What is true hydration?", "The water from both the bowl and the starter divided by all the flour, including the flour in the starter. A 75 % dough with 20 % starter at 100 % hydration is about 75 % either way; stiff starters lower it."),
          ("How much starter should I use?", "Most sourdough recipes use 10–25 % starter. Less starter means a longer, slower rise.")],
-        "t-bread", "bread", answer_guide=guides.bread_guide())
+        "t-bread", "bread", answer_guide=guides.bread_guide(),
+        promo_html=calcs_more.app_promo("levain", "bread", "Tell Levain when you want bread, and it reminds you of every feed, fold and bake step on the way."))
 
     calc_page(
         "soap/lye-calculator.html", "Lye Calculator for Cold Process Soap (NaOH) | Free",
@@ -907,6 +911,7 @@ def build_more():
          ("What superfat should I use?", "5 % is a common starting point for bar soap: a little oil stays unsaponified for a milder bar. Salt bars and 100 % coconut soaps often use 15–20 %."),
          ("Where do the SAP values come from?", "From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point.")],
         "t-soap", "lye", answer_guide=guides.lye_guide(load_oils()),
+        promo_html=calcs_more.app_promo("lye-calc", "lye", "Save your recipes, see soap qualities and the fatty acid profile, and get batch cost and cost per bar."),
         extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>')
 
 
@@ -998,6 +1003,7 @@ CALCS = [
     ("soap/lye-calculator.html", "Soap", "Lye calculator", "NaOH and water for cold process soap.", "t-soap"),
     ("countdown/christmas-countdown.html", "Countdown", "Days until Christmas", "Live countdown to Christmas and New Year.", "t-days"),
 ]
+CALCS += calcs_more.HOME_CARDS  # hobby and trade calculators built by calcs_more.build()
 
 
 def build_home():
@@ -1100,6 +1106,7 @@ def main():
     (OUT / "assets/pt-data.js").write_text(f"window.PT_DATA = {json.dumps(PT, separators=(',', ':'))};\n")
     prep_images()
     build_home()
+    calcs_more.build(sys.modules[__name__])  # hobby and trade calculators, embed copies
     build_hvac()
     build_vd()
     build_coat()
