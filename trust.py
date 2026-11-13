@@ -14,6 +14,13 @@ import guides
 
 # (date, kind, text). Newest first. "Correction" marks a wrong number or a broken calculator that was fixed.
 CHANGES = [
+    ("2026-11-13", "New", "The superheat and subcooling calculator now covers all 22 refrigerants, and a link can open it "
+     "on one of them (the PT chart pages do). R-410A, R-454B, R-32, R-22, R-134a and R-404A have a page of their own with "
+     "worked examples and typical pressures."),
+    ("2026-11-13", "New", "PT chart pages show pressures at common temperatures, safety class, GWP and lubricant with "
+     "their sources, and print cleanly. New: refrigerant comparisons, a target superheat calculator for fixed-orifice "
+     "systems, guides on bubble and dew points and on charging R-454B by subcooling, an NEC 310.16 ampacity chart, wire "
+     "size by distance and voltage drop references."),
     ("2026-11-12", "Correction", "Lye calculator: the oil list and the SAP table were empty from 9 November 2026, "
      "so the page could not calculate anything. Fixed; the build now stops if the oil list is incomplete."),
     ("2026-11-12", "New", "Methodology and sources, checked examples and this changelog. One shared disclaimer and a "

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)</title>
+<meta name="description" content="12 V DC wire size chart by amps and length for 3 % and 10 % voltage drop, 5 to 50 A over 5 to 50 ft, copper, with a worked example. Voltage drop only: check ampacity and fusing separately.">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dre Dev Tools">
+<meta property="og:title" content="12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)">
+<meta property="og:description" content="12 V DC wire size chart by amps and length for 3 % and 10 % voltage drop, 5 to 50 A over 5 to 50 ft, copper, with a worked example. Voltage drop only: check ampacity and fusing separately.">
+<meta property="og:url" content="https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html">
+<meta property="og:image" content="https://zhukovskyi.space/calculators/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-itunes-app" content="app-id=6830185126">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "@id": "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html", "url": "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html", "name": "12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)", "description": "12 V DC wire size chart by amps and length for 3 % and 10 % voltage drop, 5 to 50 A over 5 to 50 ft, copper, with a worked example. Voltage drop only: check ampacity and fusing separately.", "isPartOf": {"@type": "WebSite", "@id": "https://zhukovskyi.space/calculators/#website", "name": "Dre Dev Tools", "url": "https://zhukovskyi.space/calculators/", "publisher": {"@id": "https://zhukovskyi.space/#dredev"}}, "author": {"@id": "https://zhukovskyi.space/#person"}, "publisher": {"@id": "https://zhukovskyi.space/#dredev"}, "dateModified": "2026-11-13"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://zhukovskyi.space/"}, {"@type": "ListItem", "position": 2, "name": "Free tools", "item": "https://zhukovskyi.space/calculators/"}, {"@type": "ListItem", "position": 3, "name": "Electrical", "item": "https://zhukovskyi.space/calculators/electrical/"}, {"@type": "ListItem", "position": 4, "name": "12 V DC voltage drop and wire size chart", "item": "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html"}]}, {"@type": "Organization", "@id": "https://zhukovskyi.space/#dredev", "name": "Dre Dev", "url": "https://zhukovskyi.space/about/"}, {"@type": "Person", "@id": "https://zhukovskyi.space/#person", "name": "Andrii Zhukovskyi", "url": "https://zhukovskyi.space/"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Dataset", "name": "12 V DC wire size by current and length", "description": "12 V DC wire size chart by amps and length for 3 % and 10 % voltage drop, 5 to 50 A over 5 to 50 ft, copper, with a worked example. Voltage drop only: check ampacity and fusing separately.", "url": "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html", "creator": {"@type": "Person", "@id": "https://zhukovskyi.space/#person", "name": "Andrii Zhukovskyi", "url": "https://zhukovskyi.space/"}, "dateModified": "2026-11-12", "isAccessibleForFree": true, "isBasedOn": "NEC Chapter 9, Table 8 conductor areas; copper resistance K = 12.96 Ω·cmil/ft", "variableMeasured": [{"@type": "PropertyValue", "name": "Current", "unitText": "A"}, {"@type": "PropertyValue", "name": "One-way length", "unitText": "ft"}, {"@type": "PropertyValue", "name": "Conductor size", "unitText": "AWG"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why does voltage drop matter more at 12 V?", "acceptedAnswer": {"@type": "Answer", "text": "The volts lost depend on current and wire, not on the system voltage. Losing 0.5 V is 0.4 % of 120 V but over 4 % of 12 V, so low-voltage DC runs need much heavier wire for the same percent."}}, {"@type": "Question", "name": "What voltage drop is acceptable on 12 V?", "acceptedAnswer": {"@type": "Answer", "text": "It depends on the load, so this page gives two limits: 3 % (0.36 V) and 10 % (1.2 V). Use the limit the maker of the equipment specifies."}}, {"@type": "Question", "name": "Is the length one way or round trip?", "acceptedAnswer": {"@type": "Answer", "text": "The tables use the one-way distance from the source to the load and already count both the positive and the negative conductor."}}, {"@type": "Question", "name": "What size wire for 20 amps at 12 volts?", "acceptedAnswer": {"@type": "Answer", "text": "For a 15 ft run, 6 AWG keeps the drop within 3 % and 12 AWG within 10 %. Longer runs need larger wire: see the tables."}}, {"@type": "Question", "name": "Does this cover fuse and ampacity?", "acceptedAnswer": {"@type": "Answer", "text": "No. These tables check voltage drop only. The wire must also be rated for the current, and the fuse or breaker must protect the wire. Vehicles and boats have their own wiring standards; follow the one that applies."}}, {"@type": "Question", "name": "How is this calculated?", "acceptedAnswer": {"@type": "Answer", "text": "VD = 2 × K × I × L ÷ CM with K = 12.96 Ω·cmil/ft for copper: resistivity 0.017241 Ω·mm²/m at 20 °C plus 25 % for operating temperature, the resistance the voltage drop calculator on this site uses, set to DC. Cooler wire has slightly less resistance, so real drops are a little lower."}}]}</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "83c899454bcd4d139b58edeea34eaac0"}'></script><!-- End Cloudflare Web Analytics -->
+</head>
+<body class="t-elec">
+<header class="top"><div class="wrap">
+<a class="brand" href="../"><i></i>Dre Dev Tools</a>
+<nav aria-label="Main">
+<a href="https://zhukovskyi.space/apps/">Apps</a>
+<a href="../" aria-current="page">Free tools</a>
+<a href="https://zhukovskyi.space/blog/" class="hide-sm">Blog</a>
+<a href="https://zhukovskyi.space/about/">About</a>
+</nav>
+</div>
+<div class="wrap"><nav class="subnav" aria-label="Calculators"><a href="../hvac/">HVAC</a><a href="../electrical/">Electrical</a><a href="../coating/epoxy-coverage-calculator.html">Coatings</a><a href="../pool/pool-chemical-calculator.html">Pool</a><a href="../bread/bakers-percentage-calculator.html">Baking</a><a href="../soap/lye-calculator.html">Soap</a></nav></div></header>
+<main class="wrap">
+<link rel="stylesheet" href="../assets/ref-pages.css">
+<div class="crumbs"><a href="../">Tools</a> › <a href="../electrical/">Electrical</a> › 12 V DC voltage drop</div>
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>12 V DC voltage drop and wire size chart</h1>
+<p class="lead">The smallest copper wire that keeps a 12 V DC run within 3 % or 10 % voltage drop, for 5 to 50 A over 5 to 50 ft.</p>
+<p class="answer"><strong>Quick answer:</strong> at 12 V, 3 % is only 0.36 V. A 20 A load 15 ft from the battery needs 6 AWG copper to stay within 3 %, or 12 AWG if a 10 % drop is acceptable.</p></div>
+<p class="note byline">Checked <time datetime="2026-11-12">12 November 2026</time> by Andrii Zhukovskyi. Computed with the same formula as the voltage drop calculator on this site, set to DC.</p>
+<p class="printbar"><button type="button" class="btn ghost" data-print>Print this chart</button></p>
+<section class="guide"><h2>12 V DC wire size charts</h2>
+<p class="muted">Copper, AWG unless marked kcmil. Length is one way from the source to the load; both conductors are counted.</p>
+<h3>3 % voltage drop or less (0.36 V)</h3><div class="tablewrap "><table><thead><tr><th>Current \ one-way length</th><th>5 ft</th><th>10 ft</th><th>15 ft</th><th>20 ft</th><th>25 ft</th><th>30 ft</th><th>40 ft</th><th>50 ft</th></tr></thead><tbody><tr><td>5 A</td><td>16</td><td>14</td><td>12</td><td>10</td><td>10</td><td>8</td><td>8</td><td>6</td></tr><tr><td>10 A</td><td>14</td><td>10</td><td>8</td><td>8</td><td>6</td><td>6</td><td>4</td><td>4</td></tr><tr><td>15 A</td><td>12</td><td>8</td><td>8</td><td>6</td><td>4</td><td>4</td><td>3</td><td>2</td></tr><tr><td>20 A</td><td>10</td><td>8</td><td>6</td><td>4</td><td>4</td><td>3</td><td>2</td><td>1</td></tr><tr><td>30 A</td><td>8</td><td>6</td><td>4</td><td>3</td><td>2</td><td>2</td><td>1/0</td><td>2/0</td></tr><tr><td>40 A</td><td>8</td><td>4</td><td>3</td><td>2</td><td>1</td><td>1/0</td><td>2/0</td><td>3/0</td></tr><tr><td>50 A</td><td>6</td><td>4</td><td>2</td><td>1</td><td>1/0</td><td>2/0</td><td>3/0</td><td>4/0</td></tr></tbody></table></div>
+<h3>10 % voltage drop or less (1.2 V)</h3><div class="tablewrap "><table><thead><tr><th>Current \ one-way length</th><th>5 ft</th><th>10 ft</th><th>15 ft</th><th>20 ft</th><th>25 ft</th><th>30 ft</th><th>40 ft</th><th>50 ft</th></tr></thead><tbody><tr><td>5 A</td><td>18</td><td>18</td><td>16</td><td>16</td><td>14</td><td>14</td><td>12</td><td>12</td></tr><tr><td>10 A</td><td>18</td><td>16</td><td>14</td><td>12</td><td>12</td><td>12</td><td>10</td><td>8</td></tr><tr><td>15 A</td><td>16</td><td>14</td><td>12</td><td>12</td><td>10</td><td>10</td><td>8</td><td>8</td></tr><tr><td>20 A</td><td>16</td><td>12</td><td>12</td><td>10</td><td>8</td><td>8</td><td>6</td><td>6</td></tr><tr><td>30 A</td><td>14</td><td>12</td><td>10</td><td>8</td><td>8</td><td>6</td><td>6</td><td>4</td></tr><tr><td>40 A</td><td>12</td><td>10</td><td>8</td><td>6</td><td>6</td><td>6</td><td>4</td><td>3</td></tr><tr><td>50 A</td><td>12</td><td>8</td><td>8</td><td>6</td><td>4</td><td>4</td><td>3</td><td>2</td></tr></tbody></table></div>
+<p class="note">Voltage drop only. Check the wire's ampacity and the fuse rating separately. For 24 V the same wire allows twice the length.</p>
+<h3>Worked example: 20 A load, 15 ft from the battery, 12 V</h3><ol class="steps"><li>On 14 AWG: 2 × 15 ft of wire carry 20 A and drop 1.89 V, which is 15.8 % of 12 V.</li><li>To stay within 3 % (0.36 V) the wire has to be 6 AWG: 2.47 %.</li><li>If 10 % (1.2 V) is acceptable for the load, 12 AWG is enough: 9.93 %.</li></ol><p><strong>Result: 6 AWG for 3 %, 12 AWG for 10 %.</strong></p>
+<p class="note print-only">https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html · checked 12 November 2026</p></section>
+<p><a class="btn" href="../electrical/voltage-drop-calculator.html">Voltage drop calculator (choose DC)</a></p>
+<!-- app:electrician-calc --><section class="promo"><img class="icon" src="../img/electrician-calc-icon.jpg" alt="" width="72" height="72"><div>
+<div class="eyebrow">The whole job, on your phone</div>
+<h3>Electrician Calc: Wire &amp; Panel</h3>
+<p>DC, single and three-phase voltage drop, solar PV strings and battery sizing in one app. <a href="https://zhukovskyi.space/apps/electrician-calc/">See what's inside</a>.</p>
+<div class="btns"><a class="btn" href="https://apps.apple.com/app/id6830185126">Download on the App Store</a></div>
+</div></section>
+<section class="faq"><h2>Questions</h2><details><summary>Why does voltage drop matter more at 12 V?</summary><p>The volts lost depend on current and wire, not on the system voltage. Losing 0.5 V is 0.4 % of 120 V but over 4 % of 12 V, so low-voltage DC runs need much heavier wire for the same percent.</p></details><details><summary>What voltage drop is acceptable on 12 V?</summary><p>It depends on the load, so this page gives two limits: 3 % (0.36 V) and 10 % (1.2 V). Use the limit the maker of the equipment specifies.</p></details><details><summary>Is the length one way or round trip?</summary><p>The tables use the one-way distance from the source to the load and already count both the positive and the negative conductor.</p></details><details><summary>What size wire for 20 amps at 12 volts?</summary><p>For a 15 ft run, 6 AWG keeps the drop within 3 % and 12 AWG within 10 %. Longer runs need larger wire: see the tables.</p></details><details><summary>Does this cover fuse and ampacity?</summary><p>No. These tables check voltage drop only. The wire must also be rated for the current, and the fuse or breaker must protect the wire. Vehicles and boats have their own wiring standards; follow the one that applies.</p></details><details><summary>How is this calculated?</summary><p>VD = 2 × K × I × L ÷ CM with K = 12.96 Ω·cmil/ft for copper: resistivity 0.017241 Ω·mm²/m at 20 °C plus 25 % for operating temperature, the resistance the voltage drop calculator on this site uses, set to DC. Cooler wire has slightly less resistance, so real drops are a little lower.</p></details></section>
+<section class="related"><h2>More electrical tools</h2><div class="chips"><a href="../electrical/voltage-drop-calculator.html">Voltage drop calculator</a><a href="../electrical/wire-size-calculator.html">Wire size calculator</a><a href="../electrical/ampacity-chart-nec-310-16.html">Ampacity chart (NEC 310.16)</a><a href="../electrical/wire-size-by-amps-and-distance.html">Wire size by amps and distance</a><a href="../electrical/12-awg-voltage-drop-per-foot.html">12 AWG voltage drop per foot</a><a href="../electrical/three-phase-voltage-drop.html">Three-phase voltage drop</a><a href="../electrical/awg-to-mm2.html">AWG to mm²</a><a href="../electrical/">All electrical tools</a></div></section>
+<p class="note">Reference only. The code edition and amendments adopted where you work, the equipment's listing and the manufacturer's instructions govern. Have a licensed electrician check the installation.</p>
+
+<aside class="trust"><p class="note disclaimer">Reference only. A result depends on what you enter and on the published tables named on this page. Before you buy materials, size a circuit, charge a system or dose chemicals, check it against the code in force where you work, the product label and the manufacturer's instructions. These tools come with no warranty.</p><p class="note"><a href="../methodology.html">Methodology and sources</a> · <a href="../verification.html">Checked examples</a> · <a href="../changelog.html">Changelog</a> · <a href="mailto:mobile.support@zhukovskyi.space?subject=Calculator%20error%3A%2012%20V%20DC%20voltage%20drop%20and%20wire%20size%20chart&amp;body=Page%3A%20https%3A//zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html%0A%0AWhat%20I%20entered%3A%0A%0AWhat%20the%20page%20showed%3A%0A%0AWhat%20I%20expected%2C%20and%20where%20that%20number%20comes%20from%3A%0A">Found an error? Tell me</a></p></aside>
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev · apps and free tools by <a href="https://zhukovskyi.space/about/">Andrii Zhukovskyi</a>. No account, no tracking cookies.</span>
+<nav aria-label="Footer">
+<a href="https://zhukovskyi.space/about/">About</a>
+<a href="https://zhukovskyi.space/apps/">Apps</a>
+<a href="../">Free tools</a>
+<a href="../methodology.html">Methodology</a>
+<a href="https://zhukovskyi.space/privacy/">Privacy</a>
+<a href="https://zhukovskyi.space/testers/">Become a tester</a>
+<a href="https://zhukovskyi.space/blog/">Blog</a>
+<a href="https://github.com/andronaft">GitHub</a>
+<a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a>
+</nav>
+</div></footer>
+<script src="../assets/ref-pages.js"></script>
+</body>
+</html>
