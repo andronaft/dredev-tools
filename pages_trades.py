@@ -1,5 +1,6 @@
 """Trade calculator pages: roofing (RoofCalc), shift patterns (ShiftWise), garage floor coating (CoatCalc),
-concrete slabs by size (SlabCalc) and pool chlorine (PoolPro). Formulas are in calc_math.py; presets the apps own
+concrete slabs (SlabCalc) and pool chlorine (PoolPro). Slab sizes and pool volumes are rows of one table on one page
+each, not pages of their own: a row's link loads that size into the calculator. Formulas are in calc_math.py; presets the apps own
 (coating products, garage sizes) are read from their Dart sources at build time.
 """
 import re
@@ -14,12 +15,13 @@ from pages_hobby import inp, rows, seg
 SLABS = [(10, 10), (10, 12), (10, 20), (12, 12), (12, 16), (12, 20), (12, 24), (14, 20), (16, 16), (16, 20), (16, 24), (18, 20),
          (20, 20), (20, 24), (20, 30), (20, 40), (24, 24), (24, 30), (24, 36), (24, 40), (30, 30), (30, 40), (30, 50), (30, 60),
          (40, 40), (40, 50), (40, 60), (40, 80), (50, 100), (60, 100)]
-POOL_SIZES = [5000, 10000, 15000, 20000, 25000, 30000]
+POOL_VOLUMES = [5000, 7500, 10000, 15000, 20000, 25000, 30000, 40000]
+SLAB_PAGE = "concrete/concrete-slab-calculator.html"
 
 HOME_CARDS = [
     ("roofing/roof-pitch-multiplier-chart.html", "Roofing", "Roof pitch multiplier chart", "Slope factors for 1/12 to 12/12, with roof area and squares.", "t-roof"),
     ("roofing/shingle-bundles-calculator.html", "Roofing", "Shingle bundles calculator", "Squares and bundles from the footprint and pitch.", "t-roof"),
-    ("concrete/concrete-slab-calculator.html", "Concrete", "Concrete slab calculator", f"Yards, bags and rebar, with {len(SLABS)} slab sizes worked out.", "t-slab"),
+    (SLAB_PAGE, "Concrete", "Concrete slab calculator", f"Yards, bags and rebar, with a table of {len(SLABS)} common slab sizes.", "t-slab"),
     ("coating/garage-floor-epoxy-calculator.html", "Coatings", "Garage floor epoxy calculator", "Gallons and kits for a 1, 2 or 3 car garage by system.", "t-coat"),
     ("pool/how-much-chlorine-to-add.html", "Pool", "How much chlorine to add", "Liquid chlorine, cal-hypo or trichlor for your pool's gallons.", "t-pool"),
     ("shifts/index.html", "Shifts", "Shift pattern calendars", "4 on 4 off, 2-2-3, DuPont and more: calendar, hours and days off.", "t-lid"),
@@ -320,7 +322,23 @@ def build_garage():
                    '(<a href="https://www.neogard.com/news/id/theoretical-vs-actual-coverage-rates">Neogard, "Theoretical vs. actual coverage rates"</a>, checked 12 November 2026); '
                    "solids and thickness are mid-range values from the makers' data sheets named in the last column", "October 2026")
                + " Always use the numbers on your own product's technical data sheet.")
-    two = dict(garages)["2-car"]
+    one, two, three = (dict(garages)[k] for k in ("1-car", "2-car", "3-car"))
+    water, urea = by["Water-based epoxy"], by["Polyurea basecoat"]
+    w1 = gal(one, water)
+    ex1 = guides.example(f"a one-car garage, {n(one)} sq ft, two thin coats of water-based epoxy", [
+        f"One coat at {water['solids'] * 100:.0f} % solids and {water['mils']:g} mils: {n(one)} × {water['mils']:g} ÷ (1,604 × {water['solids']:.2f}) = "
+        f"{one * water['mils'] / (1604 * water['solids']):.2f} gal, plus 10 % = {w1:.2f} gal.",
+        f"Two coats: 2 × {w1:.2f} = {2 * w1:.2f} gal. In {water['kit']:g}-gallon kits: {m.kits(2 * w1, water['kit'])}.",
+        f"Dry film left on the floor: 2 × {water['mils']:g} = {2 * water['mils']:g} mils, against {epoxy['mils']:g} mils from one coat of 100 % solids epoxy.",
+    ], f"Result: about {2 * w1:.1f} gal for two coats, {m.kits(2 * w1, water['kit'])} kits of {water['kit']:g} gal.")
+    u3, t3 = gal(three, urea), gal(three, top)
+    ex3 = guides.example(f"a three-car garage, {n(three)} sq ft, polyurea base and polyaspartic topcoat", [
+        f"Base coat, polyurea at {urea['solids'] * 100:.0f} % solids and {urea['mils']:g} mils: {n(three)} × {urea['mils']:g} ÷ (1,604 × {urea['solids']:.2f}) × 1.10 = {u3:.2f} gal. "
+        f"In {urea['kit']:g}-gallon kits: {m.kits(u3, urea['kit'])}.",
+        f"Topcoat, polyaspartic at {top['solids'] * 100:.0f} % solids and {top['mils']:g} mils: {n(three)} × {top['mils']:g} ÷ (1,604 × {top['solids']:.2f}) × 1.10 = {t3:.2f} gal. "
+        f"In {top['kit']:g}-gallon kits: {m.kits(t3, top['kit'])}.",
+        f"Kits round up: {m.kits(u3, urea['kit'])} kits of base hold {m.kits(u3, urea['kit']) * urea['kit']:g} gal for the {u3:.1f} gal needed.",
+    ], f"Result: about {u3:.1f} gal of polyurea base and {t3:.1f} gal of polyaspartic topcoat.")
     g1, g2 = gal(two, epoxy), gal(two, top)
     ex = guides.example(f"a two-car garage, {n(two)} sq ft, flake system", [
         f"Base coat, 100 % solids epoxy at {epoxy['mils']:g} mils: {n(two)} × {epoxy['mils']:g} ÷ 1,604 = {two * epoxy['mils'] / 1604:.2f} gal, plus 10 % = {g1:.2f} gal. "
@@ -345,7 +363,7 @@ def build_garage():
         "Free garage floor epoxy calculator: gallons and kits for a 1, 2 or 3 car garage by system type, with coverage per gallon for water-based, 100 % solids, polyurea and polyaspartic coatings.",
         "Coatings", "Free coatings tool", "Garage floor epoxy calculator",
         "How many gallons and kits a one, two or three car garage needs, by coating system, thickness and solids.",
-        answer, [t1, t2, ex], [
+        answer, [t1, t2, ex1, ex, ex3], [
             ("How much epoxy do I need for a 2 car garage?",
              f"For {n(sizes['2-car'])} sq ft with a 100 % solids epoxy at 10 mils and 10 % waste: {gal(sizes['2-car'], epoxy):.1f} gallons for the base coat. "
              f"A 500 sq ft floor takes {m.coat_gallons(500, 10, 1, 0.10):.1f} gallons the same way."),
@@ -359,7 +377,7 @@ def build_garage():
              "a 50 % solids water-based epoxy at 3 mils covers about 267 sq ft, but leaves a much thinner film."),
             ("Why does a water-based kit cover more than a 100 % solids kit?",
              "Because it goes on thinner and half of it evaporates. Coverage alone does not compare products: compare the dry film thickness you end up with."),
-        ], "t-coat", ("coatcalc", "garage-epoxy", COAT_PITCH), "garage", form, result, "Garage charts and worked example",
+        ], "t-coat", ("coatcalc", "garage-epoxy", COAT_PITCH), "garage", form, result, "Garage charts and three worked examples",
         data={"products": products}, extra=c.related("More coating tools", [("coating/epoxy-coverage-calculator.html", "Epoxy coverage calculator")]),
         embed=("garage-epoxy", 620))
 
@@ -370,10 +388,6 @@ SLAB_PITCH = "Slabs, footings, columns and stairs on a feet-inch keypad, with re
 QUIKRETE = ('<a href="https://www.quikrete.com/PDFs/DATA_SHEET-Concrete%20Mix%201101.pdf">QUIKRETE Concrete Mix No. 1101 data sheet</a>: '
             "an 80 lb bag yields about 0.60 cu ft, 60 lb 0.45 cu ft, 40 lb 0.30 cu ft")
 THICK = [4, 5, 6, 8]
-
-
-def slab_path(l, w):
-    return f"concrete/{l}x{w}-concrete-slab.html"
 
 
 def slab_form(l, w):
@@ -387,104 +401,81 @@ SLAB_RESULT = rows("sb-yd", "Concrete, with the extra", [("sb-ft3", "In cubic fe
     + '<p class="note">Thickness, reinforcement and bar spacing come from your plans, engineer or building department. This sizes the order.</p>'
 
 
-def slab_tables(l, w):
-    t1 = table(f"Concrete for a {l} × {w} ft slab by thickness",
-               ["Thickness", "Exact volume", "With 10 % extra", "Ready-mix order", "80 lb bags", "60 lb bags", "40 lb bags"],
-               [[f"{t} in", f"{m.slab_ft3(l, w, t) / 27:.2f} cu yd", f"{m.slab_ft3(l, w, t, 10) / 27:.2f} cu yd", f"{trim(m.order_rounded(m.slab_ft3(l, w, t, 10)))} cu yd"]
-                + [n(m.bags_for(m.slab_ft3(l, w, t, 10), y)) for _, y in m.BAGS] for t in THICK],
-               src(f"volume is length × width × thickness; bag counts use {QUIKRETE}") + " Bags and the order include the 10 % extra; ready-mix rounds up to the next quarter yard.")
-    grid_rows = []
-    for sp in (12, 16, 18, 24):
-        g = m.rebar_grid(l, w, sp)
-        grid_rows.append([f"{sp} in on centre", f"{g['bars_long']} × {g['long_bar']:.1f} ft", f"{g['bars_short']} × {g['short_bar']:.1f} ft", str(g["pieces"]),
-                          f"{n(g['total_ft'])} ft", f"{n(g['weight_lb'])} lb"])
-    t2 = table(f"#4 rebar grid for a {l} × {w} ft slab", ["Spacing", "Bars along the length", "Bars across", "20 ft sticks to buy", "Total bar", "Weight"],
-               grid_rows, "Bars each way = spaces rounded up + 1, 3 in clear of every edge, laps of 40 bar diameters (20 in) where a run is longer than a stick. "
-               "#4 bar weighs 0.668 lb per foot (ASTM A615). Spacing and laps are examples: the engineer or your plans set them.")
-    return t1, t2
-
-
-def build_slab(i):
-    l, w = SLABS[i]
+def slab_example(l, w):
+    """A worked example with the order, the bags and the rebar grid for one slab, 4 in thick."""
     area, perim = l * w, 2 * (l + w)
     v4, v4x = m.slab_ft3(l, w, 4), m.slab_ft3(l, w, 4, 10)
-    v6x = m.slab_ft3(l, w, 6, 10)
     g = m.rebar_grid(l, w, 16)
     b80, b60 = m.bags_for(v4x, 0.60), m.bags_for(v4x, 0.45)
-    small = v4x < m.FT3_PER_YD3
-    t1, t2 = slab_tables(l, w)
-    how = ("Under a cubic yard, so it is usually mixed from bags." if small else
-           f"Over a cubic yard, so ready-mix is usually less work than {n(b80)} bags.")
-    ex = guides.example(f"a {l} × {w} ft slab, 4 in thick", [
+    return guides.example(f"a {l} × {w} ft slab, 4 in thick, with a rebar grid", [
         f"Area: {l} × {w} = {n(area)} sq ft. Perimeter for the forms: 2 × ({l} + {w}) = {perim} ft.",
         f"Volume: {n(area)} sq ft × 4 in ÷ 12 = {v4:.1f} cu ft, ÷ 27 = {v4 / 27:.2f} cu yd.",
         f"With 10 % extra for uneven ground and spillage: {v4x / 27:.2f} cu yd. Ready-mix is ordered by the quarter yard: {trim(m.order_rounded(v4x))} cu yd.",
-        f"In bags: {v4x:.1f} cu ft ÷ 0.60 = {n(b80)} bags of 80 lb, or ÷ 0.45 = {n(b60)} bags of 60 lb. {how}",
+        f"In bags that would be {v4x:.1f} cu ft ÷ 0.60 = {n(b80)} bags of 80 lb, or ÷ 0.45 = {n(b60)} bags of 60 lb, so ready-mix is usually less work on a slab this size.",
         f"Rebar at 16 in on centre: {g['bars_long']} bars of {g['long_bar']:.1f} ft and {g['bars_short']} bars of {g['short_bar']:.1f} ft, "
         f"cut from {g['pieces']} sticks of 20 ft #4, {n(g['weight_lb'])} lb of steel.",
-    ], f"Result: order {trim(m.order_rounded(v4x))} cu yd of ready-mix or {n(b80)} bags of 80 lb, and {g['pieces']} sticks of #4 rebar.")
-    answer = (f"a {l} × {w} ft slab is {n(area)} sq ft. At 4 in thick it takes {v4 / 27:.2f} cubic yards of concrete, {v4x / 27:.2f} with 10 % extra: "
-              f"order {trim(m.order_rounded(v4x))} yards of ready-mix or {n(b80)} bags of 80 lb. At 6 in thick it takes {v6x / 27:.2f} yards with the extra.")
-    near = [SLABS[j] for j in range(max(0, i - 3), min(len(SLABS), i + 4)) if j != i]
-    c.page(
-        slab_path(l, w), f"{l}x{w} Concrete Slab: Yards, Bags and Rebar | Calculator",
-        f"How much concrete for a {l}x{w} slab: {v4x / 27:.2f} cubic yards at 4 in with 10 % extra, {n(b80)} bags of 80 lb, plus yards at 5, 6 and 8 in and a #4 rebar grid.",
-        f'<a href="{{rel}}concrete/concrete-slab-calculator.html">Concrete</a> › {l} × {w} slab', "Free concrete tool", f"{l} × {w} concrete slab",
-        f"Cubic yards, 40, 60 and 80 lb bags and rebar for a {l} by {w} foot slab, at 4, 5, 6 and 8 inches thick. Change any number in the calculator.",
-        answer, [t1, t2, ex], [
-            (f"How many yards of concrete do I need for a {l}x{w} slab?",
-             f"{v4 / 27:.2f} cubic yards at 4 in thick, {m.slab_ft3(l, w, 5) / 27:.2f} at 5 in and {m.slab_ft3(l, w, 6) / 27:.2f} at 6 in, before waste. "
-             f"With 10 % extra, order {trim(m.order_rounded(v4x))} yards for a 4 in slab and {trim(m.order_rounded(v6x))} for a 6 in slab."),
-            (f"How many bags of concrete for a {l}x{w} slab?",
-             f"At 4 in thick with 10 % extra: {n(b80)} bags of 80 lb, {n(b60)} bags of 60 lb or {n(m.bags_for(v4x, 0.30))} bags of 40 lb. {how}"),
-            (f"How much rebar do I need for a {l}x{w} slab?",
-             f"A #4 grid at 16 in on centre takes {g['pieces']} sticks of 20 ft ({n(g['total_ft'])} ft of bar, {n(g['weight_lb'])} lb). "
-             f"At 12 in on centre it is {m.rebar_grid(l, w, 12)['pieces']} sticks, at 24 in {m.rebar_grid(l, w, 24)['pieces']}. Use the spacing on your plans."),
-            (f"How thick should a {l}x{w} slab be?",
-             "That depends on what it carries and on the ground under it, so take it from your plans, your engineer or the local building department. "
-             "The table shows the concrete for 4, 5, 6 and 8 in so you can price each."),
-            ("How much extra concrete should I order?",
-             "Estimating guides commonly add 5–10 % for spillage and an uneven subgrade, more for complicated forms or pumping. Running short in the middle of a pour costs far more than a little left over."),
-        ], "t-slab", ("slabcalc", f"slab-{l}x{w}", SLAB_PITCH), "slab", slab_form(l, w), SLAB_RESULT, f"{l} × {w} slab charts and worked example",
-        data={"slab": [l, w]},
-        extra=c.related("Other slab sizes", [(slab_path(a, b), f"{a} × {b}") for a, b in near] + [("concrete/concrete-slab-calculator.html", "All sizes")]))
+    ], f"Result: order {trim(m.order_rounded(v4x))} cu yd of ready-mix and {g['pieces']} sticks of #4 rebar.")
 
 
-def build_slab_hub():
+def build_slab():
     size_rows = []
     for l, w in SLABS:
         v = m.slab_ft3(l, w, 4, 10)
-        size_rows.append([f'<a href="{{rel}}{slab_path(l, w)}">{l} × {w} ft</a>', f"{n(l * w)} sq ft", f"{v / 27:.2f} cu yd", f"{trim(m.order_rounded(v))} cu yd",
-                          n(m.bags_for(v, 0.60)), f"{m.slab_ft3(l, w, 6, 10) / 27:.2f} cu yd"])
-    t1 = table("Concrete by slab size", ["Slab", "Area", "4 in thick, with 10 % extra", "Ready-mix order", "80 lb bags", "6 in thick, with 10 % extra"], size_rows,
-               src(f"volume is length × width × thickness plus 10 %; bag counts use {QUIKRETE}") + " Each size has its own page with 5 and 8 in slabs and a rebar grid.")
-    t2 = table("Bags per cubic yard", ["Bag", "Yield", "Bags per cubic yard"], [[label, f"{y:.2f} cu ft", str(m.bags_for(27, y))] for label, y in m.BAGS],
+        size_rows.append([f'<a id="{l}x{w}" href="#{l}x{w}">{l} × {w} ft</a>', f"{n(l * w)} sq ft", f"{v / 27:.2f} cu yd", f"{trim(m.order_rounded(v))} cu yd",
+                          n(m.bags_for(v, 0.60)), f"{m.slab_ft3(l, w, 6, 10) / 27:.2f} cu yd", f"{m.rebar_grid(l, w, 16)['pieces']} sticks"])
+    t1 = table("Concrete by slab size", ["Slab", "Area", "4 in thick, with 10 % extra", "Ready-mix order", "80 lb bags", "6 in thick, with 10 % extra",
+                                         "#4 rebar at 16 in, 20 ft sticks"], size_rows,
+               src(f"volume is length × width × thickness plus 10 %; bag counts use {QUIKRETE}") + " Tap a size to load it into the calculator, "
+               "then change the thickness, the extra or the bar spacing there. The rebar column is a grid 3 in clear of the edges; the spacing is an example, your plans set it.")
+    t2 = table("Concrete per 100 sq ft of slab, by thickness", ["Thickness", "Exact volume", "With 10 % extra", "80 lb bags, with the extra", "One cubic yard covers"],
+               [[f"{t} in", f"{m.slab_ft3(10, 10, t) / 27:.2f} cu yd", f"{m.slab_ft3(10, 10, t, 10) / 27:.2f} cu yd", n(m.bags_for(m.slab_ft3(10, 10, t, 10), 0.60)),
+                 f"{27 / (t / 12):.0f} sq ft"] for t in THICK],
+               src(f"volume is area × thickness; bag counts use {QUIKRETE}") + " For a size that is not in the table above, multiply the row by the slab's area ÷ 100.")
+    t3 = table("Bags per cubic yard", ["Bag", "Yield", "Bags per cubic yard"], [[label, f"{y:.2f} cu ft", str(m.bags_for(27, y))] for label, y in m.BAGS],
                src(QUIKRETE))
+    grid_rows = []
+    for sp in (12, 16, 18, 24):
+        g = m.rebar_grid(24, 24, sp)
+        grid_rows.append([f"{sp} in on centre", f"{g['bars_long']} × {g['long_bar']:.1f} ft", f"{g['bars_short']} × {g['short_bar']:.1f} ft", str(g["pieces"]),
+                          f"{n(g['total_ft'])} ft", f"{n(g['weight_lb'])} lb"])
+    t4 = table("#4 rebar grid for a 24 × 24 ft slab, by spacing", ["Spacing", "Bars along the length", "Bars across", "20 ft sticks to buy", "Total bar", "Weight"],
+               grid_rows, "Bars each way = spaces rounded up + 1, 3 in clear of every edge, laps of 40 bar diameters (20 in) where a run is longer than a stick. "
+               "#4 bar weighs 0.668 lb per foot (ASTM A615). Spacing and laps are examples: the engineer or your plans set them.")
     v = m.slab_ft3(12, 12, 4, 10)
-    ex = guides.example("a 12 × 12 ft patio slab, 4 in thick", [
+    ex1 = guides.example("a 12 × 12 ft patio slab, 4 in thick, from bags or a truck", [
         "Volume: 12 × 12 × (4 ÷ 12) = 48 cu ft, or 48 ÷ 27 = 1.78 cu yd.",
         f"With 10 % extra: {v:.1f} cu ft = {v / 27:.2f} cu yd. Ready-mix order: {trim(m.order_rounded(v))} cu yd.",
-        f"In bags: {v:.1f} ÷ 0.60 = {m.bags_for(v, 0.60)} bags of 80 lb.",
+        f"In bags: {v:.1f} ÷ 0.60 = {m.bags_for(v, 0.60)} bags of 80 lb, or {m.bags_for(v, 0.45)} bags of 60 lb.",
     ], f"Result: {trim(m.order_rounded(v))} cu yd of ready-mix, or {m.bags_for(v, 0.60)} bags of 80 lb.")
+    v20, v20x6 = m.slab_ft3(20, 20, 4, 10), m.slab_ft3(20, 20, 6, 10)
     answer = ("cubic yards = length × width × thickness in feet ÷ 27. A 10 × 10 ft slab 4 in thick is 1.23 yards, a 20 × 20 is 4.94 and a 30 × 40 is 14.81, before waste. "
               "One cubic yard is 45 bags of 80 lb, 60 bags of 60 lb or 90 bags of 40 lb.")
     c.page(
-        "concrete/concrete-slab-calculator.html", "Concrete Slab Calculator: Yards, Bags and Rebar by Size | Free",
-        f"Free concrete slab calculator: cubic yards, 40, 60 and 80 lb bags and a #4 rebar grid for any slab, with {len(SLABS)} common sizes from 10x10 to 60x100 worked out.",
+        SLAB_PAGE, "Concrete Slab Calculator: Yards, Bags and Rebar by Size | Free",
+        f"Free concrete slab calculator: cubic yards, 40, 60 and 80 lb bags and a #4 rebar grid for any slab, with a table of {len(SLABS)} common sizes from 10x10 to 60x100.",
         "Concrete", "Free concrete tool", "Concrete slab calculator",
         "Cubic yards, bags and rebar for a slab of any size, with waste and the ready-mix order rounded to the quarter yard.",
-        answer, [t1, t2, ex], [
+        answer, [t1, t2, t3, ex1, t4, slab_example(24, 24)], [
             ("How do I calculate concrete for a slab?",
              "Multiply length × width × thickness, all in feet (4 in is 0.333 ft), to get cubic feet, then divide by 27 for cubic yards. Add 5–10 % for waste."),
+            ("How many yards of concrete do I need for a 20x20 slab?",
+             f"4.94 cubic yards at 4 in thick before waste, {v20 / 27:.2f} with 10 % extra, so the ready-mix order is {trim(m.order_rounded(v20))} yards. "
+             f"At 6 in thick it is {v20x6 / 27:.2f} yards with the extra. The table has {len(SLABS)} sizes, and each one loads into the calculator."),
             ("How many 80 lb bags of concrete make a yard?",
              "45. An 80 lb bag yields about 0.60 cu ft and a cubic yard is 27 cu ft. It takes 60 bags of 60 lb or 90 bags of 40 lb."),
             ("How many square feet does a yard of concrete cover?",
              "81 sq ft at 4 in thick, 65 sq ft at 5 in and 54 sq ft at 6 in: 27 cu ft divided by the thickness in feet."),
             ("When should I order ready-mix instead of bags?",
              "Around one cubic yard. Below that a truck is a short load with an extra fee; above it you would be mixing 45 or more 80 lb bags, and ready-mix is usually less work."),
+            ("How much rebar does a slab need?",
+             f"Count the bars each way: the spaces rounded up, plus one, kept 3 in clear of the edges. A 20 × 20 ft slab with #4 bar at 16 in on centre takes "
+             f"{m.rebar_grid(20, 20, 16)['pieces']} sticks of 20 ft; at 24 in it takes {m.rebar_grid(20, 20, 24)['pieces']}. Bar size and spacing come from your plans or engineer."),
+            ("How thick should a slab be?",
+             "That depends on what it carries and on the ground under it, so take it from your plans, your engineer or the local building department. "
+             "The calculator and the tables price 4, 5, 6 and 8 in so you can compare."),
             ("Does the calculator handle footings, columns and stairs?",
              "This page is for rectangular slabs. The SlabCalc app does footings, pads, columns, sonotubes, post holes, walls and stairs, and adds mesh and forms."),
-        ], "t-slab", ("slabcalc", "slab-calc", SLAB_PITCH), "slab", slab_form(20, 20), SLAB_RESULT, "Slab sizes and worked example",
+        ], "t-slab", ("slabcalc", "slab-calc", SLAB_PITCH), "slab", slab_form(20, 20), SLAB_RESULT, "Slab sizes and worked examples",
         embed=("concrete-slab", 640))
 
 
@@ -534,6 +525,14 @@ def tfp_table():
                  src(f"{TFP}, liquid chlorine table") + " More stabilizer means more free chlorine is needed. Your local health rules and the product label still apply.")
 
 
+def adds(key, amount, gallons):
+    """What [amount] of a product (mL of a liquid, grams of a solid) adds to a pool, in ppm: (free chlorine, stabilizer, calcium hardness)."""
+    _, kind, v = m.CHLORINE[key]
+    mg = amount / 1000 * v * 1000 if kind == "liquid" else amount * v * 1000
+    fc = mg / (gallons * 3.78541)
+    return (fc,) + m.chlorine_side(key, fc)
+
+
 def build_pool():
     t1 = table("Chlorine to raise free chlorine by 1 ppm in 10,000 US gallons", ["Product (label strength)", "Amount", "Each 1 ppm also adds"],
                [[m.CHLORINE[k][0], dose_text(k, 1, 10000), side_text(k)] for k in POOL_KEYS],
@@ -541,9 +540,19 @@ def build_pool():
                    "Trouble Free Pool's Pool Math within about 1 % (10 % liquid chlorine: 12.8 fl oz)", "25 October 2026")
                + " Strengths are common label values: use the one printed on your product.")
     t2 = table("Chlorine for a 1 ppm rise by pool size", ["Pool volume", "Liquid chlorine 10 %", "Liquid chlorine 12.5 %", "Cal-hypo 65 %", "Trichlor 90 %"],
-               [[f'<a href="{{rel}}{pool_path(g)}">{n(g)} gal</a>' if g in POOL_SIZES else f"{n(g)} gal"] + [dose_text(k, 1, g) for k in ("liquid10", "liquid125", "calhypo65", "trichlor")]
-                for g in (5000, 7500, 10000, 15000, 20000, 25000, 30000, 40000)],
-               "Scale by the rise you need: 3 ppm takes three times as much. Trichlor dissolves slowly (tablets in a feeder or floater), so it is not a way to raise chlorine quickly.")
+               [[f'<a id="{g}-gallons" href="#{g}-gallons">{n(g)} gal</a>'] + [dose_text(k, 1, g) for k in ("liquid10", "liquid125", "calhypo65", "trichlor")]
+                for g in POOL_VOLUMES],
+               "Tap a volume to load it into the calculator, then pick your product and the rise you need there: 3 ppm takes three times as much. "
+               "Trichlor dissolves slowly (tablets in a feeder or floater), so it is not a way to raise chlorine quickly.")
+
+    def one(key, amount, g):
+        fc, cya, ch = adds(key, amount, g)
+        return f"+{fc:.1f} ppm" + (f", +{cya:.1f} ppm stabilizer" if cya else f", +{ch:.1f} ppm calcium" if ch else "")
+
+    t3 = table("Free chlorine one container adds, by pool size", ["Pool volume", "1 gal of liquid chlorine 10 %", "1 gal of liquid chlorine 12.5 %",
+                                                                    "1 lb of cal-hypo 65 %", "1 lb of trichlor 90 %"],
+               [[f"{n(g)} gal", one("liquid10", 3785.41, g), one("liquid125", 3785.41, g), one("calhypo65", 453.592, g), one("trichlor", 453.592, g)] for g in POOL_VOLUMES],
+               "The same maths run backwards. Stabilizer (CYA) and calcium stay in the water after the chlorine is used up; only replacing water lowers them.")
     amt, _ = m.chlorine_dose("liquid10", 3, 15000)
     ex = guides.example("15,000 gallons, free chlorine from 2 to 5 ppm", [
         "Rise needed: 5 − 2 = 3 ppm.",
@@ -559,10 +568,13 @@ def build_pool():
         "Free pool chlorine calculator: how much liquid chlorine, bleach, cal-hypo, dichlor or trichlor to add for your pool's gallons and the ppm you need, with safety notes.",
         "Pool", "Free pool tool", "How much chlorine to add to a pool",
         "The amount of liquid chlorine, bleach, cal-hypo, dichlor or trichlor that raises free chlorine by the ppm you need, for your pool's volume.",
-        answer, [t1, t2, tfp_table(), ex], [
+        answer, [t1, t2, t3, tfp_table(), ex], [
             ("How much liquid chlorine do I add per 10,000 gallons?",
              f"About {m.chlorine_dose('liquid10', 1, 10000)[0]:.1f} fl oz of 10 % liquid chlorine, or {m.chlorine_dose('liquid125', 1, 10000)[0]:.1f} fl oz of 12.5 %, for each 1 ppm of free chlorine. "
              f"A 3 ppm rise takes {m.chlorine_dose('liquid10', 3, 10000)[0]:.0f} fl oz of 10 %."),
+            ("How much liquid chlorine for a 20,000 gallon pool?",
+             f"{dose_text('liquid10', 1, 20000)} of 10 % liquid chlorine for each 1 ppm, so {dose_text('liquid10', 3, 20000)} for a 3 ppm rise. "
+             f"One gallon of 10 % adds about {adds('liquid10', 3785.41, 20000)[0]:.1f} ppm there. Other volumes are in the tables, and each one loads into the calculator."),
             ("How much chlorine per gallon of pool water?",
              f"Per 1,000 gallons, 1 ppm takes about {m.chlorine_dose('liquid10', 1, 1000)[0]:.2f} fl oz of 10 % liquid chlorine or {m.chlorine_dose('calhypo65', 1, 1000)[0]:.2f} oz of 65 % cal-hypo. "
              "Work from the ppm you need, not from a fixed amount per gallon."),
@@ -578,64 +590,8 @@ def build_pool():
             ("How long after adding chlorine can you swim?",
              "Follow the product label. As a rule, let the pump circulate the water, test again, and swim only when the free chlorine is back within the range for your pool."),
         ], "t-pool", ("poolpro", "chlorine", POOL_PITCH), "chlor", pool_form(15000), POOL_RESULT, "Chlorine charts and worked example", POOL_NOTE,
-        extra=c.related("Chlorine by pool size", [(pool_path(g), f"{n(g)} gallons") for g in POOL_SIZES] + [("pool/pool-chemical-calculator.html", "Pool chemical calculator")]),
+        extra=c.related("More pool tools", [("pool/pool-chemical-calculator.html", "Pool chemical calculator")]),
         embed=("pool-chlorine", 600))
-
-
-def pool_path(gallons):
-    return f"pool/chlorine-for-{gallons}-gallon-pool.html"
-
-
-def build_pool_size(gallons):
-    litres = gallons * 3.78541
-    rises = [1, 2, 3, 5, 10]
-    t1 = table(f"Chlorine for a {n(gallons)} gallon pool", ["Product (label strength)"] + [f"+{r} ppm" for r in rises],
-               [[m.CHLORINE[k][0]] + [dose_text(k, r, gallons) for r in rises] for k in POOL_KEYS],
-               src("ppm × litres = milligrams of chlorine, divided by the label strength; the same maths as PoolPro, cross-checked with Trouble Free Pool's Pool Math",
-                   "25 October 2026") + " Use the strength printed on your own product.")
-
-    def adds(key, grams_or_ml):
-        _, kind, v = m.CHLORINE[key]
-        mg = grams_or_ml / 1000 * v * 1000 if kind == "liquid" else grams_or_ml * v * 1000
-        fc = mg / litres
-        cya, ch = m.chlorine_side(key, fc)
-        return [f"+{fc:.1f} ppm", f"+{cya:.1f} ppm" if cya else "–", f"+{ch:.1f} ppm" if ch else "–"]
-
-    t2 = table(f"What one container adds to {n(gallons)} gallons", ["You add", "Free chlorine", "Stabilizer (CYA)", "Calcium hardness"],
-               [["1 gallon of liquid chlorine 10 %"] + adds("liquid10", 3785.41), ["1 gallon of liquid chlorine 12.5 %"] + adds("liquid125", 3785.41),
-                ["1 gallon of bleach 8.25 %"] + adds("bleach825", 3785.41), ["1 lb of cal-hypo 65 %"] + adds("calhypo65", 453.592),
-                ["1 lb of dichlor 56 %"] + adds("dichlor", 453.592), ["1 lb of trichlor 90 %"] + adds("trichlor", 453.592)],
-               "The same maths run backwards. Stabilizer and calcium stay in the water after the chlorine is used up; only replacing water lowers them.")
-    a10 = m.chlorine_dose("liquid10", 3, gallons)[0]
-    ex = guides.example(f"{n(gallons)} gallons, free chlorine from 2 to 5 ppm", [
-        "Rise needed: 5 − 2 = 3 ppm.",
-        f"{n(gallons)} gallons is {n(litres)} litres, so 3 ppm is 3 × {n(litres)} ÷ 1,000 = {3 * litres / 1000:.0f} g of chlorine.",
-        f"10 % liquid chlorine holds 100 g per litre: {3 * litres / 1000:.0f} ÷ 100 = {3 * litres / 100000:.2f} L, which is {a10:.0f} fl oz.",
-        f"With 65 % cal-hypo instead: {dose_text('calhypo65', 3, gallons)}.",
-    ], f"Result: about {a10:.0f} fl oz ({a10 / 128:.2f} gal) of 10 % liquid chlorine.")
-    answer = (f"each 1 ppm of free chlorine in a {n(gallons)} gallon pool takes about {dose_text('liquid10', 1, gallons)} of 10 % liquid chlorine, "
-              f"{dose_text('calhypo65', 1, gallons)} of 65 % cal-hypo or {dose_text('trichlor', 1, gallons)} of 90 % trichlor. "
-              f"Raising it from 2 to 5 ppm takes {dose_text('liquid10', 3, gallons)} of 10 % liquid chlorine. Follow the product label.")
-    c.page(
-        pool_path(gallons), f"How Much Chlorine for a {n(gallons)} Gallon Pool? Chart by Product",
-        f"How much chlorine to add to a {n(gallons)} gallon pool: liquid chlorine, bleach, cal-hypo, dichlor and trichlor for a 1 to 10 ppm rise, with a calculator and safety notes.",
-        f'<a href="{{rel}}pool/how-much-chlorine-to-add.html">Pool</a> › {n(gallons)} gallons', "Free pool tool", f"How much chlorine for a {n(gallons)} gallon pool",
-        f"Liquid chlorine, bleach, cal-hypo, dichlor and trichlor for a {n(gallons)} gallon pool, by the ppm of free chlorine you need to add.",
-        answer, [t1, t2, tfp_table(), ex], [
-            (f"How much liquid chlorine for a {n(gallons)} gallon pool?",
-             f"{dose_text('liquid10', 1, gallons)} of 10 % liquid chlorine for each 1 ppm, so {dose_text('liquid10', 3, gallons)} for a 3 ppm rise. With 12.5 % it is {dose_text('liquid125', 1, gallons)} per ppm."),
-            (f"How much does a gallon of liquid chlorine raise a {n(gallons)} gallon pool?",
-             f"One gallon of 10 % liquid chlorine adds about {adds('liquid10', 3785.41)[0][1:]} of free chlorine; one gallon of 12.5 % adds {adds('liquid125', 3785.41)[0][1:]}."),
-            (f"How much cal-hypo for a {n(gallons)} gallon pool?",
-             f"{dose_text('calhypo65', 1, gallons)} of 65 % cal-hypo per 1 ppm of free chlorine, {dose_text('calhypo65', 5, gallons)} for 5 ppm. It adds calcium hardness too, so watch that level in hard-water areas."),
-            (f"How many pounds of trichlor does a {n(gallons)} gallon pool use?",
-             f"One pound of 90 % trichlor adds {adds('trichlor', 453.592)[0][1:]} of free chlorine and {adds('trichlor', 453.592)[1][1:]} of stabilizer here. "
-             "How much the pool uses per week depends on sun, heat and swimmers, so test and adjust."),
-            ("Is it safe to add this much at once?",
-             "Read the label for the largest single dose, add in portions with the pump running and test again before adding more. Never mix products."),
-        ], "t-pool", ("poolpro", f"chlorine-{gallons}", POOL_PITCH), "chlor", pool_form(gallons), POOL_RESULT, f"{n(gallons)} gallon charts and worked example", POOL_NOTE,
-        data={"gallons": gallons},
-        extra=c.related("Other pool sizes", [(pool_path(g), f"{n(g)} gallons") for g in POOL_SIZES if g != gallons] + [("pool/how-much-chlorine-to-add.html", "Any size")]))
 
 
 def build():
@@ -645,12 +601,8 @@ def build():
     for key in SHIFTS:
         build_shift(key)
     build_garage()
-    build_slab_hub()
-    for i in range(len(SLABS)):
-        build_slab(i)
+    build_slab()
     build_pool()
-    for g in POOL_SIZES:
-        build_pool_size(g)
 
 
 # Rows for the methodology page (trust.METHODS): (calculator, page, tables and formulas, assumptions, limits).
@@ -661,7 +613,7 @@ METHODS = [
      ["Every plane of the roof has the same pitch.", "The footprint includes the overhangs."],
      ["Field shingles only: starter, ridge cap, underlayment, drip edge and nails are not counted.",
       "Coverage per bundle differs between products: read the wrapper.", "Code limits for low slopes follow the IRC; your local code may differ."]),
-    ("Concrete slab calculator and slab sizes", "concrete/concrete-slab-calculator.html",
+    ("Concrete slab calculator and slab sizes", SLAB_PAGE,
      ["Volume = length &times; width &times; thickness; 27 cu ft to the cubic yard; ready-mix rounded up to the next quarter yard.",
       "Bag yields from the QUIKRETE Concrete Mix No. 1101 data sheet: 0.60, 0.45 and 0.30 cu ft for 80, 60 and 40 lb bags (read 12 November 2026).",
       "Rebar: bars each way = spaces rounded up + 1, #4 bar at 0.668 lb per foot (ASTM A615), 20 ft sticks, laps of 40 bar diameters."],

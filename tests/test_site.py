@@ -19,8 +19,7 @@ NEW_FILES = ("coating/garage-floor-epoxy-calculator.html", "pool/how-much-chlori
 
 def new_pages():
     out = [p for d in NEW_DIRS for p in sorted((SITE / d).glob("*.html"))]
-    out += [SITE / f for f in NEW_FILES] + sorted((SITE / "pool").glob("chlorine-for-*.html"))
-    return out
+    return out + [SITE / f for f in NEW_FILES]
 
 
 class Site(unittest.TestCase):
@@ -30,7 +29,26 @@ class Site(unittest.TestCase):
         cls.home = (SITE / "index.html").read_text()
 
     def test_page_count(self):
-        self.assertEqual(len(new_pages()), 9 + 2 + 7 + (1 + len(pages_trades.SLABS)) + 1 + (1 + len(pages_trades.POOL_SIZES)))
+        # hobby 9, roofing 2, shifts 7, concrete 1, garage 1, chlorine 1
+        self.assertEqual(len(new_pages()), 9 + 2 + 7 + 1 + 1 + 1)
+
+    def test_sizes_are_rows_not_pages(self):
+        """Slab sizes and pool volumes live in one table on one page each; a row's link loads the size into the calculator."""
+        self.assertEqual([p.name for p in (SITE / "concrete").glob("*.html")], ["concrete-slab-calculator.html"])
+        self.assertEqual(sorted(p.name for p in (SITE / "pool").glob("*.html")), ["how-much-chlorine-to-add.html", "pool-chemical-calculator.html"])
+        slab = (SITE / pages_trades.SLAB_PAGE).read_text()
+        for l, w in pages_trades.SLABS:
+            self.assertIn(f'<a id="{l}x{w}" href="#{l}x{w}">', slab)
+        pool = (SITE / "pool/how-much-chlorine-to-add.html").read_text()
+        for g in pages_trades.POOL_VOLUMES:
+            self.assertIn(f'<a id="{g}-gallons" href="#{g}-gallons">', pool)
+        garage = (SITE / "coating/garage-floor-epoxy-calculator.html").read_text()
+        self.assertEqual(garage.count("Worked example:"), 3)
+        for size in ("a one-car garage", "a two-car garage", "a three-car garage"):
+            self.assertIn(f"Worked example: {size}", garage)
+        for name in ("sitemap.xml", "index.html", "llms.txt"):
+            text = (SITE / name).read_text()
+            self.assertNotRegex(text, r"\d+x\d+-concrete-slab|chlorine-for-\d+")
 
     def test_pattern(self):
         """Quick answer, tables with a worked example, questions, author and date, a link to the app, FAQ data."""
@@ -57,7 +75,7 @@ class Site(unittest.TestCase):
             self.assertTrue((SITE / path).exists(), path)
 
     def test_in_menu_methodology_and_changelog(self):
-        page = (SITE / "concrete/20x20-concrete-slab.html").read_text()
+        page = (SITE / pages_trades.SLAB_PAGE).read_text()
         for label, path in calcs_more.SUBNAV:
             self.assertIn(f'href="../{path}">{label}</a>', page, label)
         method = (SITE / "methodology.html").read_text()

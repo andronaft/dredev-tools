@@ -29,7 +29,11 @@
 .strip span.s-A { background: #fbd5d0; color: #14181f; border-color: transparent; }
 .strip span.s-N, .strip span.s-X { background: #d9d9f7; color: #14181f; border-color: transparent; }
 
-/* safety box on the pool pages */
+/* size tables: the row whose size is loaded in the calculator */
+.guide tr.on td { background: var(--soft); font-weight: 600; }
+.calc { scroll-margin-top: 12px; }
+
+/* safety box on the pool page */
 .safety { border: 2px solid var(--bad); border-radius: var(--radius); padding: 14px 18px; background: var(--card); max-width: 760px; }
 .safety h2 { font-size: 18px; margin: 0 0 6px; color: var(--bad); }
 .safety ul { margin: 0; padding-left: 20px; }

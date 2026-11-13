@@ -139,11 +139,22 @@
     };
   }
 
+  // A slab size or a pool volume passed in the address: "#20x20" or "?size=20x20"; "#15000-gallons" or "?gallons=15000".
+  // The size tables link to the same "#…" forms, so one page serves every size.
+  function slabFromUrl(hash, search) {
+    const m = /^#(\d{1,3})x(\d{1,3})$/.exec(hash || '') || /[?&]size=(\d{1,3})x(\d{1,3})(?:&|$)/.exec(search || '');
+    return m && +m[1] > 0 && +m[2] > 0 ? [+m[1], +m[2]] : null;
+  }
+  function gallonsFromUrl(hash, search) {
+    const m = /^#(\d{3,6})-gallons$/.exec(hash || '') || /[?&]gallons=(\d{3,6})(?:&|$)/.exec(search || '');
+    return m ? +m[1] : null;
+  }
+
   const math = {
     ceilCount, degreesToSg, sgToDegrees, abvStandard, abvAlternate, attenuation, honeyPoints, honeyLbFor, toEc, fromEc,
     fillFromWater, candleSplit, convertLoad, pitchFactor, hipFactor, pitchDegrees, roof, brewRatio, shotStyle, skeinsNeeded,
     swatchYarn, lengthFromWeight, gaugeCount, dayNumber, cycleDay, yearStats, coatGallons, coatRate, kits, slabFt3, bagsFor,
-    orderRounded, piecesFor, rebarGrid, chlorineDose, chlorineSide, CHLORINE,
+    orderRounded, piecesFor, rebarGrid, chlorineDose, chlorineSide, CHLORINE, slabFromUrl, gallonsFromUrl,
   };
   if (typeof module !== 'undefined' && module.exports) { module.exports = math; return; }
 
@@ -170,6 +181,26 @@
   }
   function listen(ids, run) {
     ids.forEach((id) => { const el = $(id); if (el) el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', run); });
+  }
+  // Loads a value from the address into the calculator on arrival, and from a table link ("#20x20") on a tap.
+  function fromAddress(parse, apply) {
+    function mark(hash) {
+      document.querySelectorAll('tr.on').forEach((r) => r.classList.remove('on'));
+      const el = hash.length > 1 ? document.getElementById(hash.slice(1)) : null;
+      if (el && el.closest('tr')) el.closest('tr').classList.add('on');
+    }
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      const v = a && parse(a.getAttribute('href'), '');
+      if (!v) return;
+      e.preventDefault();
+      history.replaceState(null, '', a.getAttribute('href'));
+      apply(v);
+      mark(a.getAttribute('href'));
+      document.querySelector('.calc').scrollIntoView({ block: 'start' });
+    });
+    const v = parse(location.hash, location.search);
+    if (v) { apply(v); mark(location.hash); }
   }
   function verdict(id, cls, text) { const v = $(id); if (v) { v.className = cls ? `verdict ${cls}` : 'verdict'; v.textContent = text; } }
 
@@ -483,7 +514,6 @@
 
   /* Concrete slab */
   function initSlab() {
-    if (DATA.slab) { $('sl').value = DATA.slab[0]; $('sw').value = DATA.slab[1]; }
     function run() {
       const l = num('sl'), w = num('sw'), t = num('st'), extra = Math.max(0, num('sextra') || 0);
       const ok = l > 0 && w > 0 && t > 0;
@@ -497,12 +527,12 @@
     }
     listen(['sl', 'sw', 'st', 'sextra', 'sspace'], run);
     run();
+    fromAddress(slabFromUrl, (s) => { $('sl').value = s[0]; $('sw').value = s[1]; run(); });
   }
 
   /* Chlorine for a pool */
   function initChlorine() {
     $('cprod').innerHTML = Object.keys(CHLORINE).map((k) => `<option value="${k}">${CHLORINE[k].name}</option>`).join('');
-    if (DATA.gallons) $('cvol').value = DATA.gallons;
     const unit = segmented('cunit', run);
     function run() {
       const vol = num('cvol'), litres = unit() === 'gal' ? vol * 3.78541 : vol;
@@ -527,6 +557,11 @@
     }
     listen(['cvol', 'cfrom', 'cto', 'cprod'], run);
     run();
+    fromAddress(gallonsFromUrl, (g) => {
+      $('cunit').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === 'gal')));
+      $('cvol').value = g;
+      run();
+    });
   }
 
   /* Embed page: select all on focus */

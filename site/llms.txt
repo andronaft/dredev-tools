@@ -232,7 +232,7 @@ Pro:
 - [Days until Christmas](https://zhukovskyi.space/calculators/countdown/christmas-countdown.html): Live countdown to Christmas and New Year.
 - [Roof pitch multiplier chart](https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html): Slope factors for 1/12 to 12/12, with roof area and squares.
 - [Shingle bundles calculator](https://zhukovskyi.space/calculators/roofing/shingle-bundles-calculator.html): Squares and bundles from the footprint and pitch.
-- [Concrete slab calculator](https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html): Yards, bags and rebar, with 30 slab sizes worked out.
+- [Concrete slab calculator](https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html): Yards, bags and rebar, with a table of 30 common slab sizes.
 - [Garage floor epoxy calculator](https://zhukovskyi.space/calculators/coating/garage-floor-epoxy-calculator.html): Gallons and kits for a 1, 2 or 3 car garage by system.
 - [How much chlorine to add](https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html): Liquid chlorine, cal-hypo or trichlor for your pool's gallons.
 - [Shift pattern calendars](https://zhukovskyi.space/calculators/shifts/): 4 on 4 off, 2-2-3, DuPont and more: calendar, hours and days off.

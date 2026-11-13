@@ -228,5 +228,22 @@ class PoolPro(unittest.TestCase):
             self.assertAlmostEqual(got[1]["ch"], m.chlorine_side(key, 3)[1], places=9)
 
 
+class Address(unittest.TestCase):
+    """A slab size or a pool volume passed in the page address (calc-more.js): one page serves every size."""
+
+    def test_slab(self):
+        self.assertEqual(js("m.slabFromUrl('#20x20', '')"), [20, 20])
+        self.assertEqual(js("m.slabFromUrl('', '?size=60x100')"), [60, 100])
+        self.assertEqual(js("m.slabFromUrl('', '?utm=x&size=12x16&y=1')"), [12, 16])
+        for bad in ("#20x", "#0x20", "#abc", "#20x20x4", "#15000-gallons", ""):
+            self.assertIsNone(js(f"m.slabFromUrl({bad!r}, '')"), bad)
+
+    def test_gallons(self):
+        self.assertEqual(js("m.gallonsFromUrl('#15000-gallons', '')"), 15000)
+        self.assertEqual(js("m.gallonsFromUrl('', '?gallons=7500')"), 7500)
+        for bad in ("#15000", "#20x20", "#-gallons", ""):
+            self.assertIsNone(js(f"m.gallonsFromUrl({bad!r}, '')"), bad)
+
+
 if __name__ == "__main__":
     unittest.main()
