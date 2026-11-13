@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three-Phase Voltage Drop: Formula, Chart and Example</title>
+<meta name="description" content="Three-phase voltage drop formula (1.732 × K × I × L ÷ CM) with a chart of the longest run at 3 % for 208, 240 and 480 V, copper and aluminum, and a worked example.">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dre Dev Tools">
+<meta property="og:title" content="Three-Phase Voltage Drop: Formula, Chart and Example">
+<meta property="og:description" content="Three-phase voltage drop formula (1.732 × K × I × L ÷ CM) with a chart of the longest run at 3 % for 208, 240 and 480 V, copper and aluminum, and a worked example.">
+<meta property="og:url" content="https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html">
+<meta property="og:image" content="https://zhukovskyi.space/calculators/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-itunes-app" content="app-id=6830185126">
+<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ef4444'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "@id": "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html", "url": "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html", "name": "Three-Phase Voltage Drop: Formula, Chart and Example", "description": "Three-phase voltage drop formula (1.732 × K × I × L ÷ CM) with a chart of the longest run at 3 % for 208, 240 and 480 V, copper and aluminum, and a worked example.", "isPartOf": {"@type": "WebSite", "@id": "https://zhukovskyi.space/calculators/#website", "name": "Dre Dev Tools", "url": "https://zhukovskyi.space/calculators/", "publisher": {"@id": "https://zhukovskyi.space/#dredev"}}, "author": {"@id": "https://zhukovskyi.space/#person"}, "publisher": {"@id": "https://zhukovskyi.space/#dredev"}, "dateModified": "2026-11-13"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://zhukovskyi.space/"}, {"@type": "ListItem", "position": 2, "name": "Free tools", "item": "https://zhukovskyi.space/calculators/"}, {"@type": "ListItem", "position": 3, "name": "Electrical", "item": "https://zhukovskyi.space/calculators/electrical/"}, {"@type": "ListItem", "position": 4, "name": "Three-phase voltage drop: formula and chart", "item": "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html"}]}, {"@type": "Organization", "@id": "https://zhukovskyi.space/#dredev", "name": "Dre Dev", "url": "https://zhukovskyi.space/about/"}, {"@type": "Person", "@id": "https://zhukovskyi.space/#person", "name": "Andrii Zhukovskyi", "url": "https://zhukovskyi.space/"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Three-phase voltage drop: formula and chart", "description": "Three-phase voltage drop formula (1.732 × K × I × L ÷ CM) with a chart of the longest run at 3 % for 208, 240 and 480 V, copper and aluminum, and a worked example.", "url": "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html", "author": {"@type": "Person", "@id": "https://zhukovskyi.space/#person", "name": "Andrii Zhukovskyi", "url": "https://zhukovskyi.space/"}, "publisher": {"@id": "https://zhukovskyi.space/#dredev"}, "dateModified": "2026-11-12", "inLanguage": "en"}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is the three-phase voltage drop formula?", "acceptedAnswer": {"@type": "Answer", "text": "VD = 1.732 × K × I × L ÷ CM, with K ≈ 12.9 Ω·cmil/ft for copper in handbooks (this site's calculator uses 12.96 for copper and 21.3 for aluminum), I the line current, L the one-way length in feet and CM the conductor area in circular mils. The result is the drop between lines; divide by the line-to-line voltage for percent."}}, {"@type": "Question", "name": "Why 1.732 instead of 2?", "acceptedAnswer": {"@type": "Answer", "text": "In a balanced three-phase circuit the currents in the three conductors cancel in the return path, so the line-to-line drop is √3 times the drop of one conductor, not twice as in a single-phase circuit."}}, {"@type": "Question", "name": "Do I use line-to-line or line-to-neutral voltage?", "acceptedAnswer": {"@type": "Answer", "text": "Line-to-line with the 1.732 formula: 208, 240 or 480 V. For a single-phase load connected line to neutral on a three-phase system, use the single-phase formula with the line-to-neutral voltage."}}, {"@type": "Question", "name": "How far can I run 6 AWG on a 480 V three-phase circuit?", "acceptedAnswer": {"@type": "Answer", "text": "About 259 ft one way at a full 65 A before the drop passes 3 %. At half the load the distance doubles."}}, {"@type": "Question", "name": "Does power factor matter?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, on large conductors and motor loads. The table assumes power factor 1; the voltage drop calculator on this site lets you enter the power factor and adds conductor reactance."}}]}</script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "83c899454bcd4d139b58edeea34eaac0"}'></script><!-- End Cloudflare Web Analytics -->
+</head>
+<body class="t-elec">
+<header class="top"><div class="wrap">
+<a class="brand" href="../"><i></i>Dre Dev Tools</a>
+<nav aria-label="Main">
+<a href="https://zhukovskyi.space/apps/">Apps</a>
+<a href="../" aria-current="page">Free tools</a>
+<a href="https://zhukovskyi.space/blog/" class="hide-sm">Blog</a>
+<a href="https://zhukovskyi.space/about/">About</a>
+</nav>
+</div>
+<div class="wrap"><nav class="subnav" aria-label="Calculators"><a href="../hvac/">HVAC</a><a href="../electrical/">Electrical</a><a href="../coating/epoxy-coverage-calculator.html">Coatings</a><a href="../pool/pool-chemical-calculator.html">Pool</a><a href="../bread/bakers-percentage-calculator.html">Baking</a><a href="../soap/lye-calculator.html">Soap</a></nav></div></header>
+<main class="wrap">
+<link rel="stylesheet" href="../assets/ref-pages.css">
+<div class="crumbs"><a href="../">Tools</a> › <a href="../electrical/">Electrical</a> › Three-phase voltage drop</div>
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>Three-phase voltage drop: formula and chart</h1>
+<p class="lead">The 1.732 formula, the longest run at 3 % for 208, 240 and 480 V, and a worked example.</p>
+<p class="answer"><strong>Quick answer:</strong> three-phase voltage drop is 1.732 × K × I × L ÷ CM, with K ≈ 12.9 for copper. It is 0.866 of the single-phase drop for the same wire, current and length.
+Example: 40 A on 8 AWG copper over 250 ft at 480 V drops 13.6 V (2.8 %).</p></div>
+<p class="note byline">Checked <time datetime="2026-11-12">12 November 2026</time> by Andrii Zhukovskyi. Computed with K = 12.96 Ω·cmil/ft for copper: resistivity 0.017241 Ω·mm²/m at 20 °C plus 25 % for operating temperature, the resistance the voltage drop calculator on this site uses.</p>
+<p class="printbar"><button type="button" class="btn ghost" data-print>Print this chart</button></p>
+<section class="guide"><h2>Longest three-phase run at 3 % voltage drop</h2>
+<p class="muted">One-way length at the load shown (the 75 °C ampacity of each size from NEC Table 310.16), power factor 1.</p>
+<div class="tablewrap wide"><table><thead><tr><th>Wire</th><th>Load</th><th>208 V copper</th><th>240 V copper</th><th>480 V copper</th><th>480 V aluminum</th></tr></thead><tbody><tr><td>12 AWG</td><td>20 A</td><td>91 ft</td><td>105 ft</td><td>209 ft</td><td>128 ft</td></tr><tr><td>10 AWG</td><td>30 A</td><td>96 ft</td><td>111 ft</td><td>222 ft</td><td>135 ft</td></tr><tr><td>8 AWG</td><td>50 A</td><td>92 ft</td><td>106 ft</td><td>212 ft</td><td>129 ft</td></tr><tr><td>6 AWG</td><td>65 A</td><td>112 ft</td><td>129 ft</td><td>259 ft</td><td>158 ft</td></tr><tr><td>4 AWG</td><td>85 A</td><td>136 ft</td><td>157 ft</td><td>315 ft</td><td>192 ft</td></tr><tr><td>2 AWG</td><td>115 A</td><td>160 ft</td><td>185 ft</td><td>370 ft</td><td>226 ft</td></tr><tr><td>1/0 AWG</td><td>150 A</td><td>196 ft</td><td>226 ft</td><td>451 ft</td><td>275 ft</td></tr><tr><td>3/0 AWG</td><td>200 A</td><td>233 ft</td><td>269 ft</td><td>538 ft</td><td>328 ft</td></tr><tr><td>250 kcmil</td><td>255 A</td><td>272 ft</td><td>314 ft</td><td>629 ft</td><td>384 ft</td></tr><tr><td>500 kcmil</td><td>380 A</td><td>366 ft</td><td>422 ft</td><td>844 ft</td><td>515 ft</td></tr></tbody></table></div>
+<p class="note">At half the load the length doubles. For 5 % multiply the length by 1.67.</p>
+<h3>Worked example: 40 A on 8 AWG copper, 480 V three phase, 250 ft</h3><ol class="steps"><li>Handbook K-factor (K = 12.9): VD = 1.732 × K × I × L ÷ CM = 1.732 × 12.9 × 40 A × 250 ft ÷ 16,510 cmil = 13.53 V.</li><li>The calculator on this site uses K = 12.96 and gives 13.60 V line to line, which is 2.83 % of 480 V.</li><li>The same wire, current and length on a single-phase circuit would drop 15.70 V: three phase is 0.866 of that.</li></ol><p><strong>Result: 13.60 V, 2.83 %, within 3 %.</strong></p>
+<p class="note print-only">https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html · checked 12 November 2026</p></section>
+<p><a class="btn" href="../electrical/voltage-drop-calculator.html">Voltage drop calculator (choose 3-phase)</a></p>
+<!-- app:electrician-calc --><section class="promo"><img class="icon" src="../img/electrician-calc-icon.jpg" alt="" width="72" height="72"><div>
+<div class="eyebrow">The whole job, on your phone</div>
+<h3>Electrician Calc: Wire &amp; Panel</h3>
+<p>Three-phase cable sizing, motor circuits and fault level, NEC and IEC, with the working shown. <a href="https://zhukovskyi.space/apps/electrician-calc/">See what's inside</a>.</p>
+<div class="btns"><a class="btn" href="https://apps.apple.com/app/id6830185126">Download on the App Store</a></div>
+</div></section>
+<section class="faq"><h2>Questions</h2><details><summary>What is the three-phase voltage drop formula?</summary><p>VD = 1.732 × K × I × L ÷ CM, with K ≈ 12.9 Ω·cmil/ft for copper in handbooks (this site's calculator uses 12.96 for copper and 21.3 for aluminum), I the line current, L the one-way length in feet and CM the conductor area in circular mils. The result is the drop between lines; divide by the line-to-line voltage for percent.</p></details><details><summary>Why 1.732 instead of 2?</summary><p>In a balanced three-phase circuit the currents in the three conductors cancel in the return path, so the line-to-line drop is √3 times the drop of one conductor, not twice as in a single-phase circuit.</p></details><details><summary>Do I use line-to-line or line-to-neutral voltage?</summary><p>Line-to-line with the 1.732 formula: 208, 240 or 480 V. For a single-phase load connected line to neutral on a three-phase system, use the single-phase formula with the line-to-neutral voltage.</p></details><details><summary>How far can I run 6 AWG on a 480 V three-phase circuit?</summary><p>About 259 ft one way at a full 65 A before the drop passes 3 %. At half the load the distance doubles.</p></details><details><summary>Does power factor matter?</summary><p>Yes, on large conductors and motor loads. The table assumes power factor 1; the voltage drop calculator on this site lets you enter the power factor and adds conductor reactance.</p></details></section>
+<section class="related"><h2>More electrical tools</h2><div class="chips"><a href="../electrical/voltage-drop-calculator.html">Voltage drop calculator</a><a href="../electrical/wire-size-calculator.html">Wire size calculator</a><a href="../electrical/ampacity-chart-nec-310-16.html">Ampacity chart (NEC 310.16)</a><a href="../electrical/wire-size-by-amps-and-distance.html">Wire size by amps and distance</a><a href="../electrical/12-awg-voltage-drop-per-foot.html">12 AWG voltage drop per foot</a><a href="../electrical/12v-dc-voltage-drop.html">12 V DC voltage drop</a><a href="../electrical/awg-to-mm2.html">AWG to mm²</a><a href="../electrical/">All electrical tools</a></div></section>
+<p class="note">Voltage drop only: the wire must also be large enough for the load and its overcurrent protection. Reference only. The code edition and amendments adopted where you work, the equipment's listing and the manufacturer's instructions govern. Have a licensed electrician check the installation.</p>
+
+<aside class="trust"><p class="note disclaimer">Reference only. A result depends on what you enter and on the published tables named on this page. Before you buy materials, size a circuit, charge a system or dose chemicals, check it against the code in force where you work, the product label and the manufacturer's instructions. These tools come with no warranty.</p><p class="note"><a href="../methodology.html">Methodology and sources</a> · <a href="../verification.html">Checked examples</a> · <a href="../changelog.html">Changelog</a> · <a href="mailto:mobile.support@zhukovskyi.space?subject=Calculator%20error%3A%20Three-phase%20voltage%20drop%3A%20formula%20and%20chart&amp;body=Page%3A%20https%3A//zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html%0A%0AWhat%20I%20entered%3A%0A%0AWhat%20the%20page%20showed%3A%0A%0AWhat%20I%20expected%2C%20and%20where%20that%20number%20comes%20from%3A%0A">Found an error? Tell me</a></p></aside>
+</main>
+<footer><div class="wrap">
+<span>© 2026 Dre Dev · apps and free tools by <a href="https://zhukovskyi.space/about/">Andrii Zhukovskyi</a>. No account, no tracking cookies.</span>
+<nav aria-label="Footer">
+<a href="https://zhukovskyi.space/about/">About</a>
+<a href="https://zhukovskyi.space/apps/">Apps</a>
+<a href="../">Free tools</a>
+<a href="../methodology.html">Methodology</a>
+<a href="https://zhukovskyi.space/privacy/">Privacy</a>
+<a href="https://zhukovskyi.space/testers/">Become a tester</a>
+<a href="https://zhukovskyi.space/blog/">Blog</a>
+<a href="https://github.com/andronaft">GitHub</a>
+<a href="mailto:mobile.support@zhukovskyi.space">mobile.support@zhukovskyi.space</a>
+</nav>
+</div></footer>
+<script src="../assets/ref-pages.js"></script>
+</body>
+</html>
