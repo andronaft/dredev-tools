@@ -27,7 +27,7 @@ Free in the browser, same formulas: [Superheat & subcooling calculator](https://
 
 ### Electrician Calc: Wire & Panel
 
-Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364. Available on the App Store. Page: https://zhukovskyi.space/apps/electrician-calc/
+Wire size, voltage drop, panel planner and 21 electrical calculators. NEC and IEC 60364. Available on Google Play and the App Store. Page: https://zhukovskyi.space/apps/electrician-calc/
 
 Real ampacity tables, correction factors and protection checks with every step shown. NEC (AWG, feet) or IEC 60364 (mm², metres), picked from your region and switched with one tap.
 

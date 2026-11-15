@@ -27,7 +27,7 @@
       "package": "com.andrii.electriccalc",
       "repo_dir": "Calculator_for_electrical",
       "app_store_url": "https://apps.apple.com/app/id6830185126",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "soon"
     },
