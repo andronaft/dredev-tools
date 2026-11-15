@@ -14,6 +14,11 @@ import guides
 
 # (date, kind, text). Newest first. "Correction" marks a wrong number or a broken calculator that was fixed.
 CHANGES = [
+    ("2026-11-16", "New", "Five electrical reference pages: wire size for 50, 60 and 100 A subpanels by distance, a conduit "
+     "fill chart for THHN in EMT and PVC Schedule 40, how many 12 AWG wires fit in 3/4 in. EMT with the ampacity "
+     "adjustment, box fill by NEC 314.16 and EV charger wire size by amps and distance. Their numbers are computed "
+     "with the tables and formulas of the Electrician Calc app (NEC 2023). The conduit fill counts round down, so "
+     "some are one lower than NEC Annex C."),
     ("2026-11-13", "New", "The superheat and subcooling calculator now covers all 22 refrigerants, and a link can open it "
      "on one of them (the PT chart pages do). R-410A, R-454B, R-32, R-22, R-134a and R-404A have a page of their own with "
      "worked examples and typical pressures."),

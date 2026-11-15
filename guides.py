@@ -83,8 +83,10 @@ def drop_volts(supply, cond, mm2, metres, amps, iec=False, pf=1.0):
     return (math.sqrt(3) if supply == "three" else 2) * amps * metres * z
 
 
-def wire_size(amps, wire="thhn", cond="cu", cont=False, term=75):
-    """Ampacity pick exactly as initWireSize() in calc.js: (size, ampacity, breaker, column)."""
+def wire_size(amps, wire="thhn", cond="cu", cont=False, term=75, adjust=1):
+    """Ampacity pick exactly as initWireSize() in calc.js: (size, ampacity, breaker, column).
+    `adjust` is the app's correction × adjustment factor on the insulation column (cableSizeNec in sizing.dart);
+    the live calculator has no derating, so it leaves it at 1."""
     insul_t, limit_t = WIRES[wire]
     design = amps * 1.25 if cont else amps
     ocpd = next((b for b in BREAKERS if b >= design - 1e-9), None)
@@ -94,7 +96,7 @@ def wire_size(amps, wire="thhn", cond="cu", cont=False, term=75):
         term_a = AMPACITY[cond][cap][i]
         if not insul or not ocpd:
             continue
-        a = min(insul, term_a)
+        a = min(insul, term_a) if adjust == 1 else min(insul * adjust, term_a)
         small = SMALL[cond].get(s)
         if small and ocpd > small:
             continue

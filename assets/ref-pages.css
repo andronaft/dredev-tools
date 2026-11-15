@@ -16,6 +16,11 @@ p.btns { margin: 16px 0; }
 .tsh th, .tsh td { padding: 6px 8px; text-align: center; }
 .tsh th:first-child, .tsh td:first-child { text-align: left; font-weight: 600; }
 .wide th { white-space: normal; vertical-align: bottom; }
+.tight th, .tight td { padding: 6px 7px; }
+.wrap1 td:first-child { white-space: normal; min-width: 8.5em; }
+.stack td small { display: block; font-size: 12px; color: var(--muted); }
+.appline { margin: 14px 0 6px; max-width: 760px; }
+.appline p { margin: 0 0 10px; }
 
 
 @media print {
@@ -23,7 +28,7 @@ p.btns { margin: 16px 0; }
     --bg: #fff; --card: #fff; --fg: #000; --muted: #333; --line: #999; --soft: #f2f2f2; --accent: #000; --shadow: none;
   }
   body { background: #fff; color: #000; font-size: 11pt; }
-  header.top, footer, .promo, .faq, .related, .chips, .printbar, .btns, .crumbs, .calc, .answer, section:has(> .chips) { display: none !important; }
+  header.top, footer, .promo, .appline, .faq, .related, .chips, .printbar, .btns, .crumbs, .calc, .answer, section:has(> .chips) { display: none !important; }
   .wrap { max-width: none; padding: 0; }
   .hero { padding: 0 0 6pt; }
   .hero h1 { font-size: 18pt; margin-bottom: 4pt; }

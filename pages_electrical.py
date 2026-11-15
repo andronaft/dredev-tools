@@ -1,13 +1,17 @@
-"""Electrical reference pages: the NEC Table 310.16 ampacity chart, wire size by amps and distance, and voltage drop
-references for 12 AWG, three phase and 12 V DC, plus the electrical hub.
+"""Electrical reference pages: the NEC Table 310.16 ampacity chart, wire size by amps and distance, voltage drop
+references for 12 AWG, three phase and 12 V DC, subpanel feeders, conduit fill, box fill and EV charger circuits, plus
+the electrical hub.
 
 Ampacities, wire sizes and voltage drops are computed with the functions and tables in guides.py, which mirror
-assets/calc.js; tests/test_pages.py runs calc.js itself against the numbers on these pages. Correction factors are
-read from the Electrician Calc app (nec_tables.dart), so the site never drifts from the app.
+assets/calc.js; tests/test_pages.py runs calc.js itself against the numbers on these pages. Correction factors and the
+conduit, box and grounding tables are read from the Electrician Calc app (nec_tables.dart), so the site never drifts
+from the app; the fill arithmetic is calc_math.py's mirror of the app's electrical.dart.
 """
+import math
 import re
 from html import escape as e
 
+import calc_math as cm
 import guides
 import refdata
 from guides import AMPACITY, NEC_SIZES, awg, drop_volts, fmt, max_feet, mm2_of, wire_size
@@ -22,6 +26,11 @@ BY_DISTANCE = "electrical/wire-size-by-amps-and-distance.html"
 VD_12AWG = "electrical/12-awg-voltage-drop-per-foot.html"
 VD_3PH = "electrical/three-phase-voltage-drop.html"
 VD_12V = "electrical/12v-dc-voltage-drop.html"
+SUBPANEL = "electrical/wire-size-50-amp-sub-panel.html"
+FILL_CHART = "electrical/conduit-fill-chart.html"
+FILL_12_EMT = "electrical/how-many-12-awg-wires-in-3-4-emt.html"
+BOX_FILL = "electrical/box-fill-nec-314-16.html"
+EV_WIRE = "electrical/ev-charger-wire-size.html"
 
 NEC_EDITION = "NFPA 70, National Electrical Code, 2023 edition"
 # The K factor (Ω·cmil/ft) behind every number here: calc.js takes resistivity at 20 °C and adds 25 % for operating
@@ -36,7 +45,9 @@ ALL_SIZES = [s for s, _ in guides.NEC]  # 18 AWG to 500 kcmil, for voltage drop 
 def elec_links(skip=None):
     links = [(VD_CALC, "Voltage drop calculator"), (WIRE_CALC, "Wire size calculator"), (AMPACITY_PAGE, "Ampacity chart (NEC 310.16)"),
              (BY_DISTANCE, "Wire size by amps and distance"), (VD_12AWG, "12 AWG voltage drop per foot"),
-             (VD_3PH, "Three-phase voltage drop"), (VD_12V, "12 V DC voltage drop"), (AWG_MM2, "AWG to mm²"), (HUB, "All electrical tools")]
+             (VD_3PH, "Three-phase voltage drop"), (VD_12V, "12 V DC voltage drop"), (SUBPANEL, "Subpanel feeder wire size"),
+             (EV_WIRE, "EV charger wire size"), (FILL_CHART, "Conduit fill chart"), (FILL_12_EMT, "12 AWG in 3/4 in. EMT"),
+             (BOX_FILL, "Box fill (NEC 314.16)"), (AWG_MM2, "AWG to mm²"), (HUB, "All electrical tools")]
     return related("More electrical tools", [l for l in links if l[0] != skip])
 
 
@@ -60,10 +71,10 @@ def ampacity(cond, temp, size):
     return AMPACITY[cond][temp][NEC_SIZES.index(size)]
 
 
-def size_for(amps, feet, volts, cond="cu", supply="single", limit=3.0):
+def size_for(amps, feet, volts, cond="cu", supply="single", limit=3.0, cont=False):
     """The calculator's pick: smallest size by ampacity (THHN, 75 °C terminations), then upsized until the drop is
     within `limit` percent. Returns (size or None, size by ampacity, drop %)."""
-    pick, _, _, _ = wire_size(amps, "thhn", cond)
+    pick, _, _, _ = wire_size(amps, "thhn", cond, cont)
     if not pick:
         return None, None, None
     for s in NEC_SIZES[NEC_SIZES.index(pick):]:
@@ -477,6 +488,591 @@ def vd_12v_page(b):
     b.shell(path, "12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
+# ---------- pages on the app's tables: subpanel feeders, conduit fill, box fill, EV chargers ----------
+
+# The day these five pages were compared with the app's engine (main of Calculator_for_electrical).
+ENGINE_CHECKED = ("16 November 2026", "2026-11-16")
+FILL_SIZES = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0"]
+FILL_TRADES = ["1/2", "3/4", "1", "1-1/4", "1-1/2", "2"]
+TRADE_LABEL = {"1/2": "½", "3/4": "¾", "1": "1", "1-1/4": "1¼", "1-1/2": "1½", "2": "2"}
+SUB_FEEDERS = [50, 60, 100]
+SUB_FEET = [25, 50, 75, 100, 150, 200, 250]
+EV_AMPS = [32, 40, 48, 80]
+EV_FEET = [25, 50, 75, 100, 150, 200]
+_APP = {}
+
+
+def app_tables(b):
+    """NEC Chapter 9 Tables 1, 4 and 5 (THHN in EMT and PVC Schedule 40), Table 314.16(B)(1), the common metal boxes
+    of Table 314.16(A) and Table 250.122, as the Electrician Calc app holds them in nec_tables.dart."""
+    if _APP:
+        return _APP
+    text = (b.ROOT / "Calculator_for_electrical/lib/feature/engine/nec_tables.dart").read_text()
+
+    def body(start, end="};"):
+        return text.split(start, 1)[1].split(end, 1)[0]
+
+    def pairs(src):
+        return {k: float(v) for k, v in re.findall(r"'([^']+)': ([\d.]+)", src)}
+
+    lim = body("double necFillLimit(int conductors) => switch (conductors) {")
+    _APP.update(
+        thhn=pairs(body("const thhnArea = <String, double>{")),
+        trade=re.findall(r"'([^']+)'", body("const tradeSizes = <String>[", "];")),
+        raceway={k: [float(x) for x in v.split(",") if x.strip()]
+                 for k, v in re.findall(r"Raceway\.(\w+): \[([^\]]+)\]", body("const racewayArea = <Raceway, List<double>>{"))},
+        raceway_name=dict(re.findall(r"(\w+)\('([^']+)'\)", body("enum Raceway {", ";"))),
+        limits=tuple(float(re.search(k + r" => ([\d.]+)", lim).group(1)) for k in ("1", "2", "_")),
+        box=pairs(body("const boxVolumePerConductor = <String, double>{")),
+        boxes=[(n, float(v)) for n, v in re.findall(r"\('([^']+)', ([\d.]+)\)", body("const metalBoxes = <(String, double)>[", "];"))],
+        egc=[(int(a), cu, al) for a, cu, al in re.findall(r"(\d+): \('([^']+)', '([^']+)'\)", body("const necEgc = <int, (String, String)>{"))],
+    )
+    return _APP
+
+
+def raceway_area(t, raceway, trade):
+    return t["raceway"][raceway][t["trade"].index(trade)]
+
+
+def fill_count(t, raceway, trade, size):
+    """(the app's count, mark). '*': the 40 % calculation ends in .8 or more, where Note 7 to the Chapter 9 tables
+    permits the next whole number and the app still rounds down. '†': 40 % of the raceway would hold two, but two
+    conductors are limited to 31 %, so one fits."""
+    area, wire = raceway_area(t, raceway, trade), t["thhn"][size]
+    n = cm.conduit_max(wire, area, t["limits"])
+    x = t["limits"][2] * area / wire
+    return n, "*" if n >= 2 and x - n >= 0.8 - 1e-9 else "†" if n == 1 and x >= 2 else ""
+
+
+def ground(b, ocpd, copper=True):
+    return cm.egc_for(ocpd, app_tables(b)["egc"], copper)
+
+
+def ground_upsized(b, ocpd, minimum, installed, copper=True):
+    return cm.egc_upsized(ocpd, app_tables(b)["egc"], dict(guides.NEC), NEC_SIZES, minimum, installed, copper)
+
+
+def nmb_for(amps, cont=False):
+    """Copper NM-B for a load: the 60 °C pick, moved up to a size NM-B is made in; None above 2 AWG."""
+    s = wire_size(amps, "nmb", "cu", cont)[0]
+    return next((m for m in guides.NMB_MADE if s and NEC_SIZES.index(m) >= NEC_SIZES.index(s)), None)
+
+
+def pct_at(size, amps, feet, cond="cu", volts=240):
+    return drop_volts("single", cond, mm2_of(size), feet * 0.3048, amps) / volts * 100
+
+
+def run_table(loads, feet, cond="cu", cont=False):
+    """Rows of lengths, a column per load: the size the wire size calculator picks and the drop at that size."""
+    rows = []
+    for ft in feet:
+        cells = [f"{ft} ft"]
+        for amps in loads:
+            s, _, pct = size_for(amps, ft, 240, cond, cont=cont)
+            cells.append(f"{awg(s)} <small>{pct:.2f} %</small>" if s else "&gt; 500 kcmil")
+        rows.append(cells)
+    return table(["One-way length"] + [f"{a} A" for a in loads], rows, "stack tight")
+
+
+def holds(amps, feet, cond="cu", cont=False):
+    """(size by ampacity, the longest length of the chart it serves, the next length, the size there)."""
+    pick = wire_size(amps, "thhn", cond, cont)[0]
+    far = [ft for ft in feet if size_for(amps, ft, 240, cond, cont=cont)[0] == pick]
+    nxt = feet[len(far)] if len(far) < len(feet) else None
+    return pick, far[-1], nxt, size_for(amps, nxt, 240, cond, cont=cont)[0] if nxt else None
+
+
+def app_line(b, source, text):
+    """One factual line under the answer on what the app adds for this job, with the store buttons."""
+    name = e(b.CFG["apps"]["electrician-calc"]["short"])
+    return (f'<!-- app:electrician-calc --><div class="appline"><p><strong>In the <a href="{b.app_href("electrician-calc")}">{name}</a> app:</strong> '
+            f'{text}</p>{b.store_buttons("electrician-calc", source)}</div>')
+
+
+def checked_note(b, path):
+    return f'<p class="note print-only">{b.BASE}/{path} · checked {ENGINE_CHECKED[0]}</p>'
+
+
+# ---------- what size wire for a 50 amp sub panel ----------
+
+def subpanel_page(b):
+    path = SUBPANEL
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("Wire size for a 50 amp sub panel", path)])
+
+    def both(amps):
+        cu, al = holds(amps, SUB_FEET), holds(amps, SUB_FEET, "al")
+        far = f"up to {cu[1]} ft one way" if cu[1] == al[1] else f"up to {cu[1]} ft one way in copper and {al[1]} ft in aluminum"
+        return cu, al, far
+
+    cu, al, far = both(50)
+    answer = (f"a 50 amp subpanel needs {awg(cu[0])} copper or {awg(al[0])} aluminum feeder conductors (THHN, XHHW-2 or SER cable on 75 °C terminals; "
+              f"NEC Table 310.16, 2023 edition). On 240 V that keeps voltage drop within 3 % at a full 50 A {far}; "
+              f"at {cu[2]} ft use {awg(cu[3])} copper or {awg(size_for(50, cu[2], 240, 'al')[0])} aluminum. "
+              "The feeder has four conductors: two hots, a neutral and a ground.")
+
+    def q(amps):
+        c, a, reach_ = both(amps)
+        return (f"What size wire for a {amps} amp sub panel?",
+                f"{awg(c[0])} copper or {awg(a[0])} aluminum, on a {amps} A breaker, {reach_}. "
+                f"At {c[2]} ft the chart moves to {awg(c[3])} copper to keep the drop within 3 % at a full {amps} A on 240 V.")
+
+    grounds = table(["Feeder breaker", "Copper ground", "Aluminum ground"],
+                    [[f"{a} A", awg(ground(b, a)), awg(ground(b, a, False))] for a in SUB_FEEDERS])
+    s, pick, pct = size_for(60, 150, 240)
+    egc, up = ground(b, 60), ground_upsized(b, 60, pick, s)
+    ex = guides.example("60 A subpanel in a detached garage, 150 ft from the main panel, copper", [
+        f"By ampacity (75 °C column, NEC Table 310.16): {awg(pick)} copper, {ampacity('cu', 75, pick)} A, on a 60 A breaker.",
+        f"Voltage drop of {awg(pick)} at 150 ft and a full 60 A: {pct_at(pick, 60, 150) * 2.4:.2f} V, which is {pct_at(pick, 60, 150):.2f} % of 240 V. Over 3 %.",
+        f"Next size up, {awg(s)}: {pct * 2.4:.2f} V, or {pct:.2f} %. Under 3 %.",
+        f"Ground: Table 250.122 gives {awg(egc)} copper for a 60 A breaker. Because the hots went up from {awg(pick)} to {awg(s)}, "
+        f"250.122(B) increases the ground in the same proportion: {awg(up)}.",
+    ], f"Result: two {awg(s)} hots, a neutral of the same size and a {awg(up)} ground, all copper, on a 60 A breaker.")
+    n50, n60 = nmb_for(50), nmb_for(60)
+    nmb_why = (f"NM-B (Romex) cable is held to the 60 °C column by NEC 334.80, where {awg(cu[0])} copper is only {ampacity('cu', 60, cu[0])} A. "
+               f"On NM-B a 50 A feeder needs {awg(n50)} copper and a 60 A feeder {awg(n60)}.")
+    faq_html, faq_ld = b.faq([
+        q(50), q(60), q(100),
+        (f"Why do other sites say {awg(n50)} for a 50 amp sub panel?",
+         f"They size NM-B cable. {nmb_why} The {awg(cu[0])} answer is for THHN or XHHW-2 conductors in conduit on 75 °C terminals, where {awg(cu[0])} copper is {ampacity('cu', 75, cu[0])} A."),
+        ("Why do some charts show a smaller wire for 100 amps?",
+         "They use NEC 310.12, which allows smaller conductors for a dwelling's service and for the one feeder that carries the dwelling's whole load. "
+         "A feeder to a subpanel that carries only part of the load is sized from Table 310.16, as on this page."),
+        ("Does a sub panel need 3 wires or 4?",
+         "Four: two hots, a neutral and an equipment ground. The neutral and the ground are kept on separate bars in the subpanel, "
+         "and the neutral is bonded to ground only at the service (NEC 250.24(B)). A subpanel in a detached building also gets its own grounding electrode (NEC 250.32)."),
+        ("Is the distance one way or the total wire length?",
+         "One way: from the main panel to the subpanel. The voltage drop formula already counts the current going out and coming back."),
+        ("How are these sizes worked out?",
+         "First the smallest conductor whose ampacity in the 75 °C column of NEC Table 310.16 covers the feeder breaker. "
+         f"Then the size goes up until the voltage drop at the feeder's full rating is 3 % or less on 240 V, using copper or aluminum resistance at operating temperature "
+         f"(K = {K_CU:.2f} Ω·cmil/ft for copper, {K_AL:.1f} for aluminum). These are the formulas of the wire size calculator on this site and of the Electrician Calc app."),
+    ])
+    body = f"""{CSS}
+{crumb_html}
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>What size wire for a 50 amp sub panel?</h1>
+<p class="lead">Feeder wire for 50, 60 and 100 amp subpanels from 25 to 250 ft, copper and aluminum, with the voltage drop at each length.</p>
+<p class="answer"><strong>Quick answer:</strong> {answer}</p></div>
+{app_line(b, "subpanel", "the free Wire Size calculator sizes a feeder for any load, length, voltage and wire type, shows the working and gives the ground wire, "
+          "increased under 250.122(B) when the run is upsized for voltage drop. The Panel Planner, which assigns a panel's circuits to breakers and wire sizes, is in Pro.")}
+{byline(f"Ampacities from {NEC_EDITION}, Table 310.16; sizes and voltage drop computed with the formulas of the Electrician Calc app.", ENGINE_CHECKED)}
+{printbar()}
+<section class="guide"><h2>Feeder wire size for 50, 60 and 100 amp subpanels</h2>
+<p class="muted">Each cell is the smallest wire that carries the feeder and keeps voltage drop at or under 3 %, with the drop at that size. 240 V single phase, the feeder loaded to its full rating,
+non-continuous load, THHN/THWN-2 or XHHW-2 conductors (SER cable for aluminum) on 75 °C terminals, 30 °C ambient, power factor 1. Length is one way.</p>
+<h3>Copper</h3>{run_table(SUB_FEEDERS, SUB_FEET)}
+<h3>Aluminum</h3>{run_table(SUB_FEEDERS, SUB_FEET, "al")}
+<p class="note">The breaker in the main panel is the feeder rating: 50, 60 or 100 A. A longer run does not change it; it only makes the wire larger.
+If the subpanel's real load is lower than the breaker, the drop is lower in the same proportion. <strong>Why other sites show a different number:</strong> {nmb_why}</p>
+<h3>Four conductors, and the size of the ground</h3>
+<p>A feeder to a subpanel has four conductors: two ungrounded (hot) conductors, a neutral and an equipment grounding conductor.
+In the subpanel the neutral bar is isolated from the enclosure and from the ground bar, because the neutral is bonded to ground only at the service (NEC 250.24(B)).
+A subpanel in a detached building also needs its own grounding electrode, connected to the ground bar (NEC 250.32).
+The charts above size the two hots; run the neutral the same size unless a load calculation allows a smaller one (NEC 220.61).</p>
+{grounds}
+<p class="note">Minimum equipment grounding conductor from NEC Table 250.122, by the feeder breaker. When the hots are upsized for voltage drop, 250.122(B) increases the ground in proportion.</p>
+{ex}
+{checked_note(b, path)}</section>
+<p><a class="btn" href="{REL}{WIRE_CALC}">Wire size calculator</a> <a class="btn ghost" href="{REL}{BY_DISTANCE}">Wire size by amps and distance</a></p>
+{faq_html}
+{elec_links(SUBPANEL)}
+<p class="note">{ELEC_NOTE}</p>
+"""
+    desc = ("What size wire for a 50 amp sub panel: copper and aluminum feeder sizes for 50, 60 and 100 A subpanels from 25 to 250 ft, "
+            "with voltage drop at each length, the ground wire size and the four-wire rule. NEC 2023.")
+    ld = dataset_ld(b, path, "Subpanel feeder wire size by distance", desc, f"{NEC_EDITION}, Tables 310.16 and 250.122",
+                    [("Feeder rating", "A"), ("One-way length", "ft"), ("Conductor size", "AWG or kcmil"), ("Voltage drop", "%")], ENGINE_CHECKED[1])
+    b.shell(path, "What Size Wire for a 50 Amp Sub Panel? 60 A and 100 A Chart", desc, body, "t-elec", None, [ld, faq_ld], JS)
+
+
+# ---------- conduit fill chart ----------
+
+def fill_table(t, raceway):
+    rows = [[awg(s)] + ["{}{}".format(*fill_count(t, raceway, tr, s)) for tr in FILL_TRADES] for s in FILL_SIZES]
+    return table(["Wire \\ trade size, in."] + [TRADE_LABEL[x] for x in FILL_TRADES], rows, "tight")
+
+
+def fill_marks(t):
+    """The footnotes the two charts need, as HTML."""
+    marks = {fill_count(t, r, tr, s)[1] for r in t["raceway"] for tr in FILL_TRADES for s in FILL_SIZES}
+    one, two, more = (f"{v * 100:.0f} %" for v in t["limits"])
+    out = []
+    if "*" in marks:
+        out.append(f"* The {more} calculation ends in .8 or more. Note 7 to the Chapter 9 tables permits the next whole number in that case, "
+                   "so charts that round up, NEC Annex C among them, list one more conductor in these cells. This chart rounds down, as the Electrician Calc app does.")
+    if "†" in marks:
+        out.append(f"† Two of these conductors are under {more} of the raceway but over the {two} limit for two conductors, so only one fits.")
+    return " ".join(out)
+
+
+def fill_chart_page(b):
+    path = FILL_CHART
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("Conduit fill chart", path)])
+    t = app_tables(b)
+    one, two, more = t["limits"]
+    names = t["raceway_name"]
+
+    def n(raceway, trade, size):
+        return fill_count(t, raceway, trade, size)[0]
+
+    areas = table(["Trade size", "EMT area, in²", f"EMT at {more * 100:.0f} %, in²", "PVC Sch 40 area, in²", f"PVC Sch 40 at {more * 100:.0f} %, in²"],
+                  [[f"{TRADE_LABEL[tr]} in.", f"{raceway_area(t, 'emt', tr):.3f}", f"{raceway_area(t, 'emt', tr) * more:.4f}",
+                    f"{raceway_area(t, 'pvc40', tr):.3f}", f"{raceway_area(t, 'pvc40', tr) * more:.4f}"] for tr in FILL_TRADES], "wide tight")
+    wires = table(["THHN / THWN-2 wire", "Area with insulation, in²"], [[awg(s), f"{t['thhn'][s]:.4f}"] for s in FILL_SIZES])
+    a34, w12, w10 = raceway_area(t, "emt", "3/4"), t["thhn"]["12"], t["thhn"]["10"]
+    ex1 = guides.example("12 AWG THHN in ¾ in. EMT", [
+        f"Total area of ¾ in. EMT (Chapter 9, Table 4): {a34:.3f} in².",
+        f"More than two conductors may fill {more * 100:.0f} % (Table 1): {a34:.3f} × {more:.2f} = {a34 * more:.4f} in².",
+        f"One 12 AWG THHN is {w12:.4f} in² with its insulation (Table 5): {a34 * more:.4f} ÷ {w12:.4f} = {a34 * more / w12:.2f}.",
+    ], f"Result: {n('emt', '3/4', '12')} conductors.")
+    a12 = raceway_area(t, "emt", "1/2")
+    mixed = [w10] * 3 + [w12]
+    pct, limit, ok = cm.conduit_fill(mixed, a12, t["limits"])
+    ex2 = guides.example("three 10 AWG and a 12 AWG ground in ½ in. EMT (mixed sizes)", [
+        f"Add the areas: 3 × {w10:.4f} + {w12:.4f} = {sum(mixed):.4f} in².",
+        f"Divide by the area of ½ in. EMT: {sum(mixed):.4f} ÷ {a12:.3f} = {pct:.1f} %.",
+        f"Four conductors, so the limit is {limit:.0f} %. The ground counts like any other conductor.",
+    ], f"Result: {pct:.1f} % fill, {'within' if ok else 'over'} the {limit:.0f} % limit.")
+    marks = fill_marks(t)
+    faq_html, faq_ld = b.faq([
+        ("How many 12 AWG wires fit in 1/2 inch EMT?",
+         f"{n('emt', '1/2', '12')} THHN conductors at the {more * 100:.0f} % limit. PVC Schedule 40 of the same trade size is slightly smaller inside and holds {n('pvc40', '1/2', '12')}."),
+        ("How many 12 AWG wires fit in 3/4 inch conduit?",
+         f"{n('emt', '3/4', '12')} THHN conductors in EMT and {n('pvc40', '3/4', '12')} in PVC Schedule 40. "
+         f'With more than three of them carrying current the ampacity has to be reduced: see <a href="{REL}{FILL_12_EMT}">how many 12 AWG wires in 3/4 EMT</a>.'),
+        ("What is the 40 % rule?",
+         f"NEC Chapter 9, Table 1: conductors may fill {one * 100:.0f} % of a raceway's cross-section when there is one, {two * 100:.0f} % when there are two "
+         f"and {more * 100:.0f} % when there are more than two. Fill is the total area of the conductors with their insulation (Table 5) divided by the internal area of the raceway (Table 4)."),
+        ("Do ground wires count toward conduit fill?",
+         "Yes. Every conductor in the raceway counts, equipment grounding conductors included (Note 3 to the Chapter 9 tables)."),
+        ("Why does this chart show one less than my code book in some cells?",
+         "Annex C of the NEC rounds up when the calculation ends in .8 or more, as Note 7 to the Chapter 9 tables permits for conductors of one size. "
+         "This chart always rounds down, as the Electrician Calc app does, so the marked cells are one lower. Rounding down never overfills the raceway."),
+        ("Does fill decide how many circuits I can run in one conduit?",
+         "Only partly. With more than three current-carrying conductors in a raceway, NEC 310.15(C)(1) reduces their ampacity, and that limit is often reached before the fill limit."),
+        ("Where do these numbers come from?",
+         f"{NEC_EDITION}: Chapter 9, Table 1 (fill limits), Table 4 (raceway areas) and Table 5 (THHN and THWN-2 areas), as held in the Electrician Calc app. "
+         f"Each count is the largest number of conductors whose total area stays within the limit. The code text is not reproduced here."),
+    ])
+    body = f"""{CSS}
+{crumb_html}
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>Conduit fill chart: THHN in EMT and PVC Schedule 40</h1>
+<p class="lead">How many THHN or THWN-2 conductors, 14 AWG to 1/0, fit in ½ to 2 in. EMT and PVC Schedule 40 conduit, with the 40 % rule and the areas behind every count.</p>
+<p class="answer"><strong>Quick answer:</strong> at {more * 100:.0f} % fill, ½ in. EMT holds {n('emt', '1/2', '14')} conductors of 14 AWG THHN, {n('emt', '1/2', '12')} of 12 AWG or {n('emt', '1/2', '10')} of 10 AWG.
+¾ in. EMT holds {n('emt', '3/4', '14')}, {n('emt', '3/4', '12')} or {n('emt', '3/4', '10')}, and 1 in. EMT {n('emt', '1', '14')}, {n('emt', '1', '12')} or {n('emt', '1', '10')}
+(NEC Chapter 9, Tables 1, 4 and 5, 2023 edition). Counts are rounded down, so some are one lower than Annex C.</p></div>
+{app_line(b, "conduit-fill", "Conduit Fill is free. It mixes two wire sizes in one run, such as the circuit conductors and a smaller ground, shows the fill percent against the limit "
+          "and names the smallest EMT or PVC Schedule 40 that fits.")}
+{byline(f"Areas and limits from {NEC_EDITION}, Chapter 9, Tables 1, 4 and 5, as held in the Electrician Calc app; counts computed with the app's formula.", ENGINE_CHECKED)}
+{printbar()}
+<section class="guide"><h2>Maximum number of THHN conductors</h2>
+<p class="muted">All conductors the same size, THHN or THWN-2, counted by NEC Chapter 9, Table 1: {one * 100:.0f} % fill for one conductor, {two * 100:.0f} % for two, {more * 100:.0f} % for more than two. Grounds count.</p>
+<h3>{e(names['emt'])} (electrical metallic tubing)</h3>{fill_table(t, 'emt')}
+<h3>{e(names['pvc40'])}</h3>{fill_table(t, 'pvc40')}
+<p class="note">{marks}</p>
+<p class="note">Fill is only the space. More than three current-carrying conductors in one raceway also lowers their ampacity (NEC 310.15(C)(1)).
+Other raceway types have their own areas in Table 4 and are not covered here.</p>
+<h3>The 40 % rule: raceway areas</h3>{areas}
+<h3>Conductor areas</h3>{wires}
+{ex1}{ex2}
+{checked_note(b, path)}</section>
+<p><a class="btn" href="{REL}{FILL_12_EMT}">How many 12 AWG wires in ¾ in. EMT</a> <a class="btn ghost" href="{REL}{BOX_FILL}">Box fill</a></p>
+{faq_html}
+{elec_links(FILL_CHART)}
+<p class="note">{ELEC_NOTE}</p>
+"""
+    desc = ("Conduit fill chart: how many THHN conductors from 14 AWG to 1/0 fit in 1/2 to 2 in. EMT and PVC Schedule 40 at 40 % fill, "
+            "with raceway and wire areas from NEC Chapter 9, Tables 1, 4 and 5 (2023) and worked examples.")
+    ld = dataset_ld(b, path, "Conduit fill chart for THHN conductors", desc, f"{NEC_EDITION}, Chapter 9, Tables 1, 4 and 5",
+                    [("Conductor size", "AWG"), ("Trade size", "in"), ("Maximum number of conductors", "")], ENGINE_CHECKED[1])
+    b.shell(path, "Conduit Fill Chart: THHN in EMT and PVC Schedule 40 (NEC 2023)", desc, body, "t-elec", None, [ld, faq_ld], JS)
+
+
+# ---------- how many 12 AWG wires in 3/4 EMT ----------
+
+def fill_12_emt_page(b):
+    path = FILL_12_EMT
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("12 AWG wires in ¾ in. EMT", path)])
+    t = app_tables(b)
+    more = t["limits"][2]
+    _, adj = load_factors(b)
+    adj = adj[:4]  # 1–3, 4–6, 7–9, 10–20: more than 20 conductors of these sizes do not fit the two conduits
+
+    def n(trade, size):
+        return fill_count(t, "emt", trade, size)[0]
+
+    def capped(size, factor):
+        return min(ampacity("cu", 90, size) * factor, ampacity("cu", 75, size))
+
+    counts = table(["THHN wire", "½ in. EMT", "¾ in. EMT"], [[awg(s), str(n("1/2", s)), str(n("3/4", s))] for s in ("12", "10")])
+    rows = [[f"{lbl} <small>× {f:.2f}</small>", f"{capped('12', f):g} A", awg(wire_size(20, "thhn", "cu", adjust=f)[0]),
+             f"{capped('10', f):g} A", awg(wire_size(30, "thhn", "cu", adjust=f)[0])] for lbl, f in adj]
+    derate = table(["Current-carrying wires, and the factor", "12 AWG THHN carries", "A 20 A load needs", "10 AWG THHN carries", "A 30 A load needs"], rows, "wide tight stack")
+    last12 = [lbl for lbl, f in adj if wire_size(20, "thhn", "cu", adjust=f)[0] == "12"][-1]  # "7–9"
+    first10 = next(lbl for lbl, f in adj if wire_size(20, "thhn", "cu", adjust=f)[0] != "12")  # "10–20"
+    most12, least10 = last12.split("–")[-1], first10.split("–")[0]
+    up20 = awg(wire_size(20, "thhn", "cu", adjust=dict(adj)[first10])[0])
+    a34, a1, w12, w10 = raceway_area(t, "emt", "3/4"), raceway_area(t, "emt", "1"), t["thhn"]["12"], t["thhn"]["10"]
+    egc20 = ground(b, 20)
+    four = cm.conduit_fill([w12] * 8 + [t["thhn"][egc20]], a34, t["limits"])
+    five = [w10] * 10 + [t["thhn"][egc20]]
+    five34, five1 = cm.conduit_fill(five, a34, t["limits"]), cm.conduit_fill(five, a1, t["limits"])
+    ex = guides.example("Five 20 A, 120 V circuits in one conduit", [
+        "Each two-wire circuit has a hot and a neutral, and both carry current: five circuits are 10 current-carrying conductors. The ground is not counted for ampacity.",
+        f"Table 310.15(C)(1), {first10} conductors: multiply the ampacity by {dict(adj)[first10]:.2f}. 12 AWG THHN starts at {ampacity('cu', 90, '12')} A in the 90 °C column, "
+        f"so it carries {capped('12', dict(adj)[first10]):g} A. Not enough for a 20 A circuit: the circuits need {up20}.",
+        f"Fill of ten {up20} and one {awg(egc20)} ground: 10 × {w10:.4f} + {t['thhn'][egc20]:.4f} = {sum(five):.4f} in². "
+        f"In ¾ in. EMT ({a34:.3f} in²) that is {five34[0]:.1f} %, {'within' if five34[2] else 'over'} the {five34[1]:.0f} % limit; in 1 in. EMT ({a1:.3f} in²) it is {five1[0]:.1f} %.",
+        f"Four circuits stay at eight current-carrying conductors, factor {dict(adj)[last12]:.2f}: 12 AWG still carries {capped('12', dict(adj)[last12]):g} A, "
+        f"and eight 12 AWG with a {awg(egc20)} ground fill ¾ in. EMT to {four[0]:.1f} %.",
+    ], f"Result: four 20 A circuits fit ¾ in. EMT on 12 AWG. A fifth circuit means {up20} and 1 in. EMT.")
+    why = (f"<strong>Why other sites give a smaller number:</strong> {n('3/4', '12')} is how many wires physically fit. "
+           f"Once more than three of them carry current, NEC 310.15(C)(1) reduces the ampacity of every one, and from {least10} current-carrying conductors up "
+           f"12 AWG THHN no longer carries 20 A. That is why {most12} is often given as the practical limit for 20 A circuits.")
+    faq_html, faq_ld = b.faq([
+        ("How many 12 AWG wires can I put in 3/4 EMT?",
+         f"{n('3/4', '12')} THHN or THWN-2 conductors by conduit fill. If they are 20 A circuits, no more than {most12} of them may be current-carrying before the wire has to go up to {up20}."),
+        ("How many 12 AWG wires fit in 1/2 EMT?",
+         f"{n('1/2', '12')} THHN conductors by fill. All {n('1/2', '12')} can carry current on 20 A circuits: with {last12} current-carrying conductors 12 AWG THHN still carries {capped('12', dict(adj)[last12]):g} A."),
+        ("How many 10 AWG wires fit in 3/4 EMT?",
+         f"{n('3/4', '10')} THHN conductors by fill, and {n('1/2', '10')} in ½ in. EMT. For 30 A circuits the ampacity limit comes first: "
+         f"with more than six current-carrying conductors a full 30 A load needs {awg(wire_size(30, 'thhn', 'cu', adjust=dict(adj)['7–9'])[0])}."),
+        ("How many 20 amp circuits can I run in 3/4 conduit?",
+         "Four two-wire 120 V circuits on 12 AWG THHN: eight current-carrying conductors and a ground. A fifth circuit takes the count to ten, "
+         f"which needs {up20} and, with it, a larger conduit."),
+        ("Do neutrals and grounds count?",
+         "For fill, every conductor counts, grounds included. For the ampacity adjustment, count the hots and the neutral of each two-wire circuit. "
+         "A neutral that carries only the unbalanced current of a multiwire circuit is not counted (NEC 310.15(E)), and grounds are never counted (310.15(F))."),
+        ("Where do these numbers come from?",
+         f"{NEC_EDITION}: Chapter 9, Tables 1, 4 and 5 for fill, Table 310.16 and Table 310.15(C)(1) for ampacity and its adjustment, 240.4(D) for the breaker limits on small conductors. "
+         "They are the tables and formulas of the Electrician Calc app."),
+    ])
+    body = f"""{CSS}
+{crumb_html}
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>How many 12 AWG wires in ¾ in. EMT?</h1>
+<p class="lead">The conduit fill count for 12 AWG and 10 AWG THHN in ½ and ¾ in. EMT, and the ampacity rule that usually stops you before the conduit is full.</p>
+<p class="answer"><strong>Quick answer:</strong> {n('3/4', '12')} THHN conductors of 12 AWG fit in ¾ in. EMT at the {more * 100:.0f} % fill limit, and {n('1/2', '12')} fit in ½ in. EMT.
+For 10 AWG THHN it is {n('3/4', '10')} and {n('1/2', '10')} (NEC Chapter 9, Tables 1, 4 and 5, 2023 edition).</p>
+<p class="answer">That is fill only. With more than three current-carrying conductors in the conduit, NEC 310.15(C)(1) lowers the ampacity of each one:
+12 AWG THHN stays good for 20 A circuits up to {most12} current-carrying conductors, and from {least10} up the circuits need {up20}.</p></div>
+{app_line(b, "fill-12-emt", "Conduit Fill is free and checks any mix of two wire sizes against the limit. Wire Size, also free, applies the 310.15(C)(1) factor together with the ambient temperature and shows each step.")}
+{byline(f"Areas, limits and ampacities from {NEC_EDITION}, as held in the Electrician Calc app; counts and sizes computed with the app's formulas.", ENGINE_CHECKED)}
+{printbar()}
+<section class="guide"><h2>Conduit fill: how many fit</h2>
+<p class="muted">THHN or THWN-2, all one size, {more * 100:.0f} % fill for more than two conductors (NEC Chapter 9, Table 1). Grounds count toward fill.</p>
+{counts}
+<p class="note">¾ in. EMT has {a34:.3f} in² inside (Table 4); {more * 100:.0f} % of it is {a34 * more:.4f} in². One 12 AWG THHN is {w12:.4f} in² (Table 5), and {a34 * more:.4f} ÷ {w12:.4f} = {a34 * more / w12:.2f}, so {n('3/4', '12')} fit.</p>
+<h2>Ampacity: how many may carry current</h2>
+<p>{why}</p>
+{derate}
+<p class="note">THHN is a 90 °C conductor, so the adjustment starts from the 90 °C column of Table 310.16 ({ampacity('cu', 90, '12')} A for 12 AWG, {ampacity('cu', 90, '10')} A for 10 AWG) and the result may not exceed the 75 °C termination value
+({ampacity('cu', 75, '12')} A and {ampacity('cu', 75, '10')} A). 30 °C ambient; a hot attic or roof lowers these further. Breakers on 12 and 10 AWG copper stay at 20 and 30 A (240.4(D)).</p>
+{ex}
+{checked_note(b, path)}</section>
+<p><a class="btn" href="{REL}{FILL_CHART}">Conduit fill chart, 14 AWG to 1/0</a> <a class="btn ghost" href="{REL}{AMPACITY_PAGE}">Ampacity chart</a></p>
+{faq_html}
+{elec_links(FILL_12_EMT)}
+<p class="note">{ELEC_NOTE}</p>
+"""
+    desc = (f"How many 12 AWG wires fit in 3/4 EMT: {n('3/4', '12')} THHN conductors by NEC conduit fill ({n('1/2', '12')} in 1/2 in. EMT; 10 AWG: {n('3/4', '10')} and {n('1/2', '10')}), "
+            "and how the ampacity adjustment of 310.15(C)(1) limits the number of 20 A circuits.")
+    ld = dataset_ld(b, path, "12 AWG and 10 AWG THHN in 1/2 and 3/4 in. EMT", desc, f"{NEC_EDITION}, Chapter 9, Tables 1, 4 and 5; Tables 310.16 and 310.15(C)(1)",
+                    [("Conductor size", "AWG"), ("Trade size", "in"), ("Maximum number of conductors", ""), ("Adjusted ampacity", "A")], ENGINE_CHECKED[1])
+    b.shell(path, "How Many 12 AWG Wires in 3/4 EMT? Fill Count and Derating", desc, body, "t-elec", None, [ld, faq_ld], JS)
+
+
+# ---------- box fill ----------
+
+def box_fill_page(b):
+    path = BOX_FILL
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("Box fill", path)])
+    t = app_tables(b)
+    vol, boxes = t["box"], t["boxes"]
+
+    def smallest(need):
+        return next(((name, v) for name, v in boxes if v >= need - 1e-9), None)
+
+    def holds_n(volume, size):
+        return cm.box_fill(0, False, 0, 0, 0, vol[size], volume)[3]
+
+    per = table(["Conductor size", "Volume for each conductor"], [[awg(s), f"{v:.2f} in³"] for s, v in vol.items()])
+    counts = table(["What is in the box", "Volume allowances", "NEC"], [
+        ["Each insulated conductor that enters the box and is spliced or ends there", "1", "314.16(B)(1)"],
+        ["A conductor that passes through without a splice", "1", "314.16(B)(1)"],
+        ["Pigtails that start and end inside the box", "0", "314.16(B)(1)"],
+        ["Internal cable clamps, however many", "1", "314.16(B)(2)"],
+        ["Fixture studs or hickeys: once for each type present", "1", "314.16(B)(3)"],
+        ["Each switch or receptacle (one yoke)", "2", "314.16(B)(4)"],
+        ["Ground wires: up to four", "1", "314.16(B)(5)"],
+        ["Each ground wire over four", "¼", "314.16(B)(5)"],
+    ], "wide tight wrap1")
+    cap = table(["Metal box", "Volume", "14 AWG", "12 AWG", "10 AWG"],
+                [[e(name), f"{v:g} in³"] + [str(holds_n(v, s)) for s in ("14", "12", "10")] for name, v in boxes], "wide tight wrap1")
+    # Example 1: two 12/2 cables to a receptacle in a metal box with clamps.
+    a1, need1, _, _ = cm.box_fill(4, True, 0, 1, 2, vol["12"])
+    box1 = smallest(need1)
+    ex1 = guides.example("a receptacle fed by two 12/2 cables, metal box with internal clamps", [
+        "Insulated conductors: two cables with a hot and a neutral each, 4 allowances.",
+        "Internal clamps: 1. Receptacle: 2. Two ground wires: 1.",
+        f"Total: 4 + 1 + 2 + 1 = {a1:g} allowances.",
+        f"All wires are 12 AWG at {vol['12']:.2f} in³ each: {a1:g} × {vol['12']:.2f} = {need1:g} in³.",
+    ], f"Result: {need1:g} in³. The smallest standard metal box is a {box1[0]} box ({box1[1]:g} in³).")
+    # Example 2: five 12/2 cables spliced in a junction box, to show the quarter allowance for grounds over four.
+    a2, need2, _, _ = cm.box_fill(10, True, 0, 0, 5, vol["12"])
+    old2 = cm.box_fill(10, True, 0, 0, 4, vol["12"])
+    box2 = smallest(need2)
+    ex2 = guides.example("a junction box with five 12/2 cables spliced, internal clamps, no device", [
+        "Insulated conductors: five cables with a hot and a neutral each, 10 allowances.",
+        "Internal clamps: 1.",
+        "Five ground wires: 1 for the first four and ¼ for the fifth, 1¼ allowances.",
+        f"Total: 10 + 1 + 1¼ = {a2:g} allowances. {a2:g} × {vol['12']:.2f} = {need2:.2f} in³.",
+    ], f"Result: {need2:.2f} in³. The smallest standard metal box is a {box2[0]} box ({box2[1]:g} in³).")
+    sq15, sq21 = dict(boxes)["4 in square × 1½ in"], dict(boxes)["4 in square × 2⅛ in"]
+    dev = dict(boxes)["3 × 2 × 3½ in device"]
+    faq_html, faq_ld = b.faq([
+        ("How many 12 AWG wires can be in a 4 inch square box?",
+         f"A 4 in square × 1½ in box is {sq15:g} in³ and takes {holds_n(sq15, '12')} conductors of 12 AWG; the 2⅛ in deep one is {sq21:g} in³ and takes {holds_n(sq21, '12')}. "
+         "That is with nothing else in the box: a device counts as two conductors, clamps as one and the grounds as one."),
+        ("How many 14 AWG wires fit in a single-gang box?",
+         f"A 3 × 2 × 3½ in metal device box is {dev:g} in³: {holds_n(dev, '14')} conductors of 14 AWG, or {holds_n(dev, '12')} of 12 AWG, before devices, clamps and grounds are counted. "
+         "For a plastic box use the volume stamped inside it."),
+        ("Do ground wires count in box fill?",
+         "Yes, but together: up to four ground wires count as one conductor, and each one over four adds a quarter (NEC 314.16(B)(5))."),
+        ("Why do older guides count all the grounds as one?",
+         f"Before the 2020 edition every ground in the box shared a single allowance. Since NEC 2020 each ground over four adds a quarter, so the junction box in the second example "
+         f"needs {a2:g} allowances ({need2:.2f} in³) where an older guide says {old2[0]:g} ({old2[1]:g} in³)."),
+        ("Do pigtails and wire nuts count?",
+         "No. A pigtail that starts and ends inside the box is not counted, and neither are wire connectors."),
+        ("Does a switch or receptacle count?",
+         "Yes: each device on one yoke counts as two conductors of the largest size connected to it."),
+        ("What if the wires are different sizes?",
+         "The code takes each item at the size of the conductor it belongs to: a device at the largest wire connected to it, clamps at the largest wire in the box. "
+         "This page and the app use one size for everything, the largest wire in the box, which never gives a smaller box than the code."),
+        ("Where do these numbers come from?",
+         f"{NEC_EDITION}: 314.16(B) and Table 314.16(B)(1) for the volume allowances, Table 314.16(A) for the metal box volumes, as held in the Electrician Calc app. The code text is not reproduced here."),
+    ])
+    body = f"""{CSS}
+{crumb_html}
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>Box fill: NEC 314.16 chart and examples</h1>
+<p class="lead">The volume each conductor needs, what counts as a conductor, how many wires common metal boxes take, and two worked examples.</p>
+<p class="answer"><strong>Quick answer:</strong> each conductor needs {vol['14']:.2f} in³ of box for 14 AWG, {vol['12']:.2f} in³ for 12 AWG and {vol['10']:.2f} in³ for 10 AWG (NEC Table 314.16(B)(1), 2023 edition).
+Count one for each insulated conductor, one for all internal clamps, one for a fixture stud or hickey, two for each switch or receptacle and one for up to four ground wires, then multiply by the volume for the wire size.
+Two 12/2 cables and a receptacle in a box with clamps come to {a1:g} × {vol['12']:.2f} = {need1:g} in³.</p></div>
+{app_line(b, "box-fill", "box fill is part of the free Conduit Fill calculator. Enter what is in the box and it shows the volume needed, the working, the smallest standard metal box and how many more conductors still fit.")}
+{byline(f"Volumes from {NEC_EDITION}, Tables 314.16(A) and 314.16(B)(1), as held in the Electrician Calc app; examples computed with the app's formula.", ENGINE_CHECKED)}
+{printbar()}
+<section class="guide"><h2>Volume allowance per conductor</h2>
+<p class="muted">NEC Table 314.16(B)(1): the free space in the box required for each conductor.</p>
+{per}
+<h3>What counts</h3>{counts}
+<p class="note">Add the allowances and multiply by the volume for the wire size. The box volume must be at least that: Table 314.16(A) for standard metal boxes, the marked volume for plastic boxes, plus the marked volume of any extension or plaster ring.</p>
+<h3>Common metal boxes: how many conductors they take</h3>
+<p class="muted">Box volume from Table 314.16(A), divided by the volume per conductor and rounded down. Nothing else in the box: subtract two for each device, one for clamps and one for the grounds.</p>
+{cap}
+{ex1}{ex2}
+{checked_note(b, path)}</section>
+<p><a class="btn" href="{REL}{FILL_CHART}">Conduit fill chart</a> <a class="btn ghost" href="{REL}{WIRE_CALC}">Wire size calculator</a></p>
+{faq_html}
+{elec_links(BOX_FILL)}
+<p class="note">{ELEC_NOTE}</p>
+"""
+    desc = ("Box fill by NEC 314.16 (2023): volume per conductor from Table 314.16(B)(1), what counts (devices, clamps, grounds, fixture studs), "
+            "how many 14, 12 and 10 AWG conductors common metal boxes take, and two worked examples.")
+    b.shell(path, "Box Fill Chart and Examples: NEC 314.16 (2023)", desc, body, "t-elec", None,
+            [article_ld(b, path, "Box fill: NEC 314.16 chart and examples", desc, ENGINE_CHECKED[1]), faq_ld], JS)
+
+
+# ---------- EV charger wire size ----------
+
+def ev_wire_page(b):
+    path = EV_WIRE
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("EV charger wire size", path)])
+
+    def circuit(amps):
+        """(breaker, copper THHN, copper NM-B or None, copper ground) for a charger drawing `amps` continuously."""
+        cu, _, ocpd, _ = wire_size(amps, "thhn", "cu", True)
+        return ocpd, cu, nmb_for(amps, True), ground(b, ocpd)
+
+    rows = []
+    for a in EV_AMPS:
+        ocpd, cu, nm, egc = circuit(a)
+        rows.append([f"{a} A <small>{a * 240 / 1000:.1f} kW</small>", f"{ocpd} A", awg(cu), awg(nm) if nm else "–", awg(egc)])
+    summary = table(["Charger current, power at 240 V", "Breaker (125&nbsp;%)", "Copper THHN in conduit", "Copper NM-B cable", "Copper ground"], rows, "wide tight stack")
+
+    def line(a):
+        ocpd, cu, _, _ = circuit(a)
+        return f"{a} A charger: {ocpd} A breaker and {awg(cu)} copper for runs up to {holds(a, EV_FEET, cont=True)[1]} ft"
+
+    o48, cu48, nm48, _ = circuit(48)
+    why = (f"<strong>Why other sites show a different number:</strong> the wiring method. THHN in conduit on 75 °C terminals is read from the 75 °C column, where {awg(cu48)} copper is {ampacity('cu', 75, cu48)} A. "
+           f"NM-B cable is held to the 60 °C column (NEC 334.80), where {awg(cu48)} is {ampacity('cu', 60, cu48)} A: less than the {o48} A a 48 A charger needs, so NM-B has to be {awg(nm48)}.")
+    s, pick, pct = size_for(48, 200, 240, cont=True)
+    egc, up = ground(b, o48), ground_upsized(b, o48, pick, s)
+    ex = guides.example("48 A charger, 200 ft from the panel, copper THHN in conduit", [
+        f"Charging is a continuous load: 48 A × 125 % = {48 * 1.25:g} A, so the breaker is {o48} A.",
+        f"By ampacity (75 °C column, NEC Table 310.16): {awg(pick)} copper, {ampacity('cu', 75, pick)} A.",
+        f"Voltage drop of {awg(pick)} at 200 ft and 48 A: {pct_at(pick, 48, 200):.2f} % of 240 V. Over 3 %.",
+        f"Next size up, {awg(s)}: {pct:.2f} %. Under 3 %.",
+        f"Ground: Table 250.122 gives {awg(egc)} copper for a {o48} A breaker; with the wire upsized from {awg(pick)} to {awg(s)}, 250.122(B) increases it to {awg(up)}.",
+    ], f"Result: {awg(s)} copper with a {awg(up)} ground on a {o48} A breaker.")
+    o40, cu40, nm40, _ = circuit(40)
+    faq_html, faq_ld = b.faq([
+        ("What size wire for a 48 amp EV charger?",
+         f"{awg(cu48)} copper THHN in conduit on a {o48} A breaker, for runs up to {holds(48, EV_FEET, cont=True)[1]} ft. In NM-B cable it has to be {awg(nm48)} copper."),
+        ("What size breaker for a 40 amp EV charger?",
+         f"{o40} A: the charger is a continuous load, so the breaker is at least 125 % of 40 A. The wire is {awg(cu40)} copper THHN in conduit, or {awg(nm40)} copper NM-B."),
+        ("What size wire for a 50 amp EV charger circuit?",
+         f"A {o40} A circuit carries a charger set to 40 A. It needs {awg(cu40)} copper THHN in conduit or {awg(nm40)} copper NM-B cable, larger on long runs: see the chart."),
+        (f"Can I use {awg(cu48)} NM-B (Romex) for a 48 amp charger?",
+         f"No. NM-B is limited to the 60 °C column, where {awg(cu48)} copper is {ampacity('cu', 60, cu48)} A, and a 48 A charger needs a {o48} A circuit. "
+         f"Use {awg(nm48)} NM-B, or {awg(cu48)} THHN in conduit, or set the charger to 40 A on a {o40} A breaker."),
+        ("Why 125 %?",
+         "An EV charger can run at full current for hours, so the NEC treats it as a continuous load: the breaker is rated at least 125 % of the charger's maximum current (NEC 625.41), "
+         "and the conductors are sized for the same 125 % (210.19(A)(1))."),
+        ("Does a longer run change the breaker?",
+         "No. The breaker follows the charger. A longer run only makes the wire larger to keep the voltage drop within 3 %."),
+        ("Can my panel take the charger?",
+         "That is a separate question from the wire size: the existing service has to carry the new load. NEC 220.83 and 220.87 are the two ways to check an existing house. "
+         "The EV Charger &amp; Heat Pump Check in the Electrician Calc app (Pro) does both."),
+        ("How are these sizes worked out?",
+         "The breaker is the next standard size at or above 125 % of the charger current. The wire is the smallest copper conductor whose ampacity in the 75 °C column of NEC Table 310.16 covers that, "
+         f"then upsized until the voltage drop at the charger current is 3 % or less on 240 V (K = {K_CU:.2f} Ω·cmil/ft). These are the formulas of the wire size calculator on this site and of the Electrician Calc app."),
+    ])
+    body = f"""{CSS}
+{crumb_html}
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>EV charger wire size by amps and distance</h1>
+<p class="lead">Breaker and copper wire for 32, 40, 48 and 80 amp Level 2 chargers on 240 V, with the 125 % continuous-load rule and the voltage drop from 25 to 200 ft.</p>
+<p class="answer"><strong>Quick answer:</strong> {line(48)}. {line(40)}. {line(32)}. {line(80)}.
+That is copper THHN in conduit on 75 °C terminals (NEC Table 310.16, 2023 edition), with voltage drop within 3 % on 240 V. The breaker is 125 % of the charger current, because the NEC treats charging as a continuous load (625.41).</p></div>
+{app_line(b, "ev-wire", "Wire Size is free and sizes the charger circuit for any current, length and wire type, with a switch for continuous loads. "
+          "The EV Charger &amp; Heat Pump Check (Pro) answers whether the existing service can take the charger, by NEC 220.83 or 220.87.")}
+{byline(f"Ampacities from {NEC_EDITION}, Table 310.16; sizes and voltage drop computed with the formulas of the Electrician Calc app.", ENGINE_CHECKED)}
+{printbar()}
+<section class="guide"><h2>Breaker and wire for each charger</h2>
+<p class="muted">Charger current is what the charger draws, not the breaker. 240 V single phase, copper, 75 °C terminals, 30 °C ambient, no more than three current-carrying conductors. Short runs; see the next chart for length.</p>
+{summary}
+<p class="note">{why} NM-B is not made above 2 AWG (the dash in the chart), so an 80 A charger is wired with THHN in conduit. The ground is the minimum of NEC Table 250.122 for the breaker.</p>
+<h3>Copper THHN by run length</h3>
+<p class="muted">The smallest wire that carries the charger and keeps voltage drop at or under 3 % at the charger current, with the drop at that size. Length is one way.</p>
+{run_table(EV_AMPS, EV_FEET, cont=True)}
+{ex}
+{checked_note(b, path)}</section>
+<p><a class="btn" href="{REL}{WIRE_CALC}">Wire size calculator</a> <a class="btn ghost" href="{REL}{BY_DISTANCE}">Wire size by amps and distance</a></p>
+{faq_html}
+{elec_links(EV_WIRE)}
+<p class="note">{ELEC_NOTE}</p>
+"""
+    desc = ("EV charger wire size chart: breaker and copper wire for 32, 40, 48 and 80 A Level 2 chargers with the 125 % continuous-load rule, "
+            "THHN and NM-B, by run length from 25 to 200 ft with voltage drop. NEC 2023.")
+    ld = dataset_ld(b, path, "EV charger wire size by amps and distance", desc, f"{NEC_EDITION}, Tables 310.16 and 250.122",
+                    [("Charger current", "A"), ("Breaker", "A"), ("One-way length", "ft"), ("Conductor size", "AWG"), ("Voltage drop", "%")], ENGINE_CHECKED[1])
+    b.shell(path, "EV Charger Wire Size Chart: 32, 40, 48 and 80 Amp by Distance", desc, body, "t-elec", None, [ld, faq_ld], JS)
+
+
 # ---------- hub ----------
 
 def hub_page(b):
@@ -490,6 +1086,11 @@ def hub_page(b):
         (VD_12AWG, "Chart", "12 AWG voltage drop per foot", "Millivolts per amp per foot and maximum run length."),
         (VD_3PH, "Guide", "Three-phase voltage drop", "The 1.732 formula with a chart for 208, 240 and 480 V."),
         (VD_12V, "Chart", "12 V DC voltage drop", "Wire size for 3 % and 10 % drop on low-voltage DC runs."),
+        (SUBPANEL, "Chart", "Wire size for a 50 amp sub panel", "50, 60 and 100 A feeders, copper and aluminum, 25 to 250 ft."),
+        (EV_WIRE, "Chart", "EV charger wire size", "32 to 80 A chargers: breaker and copper wire by run length."),
+        (FILL_CHART, "Chart", "Conduit fill chart", "THHN in EMT and PVC Schedule 40, 1/2 to 2 in., at 40 % fill."),
+        (FILL_12_EMT, "Guide", "How many 12 AWG wires in 3/4 EMT", "The fill count, and what derating leaves of it."),
+        (BOX_FILL, "Guide", "Box fill (NEC 314.16)", "Volume per conductor, what counts and two worked examples."),
     ]
     grid = "".join(f'<a class="card" href="{REL}{p}"><span class="tag">{tag}</span><h3>{e(h)}</h3><p>{e(d)}</p></a>' for p, tag, h, d in cards)
     body = f"""{CSS}
@@ -513,6 +1114,11 @@ CARDS = [
     (VD_12AWG, "Electrical", "12 AWG voltage drop per foot", "Per amp per foot, with maximum run length.", "t-elec"),
     (VD_3PH, "Electrical", "Three-phase voltage drop", "Formula, chart and example.", "t-elec"),
     (VD_12V, "Electrical", "12 V DC voltage drop", "Wire size for 3 % and 10 % drop.", "t-elec"),
+    (SUBPANEL, "Electrical", "Wire size for a 50 amp sub panel", "50, 60 and 100 A feeders by distance, copper and aluminum.", "t-elec"),
+    (EV_WIRE, "Electrical", "EV charger wire size", "32 to 80 A chargers: breaker and wire by run length.", "t-elec"),
+    (FILL_CHART, "Electrical", "Conduit fill chart", "THHN in EMT and PVC Schedule 40 at 40 % fill.", "t-elec"),
+    (FILL_12_EMT, "Electrical", "How many 12 AWG wires in 3/4 EMT", "Fill count and the derating that limits it.", "t-elec"),
+    (BOX_FILL, "Electrical", "Box fill (NEC 314.16)", "Volume per conductor, what counts, worked examples.", "t-elec"),
 ]
 
 
@@ -523,3 +1129,8 @@ def build(b):
     vd_12awg_page(b)
     vd_3ph_page(b)
     vd_12v_page(b)
+    subpanel_page(b)
+    fill_chart_page(b)
+    fill_12_emt_page(b)
+    box_fill_page(b)
+    ev_wire_page(b)

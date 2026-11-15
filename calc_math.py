@@ -215,6 +215,56 @@ def year_stats(cycle, year, start):
     return shifts, off, hours, weekends
 
 
+# ---------- Electrician Calc: Calculator_for_electrical/lib/feature/engine/electrical.dart ----------
+# Only the arithmetic. The tables (NEC Chapter 9 Tables 1, 4 and 5, Tables 314.16(B)(1) and 250.122) are read from
+# the app's nec_tables.dart by pages_electrical.py and passed in.
+
+def fill_limit(n, limits):
+    """Chapter 9 Table 1 as necFillLimit(): limits = (one conductor, two, more than two)."""
+    return limits[0] if n == 1 else limits[1] if n == 2 else limits[2]
+
+
+def conduit_max(cable_area, raceway_area, limits):
+    """Most identical conductors that fit (conduitFill().maxConductors). It counts up while the limit for that
+    many conductors holds, so it never rounds up."""
+    n = 0
+    while n <= 999 and fill_limit(n + 1, limits) * raceway_area >= (n + 1) * cable_area:
+        n += 1
+    return n
+
+
+def conduit_fill(areas, raceway_area, limits):
+    """(fill %, limit %, fits) for conductors of the given areas in one raceway (conduitFill() on their total)."""
+    pct, limit = sum(areas) / raceway_area * 100, fill_limit(len(areas), limits) * 100
+    return pct, limit, pct <= limit + 1e-9
+
+
+def box_fill(conductors, clamps, fittings, devices, grounds, per_conductor, box_volume=0.0):
+    """NEC 314.16(B) as boxFill(): (volume allowances, in³ required, fits, spare conductors). One allowance per
+    conductor, one for any internal clamps, one per fixture stud or hickey, two per device, one for up to four
+    grounds and a quarter for each one more."""
+    ground = 0.0 if grounds <= 0 else 1 + (grounds - 4) * 0.25 if grounds > 4 else 1.0
+    n = conductors + (1 if clamps else 0) + fittings + 2 * devices + ground
+    need = n * per_conductor
+    return n, need, need <= box_volume + 1e-9, math.floor((box_volume - need) / per_conductor + 1e-9)
+
+
+def egc_for(ocpd, table, copper=True):
+    """Table 250.122 ground for a breaker (necEgcFor): table = [(largest breaker, copper, aluminum)]."""
+    return next(((cu if copper else al) for top, cu, al in table if ocpd <= top), None)
+
+
+def egc_upsized(ocpd, table, cmil, sizes, minimum, installed, copper=True):
+    """250.122(B) as necEgcUpsized(): the ground grows with the circular mils of the upsized conductors, never
+    beyond them. cmil = {size: circular mils}, sizes = the app's necSizes in order."""
+    base = egc_for(ocpd, table, copper)
+    if base is None or minimum == installed:
+        return base
+    need = cmil[base] * cmil[installed] / cmil[minimum]
+    size = next((s for s in sizes if cmil[s] >= need - 1e-6), installed)
+    return installed if cmil[size] > cmil[installed] else size
+
+
 # ---------- CoatCalc: coatcalc-app/lib/feature/calc.dart ----------
 
 SQFT_PER_GAL_1MIL = 1604.0
