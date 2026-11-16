@@ -1,7 +1,8 @@
 """Control values for calc_math.py and assets/calc-more.js.
 
 The expected numbers are the ones the apps' own unit tests pin (ferment-app, growlab-app, wickcalc-app, roofcalc-app,
-slabcalc-app, pool-chem-app, coatcalc-app test/*.dart), so a page can only drift from an app by failing here.
+slabcalc-app, pool-chem-app, coatcalc-app, Calculator_for_electrical test/*.dart), so a page can only drift from an
+app by failing here.
 Run: python3 -m unittest discover -s tests
 """
 import json
@@ -14,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 import calc_math as m  # noqa: E402
+import guides  # noqa: E402
 
 
 def js(expr):
@@ -165,6 +167,45 @@ class ShiftWise(unittest.TestCase):
             cycle = m.PATTERNS[key]
             got = js(f"m.yearStats({json.dumps(cycle)}, 2027, m.dayNumber({start.year}, {start.month - 1}, {start.day}), {json.dumps(m.SHIFT_HOURS)})")
             self.assertEqual((got["shifts"], got["off"], got["hours"], got["weekends"]), m.year_stats(cycle, 2027, start), key)
+
+
+class ElectricianCalc(unittest.TestCase):
+    LIMITS = (0.53, 0.31, 0.40)  # NEC Chapter 9 Table 1 (necFillLimit)
+    HALF_EMT, W14, W12, W10 = 0.304, 0.0097, 0.0133, 0.0211  # Chapter 9 Tables 4 and 5, as in nec_tables.dart
+    EGC = [(15, "14", "12"), (20, "12", "10"), (60, "10", "8"), (100, "8", "6"), (200, "6", "4")]  # Table 250.122
+
+    def test_conduit_fill(self):  # Calculator_for_electrical/test/nec_test.dart 'conduit fill matches Annex C'
+        self.assertEqual(m.conduit_max(self.W12, self.HALF_EMT, self.LIMITS), 9)
+        self.assertEqual(m.conduit_max(self.W14, self.HALF_EMT, self.LIMITS), 12)
+        self.assertFalse(m.conduit_fill([self.W12] * 10, self.HALF_EMT, self.LIMITS)[2])
+        # test/conduit_fill_test.dart: three 10 AWG and a 12 AWG ground in 1/2 in. EMT, 0.0766 in², 25.2 %.
+        pct, limit, ok = m.conduit_fill([self.W10] * 3 + [self.W12], self.HALF_EMT, self.LIMITS)
+        self.assertEqual((f"{pct:.1f}", f"{limit:.0f}", ok), ("25.2", "40", True))
+        # One conductor may fill 53 %, two 31 %: the count stops at one where two would pass 31 %.
+        self.assertEqual([m.fill_limit(n, self.LIMITS) for n in (1, 2, 3, 9)], [0.53, 0.31, 0.40, 0.40])
+        self.assertEqual(m.conduit_max(0.0507, self.HALF_EMT, self.LIMITS), 1)  # 6 AWG: two are 33 % of 1/2 in. EMT
+        self.assertEqual(m.conduit_max(0.1855, self.HALF_EMT, self.LIMITS), 0)  # 1/0: one is 61 %
+
+    def test_box_fill(self):  # test/customer_voice_test.dart 'box fill counts allowances as NEC 314.16(B) does'
+        n, need, ok, spare = m.box_fill(4, True, 0, 1, 2, 2.25, 18)
+        self.assertEqual((n, ok, spare), (8, True, 0))
+        self.assertAlmostEqual(need, 18, places=9)
+        self.assertEqual(m.box_fill(0, False, 0, 0, 6, 2, 10)[0], 1.5)
+        self.assertEqual(m.box_fill(0, False, 0, 0, 0, 2.25, 21)[3], 9)
+
+    def test_grounds(self):  # test/nec_test.dart 'equipment grounding conductor'
+        cmil, sizes = dict(guides.NEC), guides.NEC_SIZES
+        self.assertEqual([m.egc_for(20, self.EGC), m.egc_for(100, self.EGC), m.egc_for(150, self.EGC, False)], ["12", "8", "4"])
+        self.assertIsNone(m.egc_for(250, self.EGC))
+        self.assertEqual(m.egc_upsized(20, self.EGC, cmil, sizes, "12", "8"), "8")
+        self.assertEqual(m.egc_upsized(60, self.EGC, cmil, sizes, "6", "3"), "6")
+        self.assertEqual(m.egc_upsized(60, self.EGC, cmil, sizes, "6", "6"), "10")
+
+    def test_adjusted_wire_size(self):  # test/nec_test.dart: THHN copper on 75 °C terminals
+        self.assertEqual(guides.wire_size(16, "thhn", "cu", True)[::2], ("12", 20))  # continuous 16 A: 12 AWG on 20 A
+        self.assertEqual(guides.wire_size(40, "thhn", "cu", adjust=0.91 * 0.80)[0], "8")  # 36–40 °C and 4–6 conductors
+        self.assertEqual([guides.wire_size(a, "nmb")[0] for a in (20, 30)], ["12", "10"])  # NM-B at the 60 °C column
+        self.assertEqual(guides.wire_size(40)[1], 50)  # without a factor the ampacity stays the table's whole number
 
 
 class CoatCalc(unittest.TestCase):

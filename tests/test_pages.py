@@ -1,6 +1,7 @@
 """Checks that the numbers on the HVAC and electrical reference pages are the ones the live calculator gives
 (assets/calc.js and assets/ref-pages.js, run in Node by calc_harness.js) and the ones in the source data
-(hvac-charge-app pt_data.dart and charge.dart, Calculator_for_electrical nec_tables.dart, refdata.py).
+(hvac-charge-app pt_data.dart and charge.dart, Calculator_for_electrical nec_tables.dart, refdata.py). The subpanel,
+conduit fill, box fill and EV charger pages are also held to the answers of the app's own Dart engine (ENGINE_* below).
 Also: every new page is in the sitemap and reachable from its section hub, no internal link is broken, JSON-LD parses.
 
     python3 -m unittest discover -s tests
@@ -123,6 +124,62 @@ def dart_nec():
         return {int(t): [float(x) for x in vals.split(",") if x.strip()] for t, vals in re.findall(r"NecTemp\.c(\d+): \[([^\]]+)\]", body)}
 
     return block("_cu"), block("_al"), block("_ambient")
+
+
+def dart_const(name):
+    """The body of one constant of the app's nec_tables.dart."""
+    text_ = (build.ROOT / "Calculator_for_electrical/lib/feature/engine/nec_tables.dart").read_text()
+    return text_.split(f"const {name} = ", 1)[1].split(";", 1)[0]
+
+
+def dart_fill():
+    """Chapter 9 Tables 4 and 5, Table 314.16(B)(1), the metal boxes and Table 250.122 as the app holds them."""
+    def num_map(name):
+        return {k: float(v) for k, v in re.findall(r"'([^']+)': ([\d.]+)", dart_const(name))}
+
+    raceway = {k: [float(x) for x in v.split(",") if x.strip()] for k, v in re.findall(r"Raceway\.(\w+): \[([^\]]+)\]", dart_const("racewayArea"))}
+    boxes = [(n, float(v)) for n, v in re.findall(r"\('([^']+)', ([\d.]+)\)", dart_const("metalBoxes"))]
+    egc = {int(a): (cu, al) for a, cu, al in re.findall(r"(\d+): \('([^']+)', '([^']+)'\)", dart_const("necEgc"))}
+    return num_map("thhnArea"), raceway, num_map("boxVolumePerConductor"), boxes, egc
+
+
+# What the app's own engine answers: cableSizeNec, necEgcFor, conduitFill and boxFill of Calculator_for_electrical
+# (lib/feature/engine/sizing.dart and electrical.dart, main at 12f1339), run with dart on 16 November 2026.
+# Size and voltage drop in percent at 25, 50, 75, 100, 150, 200 and 250 ft, 240 V, THHN on 75 °C terminals.
+ENGINE_SUB = {
+    ("cu", 50): "8 0.82, 8 1.64, 8 2.45, 6 2.06, 4 1.94, 4 2.59, 3 2.57",
+    ("cu", 60): "6 0.62, 6 1.24, 6 1.85, 6 2.47, 4 2.33, 3 2.46, 2 2.44",
+    ("cu", 100): "3 0.51, 3 1.03, 3 1.54, 3 2.05, 2 2.44, 1 2.58, 1/0 2.56",
+    ("al", 50): "6 0.84, 6 1.69, 6 2.53, 4 2.12, 3 2.52, 2 2.67, 1 2.65",
+    ("al", 60): "4 0.64, 4 1.27, 4 1.91, 4 2.55, 2 2.40, 1 2.54, 1/0 2.52",
+    ("al", 100): "1 0.53, 1 1.06, 1 1.59, 1 2.12, 1/0 2.52, 2/0 2.66, 3/0 2.64",
+}
+ENGINE_SUB_GROUND = {50: ("10", "8"), 60: ("10", "8"), 100: ("8", "6")}  # Table 250.122: copper, aluminum
+# Continuous load, copper: breaker, ground, the engine's NM-B size (60 °C column), THHN size and drop at 25 to 200 ft.
+ENGINE_EV = {
+    32: (40, "10", "8", "8 0.52, 8 1.05, 8 1.57, 8 2.09, 6 1.98, 6 2.63"),
+    40: (50, "10", "6", "8 0.65, 8 1.31, 8 1.96, 8 2.62, 6 2.47, 4 2.07"),
+    48: (60, "10", "4", "6 0.49, 6 0.99, 6 1.48, 6 1.98, 6 2.96, 4 2.48"),
+    80: (100, "8", "1", "3 0.41, 3 0.82, 3 1.23, 3 1.64, 3 2.46, 2 2.60"),
+}
+# conduitFill().maxConductors of THHN in 1/2, 3/4, 1, 1-1/4, 1-1/2 and 2 in.
+ENGINE_FILL = {
+    "emt": {"14": [12, 21, 35, 61, 83, 138], "12": [9, 16, 25, 44, 61, 100], "10": [5, 10, 16, 28, 38, 63], "8": [3, 5, 9, 16, 22, 36],
+            "6": [1, 4, 6, 11, 16, 26], "4": [1, 2, 4, 7, 9, 16], "3": [1, 1, 3, 6, 8, 13], "2": [1, 1, 2, 5, 7, 11],
+            "1": [1, 1, 1, 3, 5, 8], "1/0": [0, 1, 1, 3, 4, 7]},
+    "pvc40": {"14": [11, 20, 34, 59, 81, 135], "12": [8, 15, 25, 43, 59, 98], "10": [5, 9, 15, 27, 37, 62], "8": [3, 5, 9, 15, 21, 35],
+              "6": [1, 4, 6, 11, 15, 25], "4": [1, 1, 4, 7, 9, 15], "3": [1, 1, 3, 5, 8, 13], "2": [1, 1, 2, 5, 6, 11],
+              "1": [0, 1, 1, 3, 5, 8], "1/0": [0, 1, 1, 3, 4, 7]},
+}
+# boxFill().spare of an empty box: 14, 12 and 10 AWG conductors in each metal box of nec_tables.dart.
+ENGINE_BOXES = {"3 × 2 × 2 in device": [5, 4, 4], "3 × 2 × 2½ in device": [6, 5, 5], "4 in square × 1¼ in": [9, 8, 7],
+                "3 × 2 × 3½ in device": [9, 8, 7], "4 in square × 1½ in": [10, 9, 8], "4 in round/octagon × 2⅛ in": [10, 9, 8],
+                "4 11/16 in square × 1¼ in": [12, 11, 10], "4 11/16 in square × 1½ in": [14, 13, 11], "4 in square × 2⅛ in": [15, 13, 12],
+                "4 11/16 in square × 2⅛ in": [21, 18, 16]}
+# cableSizeNec for a full 20 A and 30 A load with 1–3, 4–6, 7–9 and 10–20 current-carrying conductors, and the
+# adjusted ampacity of 12 and 10 AWG THHN (90 °C column × Table 310.15(C)(1), capped at the 75 °C column).
+ENGINE_DERATE = [["1–3 × 1.00", "25 A", "12 AWG", "35 A", "10 AWG"], ["4–6 × 0.80", "24 A", "12 AWG", "32 A", "10 AWG"],
+                 ["7–9 × 0.70", "21 A", "12 AWG", "28 A", "8 AWG"], ["10–20 × 0.50", "15 A", "10 AWG", "20 A", "6 AWG"]]
 
 
 class PtMath(unittest.TestCase):
@@ -717,13 +774,185 @@ class Electrical(unittest.TestCase):
             self.assertIn("manufacturer's instructions", h)
 
 
+class AppTablePages(unittest.TestCase):
+    """Subpanel feeders, conduit fill, box fill and EV chargers: every number is the app engine's (the ENGINE_* values
+    above), the wire sizes are also the live calculator's, and the tables are the cells of nec_tables.dart."""
+    PAGES = (pe.SUBPANEL, pe.FILL_CHART, pe.FILL_12_EMT, pe.BOX_FILL, pe.EV_WIRE)
+
+    def run_charts(self, path, loads, feet, conds, cont):
+        """The length charts of a page as {(cond, amps): 'size pct, ...'}, checked cell by cell against calc.js."""
+        charts = [t for t in tables(page(path)) if t[0][0] == "One-way length"]
+        self.assertEqual(len(charts), len(conds))
+        res = iter(js([{"op": "wire", "amps": a, "len": ft, "volts": 240, "cond": c, "cont": cont} for c in conds for ft in feet for a in loads]))
+        out = {}
+        for cond, chart in zip(conds, charts):
+            self.assertEqual(chart[0][1:], [f"{a} A" for a in loads])
+            self.assertEqual([r[0] for r in chart[1:]], [f"{ft} ft" for ft in feet])
+            for row in chart[1:]:
+                for amps, cell in zip(loads, row[1:]):
+                    got = next(res)
+                    size, pct = re.fullmatch(r"(\S+) AWG (\d\.\d\d) %", cell).groups()
+                    self.assertEqual(f"{size} AWG", text(got["size"]).replace(" copper", "").replace(" aluminum", ""), (path, cond, amps, row[0]))
+                    self.assertEqual(got["drop"], f"{pct} % with {size} AWG", (path, cond, amps, row[0]))
+                    out.setdefault((cond, amps), []).append(f"{size} {pct}")
+        return {k: ", ".join(v) for k, v in out.items()}
+
+    def test_subpanel_chart_is_the_engine_and_the_live_calculator(self):
+        self.assertEqual(self.run_charts(pe.SUBPANEL, pe.SUB_FEEDERS, pe.SUB_FEET, ("cu", "al"), False), ENGINE_SUB)
+        h = page(pe.SUBPANEL)
+        grounds = next(t for t in tables(h) if t[0][0] == "Feeder breaker")
+        self.assertEqual(grounds[1:], [[f"{a} A", f"{cu} AWG", f"{al} AWG"] for a, (cu, al) in ENGINE_SUB_GROUND.items()])
+        egc = dart_fill()[4]
+        self.assertEqual((egc[60], egc[100]), (("10", "8"), ("8", "6")))
+        plain = text(h)
+        self.assertIn("a 50 amp subpanel needs 8 AWG copper or 6 AWG aluminum feeder conductors", plain)
+        self.assertIn("up to 75 ft one way; at 100 ft use 6 AWG copper or 4 AWG aluminum", plain)
+        self.assertIn("The feeder has four conductors: two hots, a neutral and a ground.", plain)
+        # Worked example, 60 A at 150 ft: 6 AWG by ampacity, 4 AWG for the drop, and the engine's 250.122(B) ground.
+        got = js([{"op": "wire", "amps": 60, "len": 150, "volts": 240}])[0]
+        self.assertEqual((text(got["size"]), got["amp"].split(" · ")[0]), ("4 AWG copper", "6 AWG"))
+        self.assertIn("Next size up, 4 AWG: 5.59 V, or 2.33 %. Under 3 %.", plain)
+        self.assertIn("250.122(B) increases the ground in the same proportion: 6 AWG.", plain)
+        # NM-B at the 60 °C column, as the engine sizes it: 6 AWG for 50 A, 4 AWG for 60 A.
+        nmb = js([{"op": "wire", "amps": a, "wire": "nmb"} for a in (50, 60)])
+        self.assertEqual([text(r["size"]) for r in nmb], ["6 AWG copper", "4 AWG copper"])
+        self.assertIn("On NM-B a 50 A feeder needs 6 AWG copper and a 60 A feeder 4 AWG.", plain)
+
+    def test_ev_charger_charts_are_the_engine_and_the_live_calculator(self):
+        charts = self.run_charts(pe.EV_WIRE, pe.EV_AMPS, pe.EV_FEET, ("cu",), True)
+        self.assertEqual(charts, {("cu", a): v[3] for a, v in ENGINE_EV.items()})
+        h = page(pe.EV_WIRE)
+        summary = next(t for t in tables(h) if t[0][0].startswith("Charger current"))
+        live = js([{"op": "wire", "amps": a, "cont": True, "wire": w} for a in pe.EV_AMPS for w in ("thhn", "nmb")])
+        for i, (row, amps) in enumerate(zip(summary[1:], pe.EV_AMPS)):
+            ocpd, ground, nmb, runs = ENGINE_EV[amps]
+            # NM-B is not made above 2 AWG: where the engine answers 1 AWG, the page says so instead.
+            want_nmb = f"{nmb} AWG" if nmb in guides.NMB_MADE else "–"
+            self.assertEqual(row, [f"{amps} A {amps * 240 / 1000:.1f} kW", f"{ocpd} A", runs.split()[0] + " AWG", want_nmb, f"{ground} AWG"], amps)
+            self.assertEqual((live[2 * i]["ocpd"], text(live[2 * i]["size"])), (row[1], row[2] + " copper"))
+            self.assertEqual(text(live[2 * i + 1]["size"]), f"{nmb} AWG copper")
+        plain = text(h)
+        self.assertIn("48 A charger: 60 A breaker and 6 AWG copper for runs up to 150 ft.", plain)
+        self.assertIn("where 6 AWG is 55 A: less than the 60 A a 48 A charger needs, so NM-B has to be 4 AWG", plain)
+        self.assertIn("Next size up, 4 AWG: 2.48 %. Under 3 %.", plain)
+        self.assertIn("250.122(B) increases it to 6 AWG.", plain)  # the engine's ground for 6 AWG upsized to 4 AWG on 60 A
+
+    def table1_count(self, wire, area):
+        """Chapter 9 Table 1 worked out here, apart from calc_math.py: 53 % for one conductor, 31 % for two, 40 % above."""
+        n = 0
+        while (0.53 if n == 0 else 0.31 if n == 1 else 0.40) * area >= (n + 1) * wire:
+            n += 1
+        return n
+
+    def test_conduit_fill_chart_is_the_engine_and_the_apps_tables(self):
+        thhn, raceway, _, _, _ = dart_fill()
+        h = page(pe.FILL_CHART)
+        charts = [t for t in tables(h) if t[0][0].startswith("Wire")]
+        self.assertEqual(len(charts), 2)
+        stars = 0
+        for (kind, want), chart in zip(ENGINE_FILL.items(), charts):
+            self.assertEqual(chart[0][1:], ["½", "¾", "1", "1¼", "1½", "2"])
+            self.assertEqual([r[0] for r in chart[1:]], [guides.awg(s) for s in want])
+            for row, size in zip(chart[1:], want):
+                for i, cell in enumerate(row[1:]):
+                    n, mark = int(cell.rstrip("*†")), cell.lstrip("0123456789")
+                    area = raceway[kind][i]
+                    self.assertEqual(n, want[size][i], (kind, size, i))
+                    self.assertEqual(n, self.table1_count(thhn[size], area), (kind, size, i))
+                    exact = 0.40 * area / thhn[size]
+                    self.assertEqual(mark, "*" if n >= 2 and exact - n >= 0.8 - 1e-9 else "†" if n == 1 and exact >= 2 else "", (kind, size, i))
+                    stars += mark == "*"
+        self.assertEqual(stars, 22)
+        # The app's own unit test (nec_test.dart): nine 12 AWG and twelve 14 AWG in 1/2 in. EMT.
+        emt = charts[0]
+        self.assertEqual((emt[2][1], emt[1][1]), ("9", "12"))
+        areas = next(t for t in tables(h) if t[0][0] == "Trade size")
+        for i, row in enumerate(areas[1:]):
+            e_, p_ = raceway["emt"][i], raceway["pvc40"][i]
+            self.assertEqual(row[1:], [f"{e_:.3f}", f"{e_ * 0.4:.4f}", f"{p_:.3f}", f"{p_ * 0.4:.4f}"])
+        wires = next(t for t in tables(h) if t[0][0].startswith("THHN"))
+        self.assertEqual(wires[1:], [[guides.awg(s), f"{thhn[s]:.4f}"] for s in ENGINE_FILL["emt"]])
+        # Pinned by hand from Chapter 9 Tables 4 and 5 as the app holds them.
+        self.assertEqual((thhn["12"], thhn["10"], raceway["emt"][:2], raceway["pvc40"][:2]), (0.0133, 0.0211, [0.304, 0.533], [0.285, 0.508]))
+        plain = text(h)
+        self.assertIn("0.2132 ÷ 0.0133 = 16.03.", plain)
+        self.assertIn("3 × 0.0211 + 0.0133 = 0.0766 in².", plain)  # test/conduit_fill_test.dart
+        self.assertIn("Result: 25.2 % fill, within the 40 % limit.", plain)
+        self.assertIn("53 % fill for one conductor, 31 % for two, 40 % for more than two", plain)
+        self.assertIn("This chart rounds down, as the Electrician Calc app does.", plain)
+        self.assertNotIn("RMC", plain)  # the app has no rigid metal conduit table, so the page has no RMC chart
+
+    def test_12_awg_in_emt_counts_and_derating(self):
+        thhn, raceway, _, _, _ = dart_fill()
+        h = page(pe.FILL_12_EMT)
+        counts = next(t for t in tables(h) if t[0][0] == "THHN wire")
+        self.assertEqual(counts[1:], [[f"{s} AWG"] + [str(n) for n in ENGINE_FILL["emt"][s][:2]] for s in ("12", "10")])
+        self.assertEqual(counts[1:], [["12 AWG", "9", "16"], ["10 AWG", "5", "10"]])
+        derate = next(t for t in tables(h) if t[0][0].startswith("Current-carrying wires"))
+        self.assertEqual(derate[1:], ENGINE_DERATE)
+        plain = text(h)
+        self.assertIn("16 THHN conductors of 12 AWG fit in ¾ in. EMT at the 40 % fill limit, and 9 fit in ½ in. EMT.", plain)
+        self.assertIn("For 10 AWG THHN it is 10 and 5", plain)
+        self.assertIn("stays good for 20 A circuits up to 9 current-carrying conductors, and from 10 up the circuits need 10 AWG", plain)
+        self.assertIn("Why other sites give a smaller number:", plain)
+        # Five circuits: ten 10 AWG and a 12 AWG ground against 3/4 and 1 in. EMT; four circuits: nine 12 AWG.
+        five = 10 * thhn["10"] + thhn["12"]
+        self.assertIn(f"= {five:.4f} in². In ¾ in. EMT (0.533 in²) that is {five / raceway['emt'][1] * 100:.1f} %, over the 40 % limit; "
+                      f"in 1 in. EMT (0.864 in²) it is {five / raceway['emt'][2] * 100:.1f} %.", plain)
+        self.assertIn("that is 42.1 %, over the 40 % limit", plain)
+        self.assertIn(f"fill ¾ in. EMT to {9 * thhn['12'] / raceway['emt'][1] * 100:.1f} %.", plain)
+
+    def test_box_fill_is_the_engine_and_the_apps_tables(self):
+        _, _, volume, boxes, _ = dart_fill()
+        h = page(pe.BOX_FILL)
+        per = next(t for t in tables(h) if t[0][0] == "Conductor size")
+        self.assertEqual(per[1:], [[f"{s} AWG", f"{v:.2f} in³"] for s, v in volume.items()])
+        # Table 314.16(B)(1) pinned by hand.
+        self.assertEqual(per[1:], [["18 AWG", "1.50 in³"], ["16 AWG", "1.75 in³"], ["14 AWG", "2.00 in³"], ["12 AWG", "2.25 in³"],
+                                   ["10 AWG", "2.50 in³"], ["8 AWG", "3.00 in³"], ["6 AWG", "5.00 in³"]])
+        cap = next(t for t in tables(h) if t[0][0] == "Metal box")
+        self.assertEqual(cap[1:], [[name, f"{v:g} in³"] + [str(n) for n in ENGINE_BOXES[name]] for name, v in boxes])
+        counts = next(t for t in tables(h) if t[0][0] == "What is in the box")
+        self.assertEqual([r[1] for r in counts[1:]], ["1", "1", "0", "1", "1", "2", "1", "¼"])
+        plain = text(h)
+        # The app's unit test (customer_voice_test.dart): 8 allowances, 18 in³. Engine run: 12.25 allowances, 27.5625 in³.
+        self.assertIn("Total: 4 + 1 + 2 + 1 = 8 allowances.", plain)
+        self.assertIn("8 × 2.25 = 18 in³.", plain)
+        self.assertIn("The smallest standard metal box is a 4 in square × 1¼ in box (18 in³).", plain)
+        self.assertIn("Total: 10 + 1 + 1¼ = 12.25 allowances. 12.25 × 2.25 = 27.56 in³.", plain)
+        self.assertIn("The smallest standard metal box is a 4 11/16 in square × 1½ in box (29.5 in³).", plain)
+        self.assertIn("needs 12.25 allowances (27.56 in³) where an older guide says 12 (27 in³)", plain)
+        self.assertIn("takes 9 conductors of 12 AWG", plain)  # 21 in³: the app's unit test
+
+    def test_page_furniture(self):
+        for path in self.PAGES:
+            h = page(path)
+            self.assertEqual(crumb_names(h)[2], "Electrical", path)
+            self.assertIn("FAQPage", [d["@type"] for d in jsonld(h)], path)
+            self.assertIn('Checked <time datetime="2026-11-16">16 November 2026</time>', h, path)
+            self.assertIn("NFPA 70, National Electrical Code, 2023 edition", h, path)
+            self.assertIn("data-print", h)
+            self.assertIn("amendments adopted where you work", h)
+            # One line on what the app adds, under the answer, with the store buttons build.py generates.
+            self.assertEqual(h.count("<!-- app:electrician-calc -->"), 1, path)
+            line = h.split('<div class="appline">', 1)[1].split("</div>", 1)[0] + "</div>"
+            self.assertLess(h.index('class="answer"'), h.index('<div class="appline">'), path)
+            self.assertLess(h.index('<div class="appline">'), h.index("<table>"), path)
+            self.assertIn(build.CFG["apps"]["electrician-calc"]["app_store_url"], line, path)
+            self.assertIn("play.google.com/store/apps/details?id=com.andrii.electriccalc", line, path)
+        # What is free and what is Pro (catalog.dart on the app's main, read on 16 November 2026).
+        self.assertIn("Conduit Fill is free.", page(pe.FILL_CHART))
+        self.assertIn("The Panel Planner, which assigns a panel's circuits to breakers and wire sizes, is in Pro.", page(pe.SUBPANEL))
+        self.assertIn("The EV Charger &amp; Heat Pump Check (Pro)", page(pe.EV_WIRE))
+
+
 class Site(unittest.TestCase):
     NEW = ([ph.HUB, ph.CMP_INDEX, ph.TSH, ph.BUBBLE_DEW, ph.CHARGE_454B, pe.HUB, pe.AMPACITY_PAGE, pe.BY_DISTANCE, pe.VD_12AWG, pe.VD_3PH, pe.VD_12V]
-           + [ph.sh_path(rid) for rid in ph.OWN_PAGES] + [ph.cmp_path(a, c) for a, c in ph.PAIRS])
+           + list(AppTablePages.PAGES) + [ph.sh_path(rid) for rid in ph.OWN_PAGES] + [ph.cmp_path(a, c) for a, c in ph.PAIRS])
 
     def test_new_pages_exist_and_are_in_the_sitemap(self):
         sitemap = (SITE / "sitemap.xml").read_text()
-        self.assertEqual(len(self.NEW), 25)
+        self.assertEqual(len(self.NEW), 30)
         for path in self.NEW + [ph.pt_path(rid) for rid in build.PT]:
             self.assertTrue((SITE / path).exists(), path)
             self.assertIn(f"<loc>{build.BASE}/{path}</loc>".replace("/index.html<", "/<"), sitemap)

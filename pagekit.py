@@ -35,10 +35,11 @@ def src(key):
     return f'<a href="{e(link)}" rel="noopener">{e(title)}</a>'
 
 
-def byline(what):
-    """Visible check date and author. `what` says what was checked against what, as HTML."""
-    return (f'<p class="note byline">Checked <time datetime="{refdata.CHECKED_ISO}">{refdata.CHECKED}</time> by '
-            f'{guides.AUTHOR}. {what}</p>')
+def byline(what, checked=None):
+    """Visible check date and author. `what` says what was checked against what, as HTML. `checked` is
+    (date as text, ISO date) for pages checked on another day than refdata.CHECKED."""
+    text, iso = checked or (refdata.CHECKED, refdata.CHECKED_ISO)
+    return f'<p class="note byline">Checked <time datetime="{iso}">{text}</time> by {guides.AUTHOR}. {what}</p>'
 
 
 def printbar(label="Print this chart"):
@@ -66,14 +67,14 @@ def person(b):
     return {"@type": "Person", "@id": b.PERSON_ID, "name": guides.AUTHOR, "url": f"{b.SITE}/"}
 
 
-def article_ld(b, path, headline, desc):
+def article_ld(b, path, headline, desc, modified=None):
     return {"@context": "https://schema.org", "@type": "TechArticle", "headline": headline, "description": desc,
-            "url": url(b, path), "author": person(b), "publisher": {"@id": b.ORG_ID}, "dateModified": refdata.CHECKED_ISO, "inLanguage": "en"}
+            "url": url(b, path), "author": person(b), "publisher": {"@id": b.ORG_ID}, "dateModified": modified or refdata.CHECKED_ISO, "inLanguage": "en"}
 
 
-def dataset_ld(b, path, name, desc, based_on, variables):
+def dataset_ld(b, path, name, desc, based_on, variables, modified=None):
     return {"@context": "https://schema.org", "@type": "Dataset", "name": name, "description": desc, "url": url(b, path),
-            "creator": person(b), "dateModified": refdata.CHECKED_ISO, "isAccessibleForFree": True, "isBasedOn": based_on,
+            "creator": person(b), "dateModified": modified or refdata.CHECKED_ISO, "isAccessibleForFree": True, "isBasedOn": based_on,
             "variableMeasured": [{"@type": "PropertyValue", "name": n, "unitText": u} for n, u in variables]}
 
 
