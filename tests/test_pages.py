@@ -998,5 +998,28 @@ class Site(unittest.TestCase):
             self.assertTrue((SITE / path).exists() and title and desc, path)
 
 
+class NecByState(unittest.TestCase):
+    """The NEC edition table is the app's state_code.dart (origin/main), row for row."""
+
+    def test_every_state_is_a_row_with_the_apps_edition(self):
+        rows = pe.state_codes(build)
+        self.assertEqual(len(rows), 52)  # 50 states, DC and Puerto Rico
+        chart = next(t for t in tables(page(pe.NEC_BY_STATE)) if t[0][0] == "State" and t[0][1] == "NEC edition in force")
+        self.assertEqual([r[0] for r in chart[1:]], [r["name"] for r in rows])
+        for r, row in zip(rows, chart[1:]):
+            want = f"NEC {r['edition']}" if r["edition"] else ("Not confirmed" if r["unconfirmed"] else "No statewide edition")
+            self.assertEqual(row[1], want, r["name"])
+            self.assertEqual(row[2], r["effective"] or "—", r["name"])
+
+    def test_the_states_named_in_the_answers_are_the_ones_in_the_table(self):
+        rows = pe.state_codes(build)
+        self.assertEqual([r["code"] for r in rows if not r["edition"] and not r["unconfirmed"]], ["AZ", "IL", "KS", "MS", "MO"])
+        h = page(pe.NEC_BY_STATE)
+        self.assertIn(pe.names([r for r in rows if r["edition"] == 2026]), h)
+        self.assertIn("Dataset", h)
+        self.assertIn("FAQPage", h)
+        self.assertIn(pe.NFPA_MAP, h)
+
+
 if __name__ == "__main__":
     unittest.main()

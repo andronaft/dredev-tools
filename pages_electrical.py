@@ -9,6 +9,8 @@ from the app; the fill arithmetic is calc_math.py's mirror of the app's electric
 """
 import math
 import re
+import subprocess
+from collections import Counter
 from html import escape as e
 
 import calc_math as cm
@@ -31,6 +33,7 @@ FILL_CHART = "electrical/conduit-fill-chart.html"
 FILL_12_EMT = "electrical/how-many-12-awg-wires-in-3-4-emt.html"
 BOX_FILL = "electrical/box-fill-nec-314-16.html"
 EV_WIRE = "electrical/ev-charger-wire-size.html"
+NEC_BY_STATE = "electrical/nec-edition-by-state.html"
 
 NEC_EDITION = "NFPA 70, National Electrical Code, 2023 edition"
 # The K factor (Ω·cmil/ft) behind every number here: calc.js takes resistivity at 20 °C and adds 25 % for operating
@@ -47,7 +50,7 @@ def elec_links(skip=None):
              (BY_DISTANCE, "Wire size by amps and distance"), (VD_12AWG, "12 AWG voltage drop per foot"),
              (VD_3PH, "Three-phase voltage drop"), (VD_12V, "12 V DC voltage drop"), (SUBPANEL, "Subpanel feeder wire size"),
              (EV_WIRE, "EV charger wire size"), (FILL_CHART, "Conduit fill chart"), (FILL_12_EMT, "12 AWG in 3/4 in. EMT"),
-             (BOX_FILL, "Box fill (NEC 314.16)"), (AWG_MM2, "AWG to mm²"), (HUB, "All electrical tools")]
+             (BOX_FILL, "Box fill (NEC 314.16)"), (NEC_BY_STATE, "NEC edition by state"), (AWG_MM2, "AWG to mm²"), (HUB, "All electrical tools")]
     return related("More electrical tools", [l for l in links if l[0] != skip])
 
 
@@ -1075,6 +1078,134 @@ That is copper THHN in conduit on 75 °C terminals (NEC Table 310.16, 2023 editi
 
 # ---------- hub ----------
 
+# ---------- NEC edition by state ----------
+
+NFPA_MAP = "https://www.nfpa.org/education-and-research/electrical/nec-enforcement-maps"
+NFPA_AS_OF = "3 August 2026"  # the date NFPA's page gives for its own table
+STATES_CHECKED = ("17 November 2026", "2026-11-17")  # the day the table below was read against NFPA's page again
+OWNER_CHECKED = "16 November 2026"
+# What NFPA's row says beyond the app's note.
+STATE_EXTRA = {
+    "NC": "NFPA lists this edition for other than one- and two-family dwellings.",
+    "IA": "NEC 2026 is being adopted.",
+    "KY": "NEC 2026 is being adopted.",
+    "NE": "NEC 2026 is being adopted.",
+    "MI": "NEC 2026 is being adopted for commercial work.",
+}
+OWNER_TEXT = {"allowed": "Yes", "notAllowed": "No", "local": "Decided by the city or county"}
+
+
+def state_codes(b):
+    """The rows of the Electrician Calc app's state_code.dart, so the page and the app give the same answer. Read
+    from origin/main, because the app's checkout is often on a work branch that does not have the file."""
+    repo, rel = b.ROOT / "Calculator_for_electrical", "lib/feature/engine/state_code.dart"
+    got = subprocess.run(["git", "-C", str(repo), "show", f"origin/main:{rel}"], capture_output=True, text=True)
+    text = got.stdout if got.returncode == 0 else (repo / rel).read_text()
+    rows = []
+    for block in text[text.index("const stateCodes"):].split("StateCode(")[1:]:
+        code, name = re.match(r"\s*'([A-Z]{2})',\s*'([^']+)'", block).groups()
+
+        def s(field):
+            m = re.search(rf"\b{field}:\s*'([^']*)'", block)
+            return m.group(1) if m else ""
+
+        ed, own = re.search(r"\bedition:\s*(\d{4})", block), re.search(r"Homeowner\.(\w+)", block)
+        rows.append({"code": code, "name": name, "edition": int(ed.group(1)) if ed else None, "effective": s("effective"),
+                     "note": s("note"), "source": s("source") or (NFPA_MAP if "_nfpa" in block else ""),
+                     "unconfirmed": "unconfirmed: true" in block, "owner": own.group(1) if own else "unknown",
+                     "owner_source": s("homeownerSource"), "owner_condition": s("ownerCondition"), "board": s("board")})
+    return rows
+
+
+def names(rows):
+    n = [r["name"] for r in rows]
+    return n[0] if len(n) == 1 else ", ".join(n[:-1]) + " and " + n[-1]
+
+
+def nec_by_state_page(b):
+    path = NEC_BY_STATE
+    crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("NEC edition by state", path)])
+    rows = state_codes(b)
+    by_ed = Counter(r["edition"] for r in rows if r["edition"])
+    of = lambda year: [r for r in rows if r["edition"] == year]  # noqa: E731
+    local = [r for r in rows if not r["edition"] and not r["unconfirmed"]]
+    top = by_ed.most_common(1)[0][0]
+    rest = ", ".join(f"NEC {y} in {by_ed[y]}" for y in sorted(by_ed, reverse=True) if y != top)
+    answer = (f"NEC {top} is the most common statewide edition, in force in {by_ed[top]} states. The others: {rest}. "
+              f"NEC 2026 is in force in {names(of(2026))}. {names(local)} have no statewide edition that covers houses: "
+              "there the city or county decides. Counts include the District of Columbia.")
+
+    def edition(r):
+        if r["edition"]:
+            return f"<strong>NEC {r['edition']}</strong>"
+        return "Not confirmed" if r["unconfirmed"] else "No statewide edition"
+
+    def note(r):
+        return " ".join(x for x in (e(r["note"]), STATE_EXTRA.get(r["code"], "")) if x) or "—"
+
+    def link(u):
+        return f'<a href="{e(u)}" rel="noopener">{e(re.sub(r"^https?://(www\.)?", "", u).split("/")[0])}</a>' if u else "—"
+
+    main = table(["State", "NEC edition in force", "In force since", "Notes"],
+                 [[f'<td id="{r["code"].lower()}">{e(r["name"])}</td>', edition(r), r["effective"] or "—", note(r)] for r in rows], "states")
+    owners = [r for r in rows if r["owner"] != "unknown"]
+    owner = table(["State", "May the owner wire their own house?", "The state's conditions", "Source"],
+                  [[e(r["name"]), OWNER_TEXT[r["owner"]], e(r["owner_condition"]) or "Ask the local building department.",
+                    link(r["owner_source"])] for r in owners], "states owners")
+    pending = [r for r in rows if re.search(r"being adopted|expected|from 1 Jan", note(r))]
+    faq_html, faq_ld = b.faq([
+        ("Which states use the 2026 NEC?",
+         f"{names(of(2026))}, as of {STATES_CHECKED[0]}. NFPA's own table is dated {NFPA_AS_OF}, so a state that switched after that day may still show its older edition here."),
+        ("Which states have no statewide electrical code?",
+         f"{names(local)}. In Arizona, Mississippi and Missouri the NEC is adopted city by city or county by county. Illinois and Kansas have a state rule based on NEC 2008, "
+         "but it does not cover houses in places with their own code, so the local edition is the one that counts."),
+        ("Which NEC edition do most states use?",
+         f"NEC {top}: {by_ed[top]} states enforce it statewide. " + " ".join(f"NEC {y}: {by_ed[y]}." for y in sorted(by_ed, reverse=True) if y != top)),
+        ("Is the NEC a federal law?",
+         "No. The National Electrical Code is a model code published by NFPA as NFPA 70. It becomes law only where a state, county or city adopts an edition, often with its own amendments."),
+        ("How often is the NEC updated?",
+         "Every three years: 2017, 2020, 2023, 2026. States adopt each edition on their own schedule, which is why several editions are in force at the same time."),
+        ("How do I find the edition my city enforces?",
+         "Ask the building department that issues the electrical permit, or read its permit page. A city may amend the state's edition or enforce a newer one, and the inspector's edition is the one your work is checked against."),
+        ("Which edition do the calculators on this site use?",
+         f"{NEC_EDITION}: Table 310.16 for ampacity, Table 250.122 for grounding and Chapter 9 for conduit fill. If your state is on another edition, check the article numbers against that edition."),
+    ])
+    body = f"""{CSS}
+{crumb_html}
+<div class="hero"><div class="eyebrow">Electrical reference</div>
+<h1>NEC edition by state: which electrical code each state uses</h1>
+<p class="lead">The National Electrical Code edition in force in each of the 50 states and the District of Columbia, the day it took effect and what is being adopted next.</p>
+<p class="answer"><strong>Quick answer:</strong> {answer}</p></div>
+{byline(f'Editions and dates from <a href="{NFPA_MAP}" rel="noopener">NFPA\'s NEC enforcement table</a>, which NFPA dates {NFPA_AS_OF}; the District of Columbia from its own code page. '
+        "It is the same list the Electrician Calc app uses.", STATES_CHECKED)}
+{printbar("Print this table")}
+<section class="guide"><h2>NEC edition in force, state by state</h2>
+<p class="muted">The statewide edition is the starting point. Cities and counties may amend it or enforce a newer one, and the inspector has the final word.</p>
+{main}
+<p class="note">A link to one state ends with its two-letter code, for example <a href="#tx">#tx</a> for Texas.
+“No statewide edition” means the state leaves the choice to cities and counties, or its own rule does not cover houses.</p>
+<h3>States where a newer edition is on the way</h3>
+<p>{names(pending)}. The note in each row says which edition and, where the state has set one, the date.</p>
+<h3>Why the edition matters</h3>
+<p>An inspector checks the work against the edition the jurisdiction adopted, not the newest one. Article numbers and requirements move between editions,
+so a rule quoted from NEC 2023 may read differently, or sit in another section, where NEC 2017 or 2020 is still in force. Before a job in another state, look up its edition first.</p>
+{checked_note(b, path)}</section>
+<section class="guide"><h2>May a homeowner do their own electrical work?</h2>
+<p class="muted">Read from each state's statute or licensing board on {OWNER_CHECKED}, for the {len(owners)} states we have checked so far. A permit and an inspection are still required almost everywhere.
+States not listed here have not been checked: ask the local building department.</p>
+{owner}</section>
+{b.promo("electrician-calc", "nec-by-state", "Wire size with derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports.")}
+{faq_html}
+{elec_links(NEC_BY_STATE)}
+<p class="note">{ELEC_NOTE}</p>
+"""
+    desc = (f"Which NEC edition each state enforces in 2026: all 50 states and DC with the effective date, pending adoptions and local-adoption states. "
+            f"NEC {top} leads with {by_ed[top]} states. Checked {STATES_CHECKED[0]}.")
+    ld = dataset_ld(b, path, "NEC edition in force by US state", desc, "NFPA, NEC enforcement table",
+                    [("NEC edition", "year"), ("Effective date", "date")], STATES_CHECKED[1])
+    b.shell(path, "NEC Edition by State (2026): Which Electrical Code Each State Uses", desc, body, "t-elec", None, [ld, faq_ld], JS)
+
+
 def hub_page(b):
     crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB)])
     cards = [
@@ -1091,6 +1222,7 @@ def hub_page(b):
         (FILL_CHART, "Chart", "Conduit fill chart", "THHN in EMT and PVC Schedule 40, 1/2 to 2 in., at 40 % fill."),
         (FILL_12_EMT, "Guide", "How many 12 AWG wires in 3/4 EMT", "The fill count, and what derating leaves of it."),
         (BOX_FILL, "Guide", "Box fill (NEC 314.16)", "Volume per conductor, what counts and two worked examples."),
+        (NEC_BY_STATE, "Reference", "NEC edition by state", "The edition each state enforces, its effective date and what is pending."),
     ]
     grid = "".join(f'<a class="card" href="{REL}{p}"><span class="tag">{tag}</span><h3>{e(h)}</h3><p>{e(d)}</p></a>' for p, tag, h, d in cards)
     body = f"""{CSS}
@@ -1119,6 +1251,7 @@ CARDS = [
     (FILL_CHART, "Electrical", "Conduit fill chart", "THHN in EMT and PVC Schedule 40 at 40 % fill.", "t-elec"),
     (FILL_12_EMT, "Electrical", "How many 12 AWG wires in 3/4 EMT", "Fill count and the derating that limits it.", "t-elec"),
     (BOX_FILL, "Electrical", "Box fill (NEC 314.16)", "Volume per conductor, what counts, worked examples.", "t-elec"),
+    (NEC_BY_STATE, "Electrical", "NEC edition by state", "Which NEC edition each state enforces, with dates and sources.", "t-elec"),
 ]
 
 
@@ -1134,3 +1267,4 @@ def build(b):
     fill_12_emt_page(b)
     box_fill_page(b)
     ev_wire_page(b)
+    nec_by_state_page(b)
