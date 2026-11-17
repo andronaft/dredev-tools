@@ -48,56 +48,60 @@
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/electrical/": {
-  "hash": "83e1f26393be317b",
-  "date": "2026-11-16"
+  "hash": "224b84b5c74cc6ee",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/12-awg-voltage-drop-per-foot.html": {
-  "hash": "ddd696cd141cb562",
-  "date": "2026-11-16"
+  "hash": "999aa910082d9df6",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html": {
-  "hash": "07aa2f2d3005c3ad",
-  "date": "2026-11-16"
+  "hash": "d04d33e8712d44ee",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/ampacity-chart-nec-310-16.html": {
-  "hash": "3b50e300499bdc4d",
-  "date": "2026-11-16"
+  "hash": "1908f92f1569bd32",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/awg-to-mm2.html": {
   "hash": "80a32cf681fdafe3",
   "date": "2026-11-15"
  },
  "https://zhukovskyi.space/calculators/electrical/box-fill-nec-314-16.html": {
-  "hash": "aefa30ba46043d6a",
-  "date": "2026-11-16"
+  "hash": "23ac23e2d6fb4337",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/conduit-fill-chart.html": {
-  "hash": "f360c49a5e7c54c1",
-  "date": "2026-11-16"
+  "hash": "4247bafaef4f746f",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/ev-charger-wire-size.html": {
-  "hash": "4b8542256688197a",
-  "date": "2026-11-16"
+  "hash": "1b98ff6501b5ae58",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/how-many-12-awg-wires-in-3-4-emt.html": {
-  "hash": "deec1f1e206c76d0",
-  "date": "2026-11-16"
+  "hash": "0291f1f68db1227f",
+  "date": "2026-11-17"
+ },
+ "https://zhukovskyi.space/calculators/electrical/nec-edition-by-state.html": {
+  "hash": "652819469851f72c",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html": {
-  "hash": "1cd6d8c8e34d2fca",
-  "date": "2026-11-16"
+  "hash": "3f64f4fce1a113c3",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html": {
   "hash": "3494e41fdd57ff9e",
   "date": "2026-11-15"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-50-amp-sub-panel.html": {
-  "hash": "c2eaeeca07d81dcb",
-  "date": "2026-11-16"
+  "hash": "8560323de81896d5",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-by-amps-and-distance.html": {
-  "hash": "05fdd74d53bd0a68",
-  "date": "2026-11-16"
+  "hash": "d060a2ad6ad4a561",
+  "date": "2026-11-17"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html": {
   "hash": "6e5d3a930512d4cc",
