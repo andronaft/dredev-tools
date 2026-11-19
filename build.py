@@ -472,7 +472,42 @@ def trust_block(path, url, body, title, calc, rel):
             f'<a href="{error_mailto(url, page_name(body, title))}">Found an error? Tell me</a></p></aside>')
 
 
+# Guides on the main site that explain the method behind a page: path -> [(blog slug, anchor text)].
+# One line under the quick answer, so the page that ranks for a lookup passes readers on to the explanation.
+GUIDES = {
+    "electrical/voltage-drop-calculator.html": [("voltage-drop-3-percent-or-5-percent", "NEC voltage drop: 3% or 5%, and is it required?")],
+    "electrical/12-awg-voltage-drop-per-foot.html": [("voltage-drop-3-percent-or-5-percent", "is 3% voltage drop required by the NEC")],
+    "electrical/three-phase-voltage-drop.html": [("voltage-drop-3-percent-or-5-percent", "NEC voltage drop limits: 3% or 5%")],
+    "electrical/12v-dc-voltage-drop.html": [("voltage-drop-3-percent-or-5-percent", "voltage drop formula and the 3% limit")],
+    "electrical/wire-size-calculator.html": [("how-to-size-wire-nec-step-by-step", "how to size wire by the NEC, step by step"),
+                                             ("why-wire-size-calculators-disagree", "why some charts say 6 AWG and others 8 AWG for 50 amps")],
+    "electrical/wire-size-by-amps-and-distance.html": [("how-to-size-wire-nec-step-by-step", "how to size wire by the NEC, step by step")],
+    "electrical/ampacity-chart-nec-310-16.html": [("how-to-size-wire-nec-step-by-step", "which Table 310.16 column to use and how to derate")],
+    "electrical/wire-size-50-amp-sub-panel.html": [("why-wire-size-calculators-disagree", "why some charts say 6 AWG and others 8 AWG for 50 amps"),
+                                                   ("voltage-drop-3-percent-or-5-percent", "the 5% feeder plus branch voltage drop budget")],
+    "electrical/ev-charger-wire-size.html": [("continuous-load-125-percent-rule", "continuous load and the 125% rule")],
+    "electrical/awg-to-mm2.html": [("awg-vs-mm2-wire-size-equivalents", "is 2.5 mm² 14 AWG or 12 AWG?")],
+    "electrical/conduit-fill-chart.html": [("conduit-fill-calculation-examples", "how to calculate conduit fill for mixed wire sizes")],
+    "electrical/how-many-12-awg-wires-in-3-4-emt.html": [("conduit-fill-calculation-examples", "how to calculate conduit fill for mixed wire sizes")],
+    "electrical/box-fill-nec-314-16.html": [("box-fill-calculation-examples", "how to calculate box fill step by step")],
+    "electrical/nec-edition-by-state.html": [("box-fill-calculation-examples", "the 2020 change to the ground-wire count in box fill")],
+}
+
+
+def guide_line(path, body):
+    """The page with a 'Guide:' line after its quick answer (or before the related links if it has none)."""
+    if path not in GUIDES:
+        return body
+    links = " &#183; ".join(f'<a href="{SITE}/blog/{slug}/">{e(text)}</a>' for slug, text in GUIDES[path])
+    line = f'<p class="guide-link"><strong>Guide:</strong> {links}</p>'
+    m = re.search(r'<p class="answer">.*?</p>', body, flags=re.S)
+    if m:
+        return body[:m.end()] + "\n" + line + body[m.end():]
+    return body.replace('<section class="related">', line + '\n<section class="related">', 1)
+
+
 def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en", canonical=None):
+    body = guide_line(path, body)
     depth = path.count("/")
     rel = "../" * depth
     home = rel or "./"
