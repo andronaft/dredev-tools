@@ -37,6 +37,8 @@ class StoreButtons(unittest.TestCase):
 
     def setUp(self):
         self.saved = copy.deepcopy(build.CFG["apps"]["hvac-charge"])
+        # HVAC Charge is live on Google Play in config.json now; these tests need it in a closed test.
+        build.CFG["apps"]["hvac-charge"].update(google_play_live=False, app_store_url="", status="testing")
 
     def tearDown(self):
         build.CFG["apps"]["hvac-charge"] = self.saved
@@ -46,6 +48,12 @@ class StoreButtons(unittest.TestCase):
         self.assertIn("Become a tester, free", html)
         self.assertIn('href="https://zhukovskyi.space/apps/hvac-charge/"', html)
         self.assertNotIn("play.google.com/store", html)
+
+    def test_apps_in_closed_test_keep_the_tester_button(self):
+        # Fastwise, Water Buddy and SlabCalc are not on Google Play production yet: no store link for them.
+        for key in ("fastwise", "water-buddy", "slabcalc"):
+            self.assertFalse(build.CFG["apps"][key]["google_play_live"], key)
+            self.assertNotIn("play.google.com/store", build.store_buttons(key, "t"), key)
 
     def test_google_play_live_switches_to_the_store_link(self):
         build.CFG["apps"]["hvac-charge"]["google_play_live"] = True

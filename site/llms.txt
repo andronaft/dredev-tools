@@ -8,7 +8,7 @@ Android apps are in closed testing on Google Play and anyone can join for free: 
 
 ### HVAC Charge: Superheat & PT
 
-Superheat, subcooling and PT charts for R-454B, R-32, R-410A and more. Offline, no account. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/hvac-charge/
+Superheat, subcooling and PT charts for R-454B, R-32, R-410A and more. Offline, no account. Available on Google Play. Page: https://zhukovskyi.space/apps/hvac-charge/
 
 Built for service techs on the roof, not in the office. Enter gauge pressure and line temperature; saturation, superheat and subcooling update as you type, from published manufacturer PT charts.
 
@@ -47,7 +47,7 @@ Free in the browser, same formulas: [Voltage drop calculator](https://zhukovskyi
 
 ### CoatCalc: Epoxy Floor Coating
 
-Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/coatcalc/
+Epoxy and polyaspartic floor calculator: kits, flake, dew point and PDF quotes. Available on Google Play. Page: https://zhukovskyi.space/apps/coatcalc/
 
 For garage-floor and concrete-coating installers. Order the right number of kits, check if you can coat today, and send a professional quote before you leave the driveway.
 
@@ -67,7 +67,7 @@ Free in the browser, same formulas: [Epoxy coverage calculator](https://zhukovsk
 
 ### PoolPro: Chemistry & Route
 
-Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/poolpro/
+Pool chemical calculator: exact doses for the products you own, CSI, a test log and a service route. Available on Google Play. Page: https://zhukovskyi.space/apps/poolpro/
 
 PoolPro turns a pool test into exact doses for the chemicals already on your shelf, in the order to add them. For pool owners and pool service techs. Offline, no account, no ads and no brand pushing.
 
@@ -87,7 +87,7 @@ Free in the browser, same formulas: [Pool chemical calculator](https://zhukovsky
 
 ### SoftWash Pro: Mix & Quote
 
-Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/softwash/
+Soft wash calculator: SH mix ratios, downstream strength, chemical cost and PDF quotes. Available on Google Play. Page: https://zhukovskyi.space/apps/softwash/
 
 For soft wash and pressure washing businesses. Mix sodium hypochlorite right, know the real strength that hits the wall, and send a clean PDF quote before you leave the driveway.
 
@@ -105,7 +105,7 @@ Pro:
 
 ### RoofCalc: Roofing Calculator
 
-Roofing calculator: squares from the footprint and pitch, every material and PDF quotes. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/roofcalc/
+Roofing calculator: squares from the footprint and pitch, every material and PDF quotes. Available on Google Play. Page: https://zhukovskyi.space/apps/roofcalc/
 
 For roofers who bid jobs every week. Measure from the ground, get the squares and every material, and send a PDF quote before you leave the driveway. No ads, works offline.
 
@@ -140,9 +140,27 @@ Pro:
 - Ready-mix vs bags cost with your prices
 - Jobs: every pour in one order
 
+### PaintBid: Painting Estimator
+
+Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline. Available on Google Play. Page: https://zhukovskyi.space/apps/paintbid/
+
+For painting contractors. Walk the house, tap in the rooms, and send a clean PDF quote before you leave the driveway. No login, no loading screens.
+
+Free:
+- Rooms, single walls, accent walls and exterior elevations
+- Doors and windows by count, identical rooms at once
+- Walls, ceilings and trim with 1–3 coats and primer
+- Exact gallons from your paint's coverage
+
+Pro:
+- PDF quotes with your business name
+- Price per room on every quote
+- Unlimited saved jobs
+- Paint store shopping list
+
 ### SiteLog: Daily Report & Snags
 
-Daily site reports and punch lists with photos. A PDF in one tap. Works offline. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/sitelog/
+Daily site reports and punch lists with photos. A PDF in one tap. Works offline. Available on Google Play. Page: https://zhukovskyi.space/apps/sitelog/
 
 The fast, offline site diary for contractors who run their own jobs. Write the daily report in two minutes, walk the site with a punch list, and send a clean PDF before you leave.
 
@@ -160,7 +178,7 @@ Pro:
 
 ### Lye Calc: Soap Recipes
 
-Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost. Android in a free closed test on Google Play ([how to join](https://zhukovskyi.space/testers/)); App Store coming. Page: https://zhukovskyi.space/apps/lye-calc/
+Lye calculator for soap making: NaOH, KOH, superfat, water, soap qualities and batch cost. Available on Google Play. Page: https://zhukovskyi.space/apps/lye-calc/
 
 A soap making calculator that gets the lye right and never loses your recipes. Add oils by weight or percent, set superfat and water, and see exactly what to weigh.
 
@@ -180,6 +198,29 @@ Pro:
 - Resize any recipe to a new batch size
 
 Free in the browser, same formulas: [Lye calculator](https://zhukovskyi.space/calculators/soap/lye-calculator.html).
+
+### Days Until: Countdown Widget
+
+Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too. Available on Google Play. Page: https://zhukovskyi.space/apps/days-until/
+
+Add an event in seconds, pick an emoji and a theme, and keep the number of days right on your home screen. Ready-made templates for Christmas, New Year, birthdays, trips and baby due dates.
+
+Free:
+- Countdown cards with a live timer down to the second
+- Home screen widgets
+- Count down or count up from any date
+- 11 templates, including Christmas and New Year
+- Notes and reminders for every event
+- English, Ukrainian, Spanish, German and Portuguese
+
+Pro:
+- Any event on any widget
+- Your own photo as the background on cards and widgets
+- 6 premium themes
+- Reminders 1 day, 1 week or 1 month before
+- Milestones: 100, 500, 1000 days and every anniversary
+
+Free in the browser, same formulas: [Live Christmas countdown](https://zhukovskyi.space/calculators/countdown/christmas-countdown.html).
 
 ### Focus Sprint: ADHD Timer
 
@@ -218,6 +259,24 @@ Pro:
 - Custom cup sizes
 - Every Buddy outfit, unlocked
 
+### Leben in Deutschland: тест UA
+
+Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами. Available on Google Play. Page: https://zhukovskyi.space/apps/lid-test/uk/
+
+На тесті питання лише німецькою. У застосунку ви бачите оригінальне німецьке питання, переклад українською, а після відповіді — чому правильна саме ця відповідь. Так ви не зазубрюєте, а розумієте.
+
+Free:
+- Усі 300 загальних питань і по 10 для кожної з 16 федеральних земель
+- Німецький оригінал і переклад українською
+- Пробний іспит: 33 питання, 60 хвилин (один на день)
+- Мої помилки, навчання за темами, пошук і закладки
+- Без реклами, без акаунта, працює без інтернету
+
+Pro:
+- Пояснення українською до всіх 460 питань
+- Необмежені пробні іспити
+- Розумне тренування: спершу помилки, потім нові питання
+
 ## Free calculators
 
 - [Superheat & subcooling calculator](https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html): 22 refrigerants, including R-454B, R-32 and R-410A, with PT lookup.
@@ -253,10 +312,7 @@ Pressure-temperature tables with bubble and dew columns: [R-410A](https://zhukov
 
 ## Coming soon
 
-- [PaintBid: Painting Estimator](https://zhukovskyi.space/apps/paintbid/): Painting estimator: rooms, gallons, labor hours and PDF quotes. Works offline.
-- [Days Until: Countdown Widget](https://zhukovskyi.space/apps/days-until/): Countdown widgets for Christmas, trips, birthdays and weddings. Count up from any date, too.
 - [Fastwise: Fasting Tracker](https://zhukovskyi.space/apps/fastwise/): Intermittent fasting made simple: a plan that fits you, a live timer and help when hunger hits.
-- [Leben in Deutschland: тест UA](https://zhukovskyi.space/apps/lid-test/uk/): Офіційні питання BAMF для тесту Leben in Deutschland з перекладом і поясненнями українською. Без реклами.
 
 ## Optional
 
