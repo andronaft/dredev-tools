@@ -17,7 +17,7 @@
       "package": "com.andrii.hvaccharge",
       "repo_dir": "hvac-charge-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -37,7 +37,7 @@
       "package": "com.andrii.coatcalc",
       "repo_dir": "coatcalc-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -47,7 +47,7 @@
       "package": "com.andrii.countdown",
       "repo_dir": "Countdown_to_events",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "soon"
     },
@@ -87,7 +87,7 @@
       "package": "com.andrii.poolchem",
       "repo_dir": "pool-chem-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -97,7 +97,7 @@
       "package": "com.andrii.softwash",
       "repo_dir": "softwash-calc-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -107,7 +107,7 @@
       "package": "com.andrii.roofcalc",
       "repo_dir": "roofcalc-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -127,7 +127,7 @@
       "package": "com.andrii.paintbid",
       "repo_dir": "paintbid-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "soon"
     },
@@ -137,7 +137,7 @@
       "package": "com.andrii.sitelog",
       "repo_dir": "sitelog-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -147,7 +147,7 @@
       "package": "com.andrii.soapcalc",
       "repo_dir": "soapcalc-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "testing"
     },
@@ -157,7 +157,7 @@
       "package": "com.andrii.lidtest",
       "repo_dir": "lid-test-ua-app",
       "app_store_url": "",
-      "google_play_live": false,
+      "google_play_live": true,
       "beta_group_url": "",
       "status": "soon",
       "site_slug": "lid-test"
