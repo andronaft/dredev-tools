@@ -28,6 +28,7 @@ BY_DISTANCE = "electrical/wire-size-by-amps-and-distance.html"
 VD_12AWG = "electrical/12-awg-voltage-drop-per-foot.html"
 VD_3PH = "electrical/three-phase-voltage-drop.html"
 VD_12V = "electrical/12v-dc-voltage-drop.html"
+DC_WIRE = "electrical/dc-wire-size-calculator.html"
 SUBPANEL = "electrical/wire-size-50-amp-sub-panel.html"
 FILL_CHART = "electrical/conduit-fill-chart.html"
 FILL_12_EMT = "electrical/how-many-12-awg-wires-in-3-4-emt.html"
@@ -48,7 +49,8 @@ ALL_SIZES = [s for s, _ in guides.NEC]  # 18 AWG to 500 kcmil, for voltage drop 
 def elec_links(skip=None):
     links = [(VD_CALC, "Voltage drop calculator"), (WIRE_CALC, "Wire size calculator"), (AMPACITY_PAGE, "Ampacity chart (NEC 310.16)"),
              (BY_DISTANCE, "Wire size by amps and distance"), (VD_12AWG, "12 AWG voltage drop per foot"),
-             (VD_3PH, "Three-phase voltage drop"), (VD_12V, "12 V DC voltage drop"), (SUBPANEL, "Subpanel feeder wire size"),
+             (VD_3PH, "Three-phase voltage drop"), (VD_12V, "12 V DC voltage drop"),
+             (DC_WIRE, "DC and solar wire size calculator"), (SUBPANEL, "Subpanel feeder wire size"),
              (EV_WIRE, "EV charger wire size"), (FILL_CHART, "Conduit fill chart"), (FILL_12_EMT, "12 AWG in 3/4 in. EMT"),
              (BOX_FILL, "Box fill (NEC 314.16)"), (NEC_BY_STATE, "NEC edition by state"), (AWG_MM2, "AWG to mm²"), (HUB, "All electrical tools")]
     return related("More electrical tools", [l for l in links if l[0] != skip])
@@ -478,7 +480,7 @@ def vd_12v_page(b):
 <p class="note">Voltage drop only. Check the wire's ampacity and the fuse rating separately. For 24 V the same wire allows twice the length.</p>
 {ex}
 <p class="note print-only">{b.BASE}/{path} · checked {refdata.CHECKED}</p></section>
-<p><a class="btn" href="{REL}{VD_CALC}">Voltage drop calculator (choose DC)</a></p>
+<p><a class="btn" href="{REL}{DC_WIRE}">DC wire size calculator (12, 24, 48 V and panel strings)</a></p>
 {b.promo("electrician-calc", "vd-12v", "DC, single and three-phase voltage drop, solar PV strings and battery sizing in one app.")}
 {faq_html}
 {elec_links(VD_12V)}
@@ -489,6 +491,114 @@ def vd_12v_page(b):
     ld = dataset_ld(b, path, "12 V DC wire size by current and length", desc, f"NEC Chapter 9, Table 8 conductor areas; copper resistance K = {K_CU:.2f} Ω·cmil/ft",
                     [("Current", "A"), ("One-way length", "ft"), ("Conductor size", "AWG")])
     b.shell(path, "12 V DC Voltage Drop and Wire Size Chart (3 % and 10 %)", desc, body, "t-elec", None, [ld, faq_ld], JS)
+
+
+# ---------- DC wire size calculator (solar, battery and low-voltage runs) ----------
+
+DC_SYSTEMS = [12, 24, 48]
+# The day the DC results were compared with another published calculator (seven DC runs, all within 1 %).
+DC_WIRE_CHECKED = ("22 November 2026", "2026-11-22")
+DC_EX_WATTS, DC_EX_FEET = 1000, 10       # an inverter close to the battery
+PV_EX_AMPS, PV_EX_FEET, PV_EX_VMP = 10, 100, 40  # a long panel run; 40 V stands for one panel's Vmp in the example
+
+
+def dc_wire(volts, amps, feet, limit=3.0, cond="cu"):
+    """dcWire() of calc.js: (size shown, size by drop alone, size by 75 °C ampacity, drop in volts) or None when no
+    single conductor up to 500 kcmil fits."""
+    by_drop, _ = vd_size(amps, feet, volts, limit, "dc", cond)
+    by_amps = next((s for s in NEC_SIZES if ampacity(cond, 75, s) >= amps), None)
+    if not by_drop or not by_amps:
+        return None
+    size = max(by_drop, by_amps, key=ALL_SIZES.index)
+    return size, by_drop, by_amps, drop_volts("dc", cond, mm2_of(size), feet * 0.3048, amps)
+
+
+def dc_power_table(watts, feet, volts_list, limit=3.0):
+    rows = []
+    for v in volts_list:
+        a = watts / v
+        size, _, _, dv = dc_wire(v, a, feet, limit)
+        rows.append([f"{v} V", f"{a:.1f} A", awg(size), f"{dv:.2f} V ({dv / v * 100:.2f} %)", f"{dv * a:.1f} W"])
+    return table(["Voltage", "Current", "Wire size", "Drop", "Lost in the wire"], rows)
+
+
+def dc_wire_page(b):
+    path = DC_WIRE
+    w, ft = DC_EX_WATTS, DC_EX_FEET
+    s12, d12, a12, _ = dc_wire(12, w / 12, ft)
+    s48 = dc_wire(48, w / 48, ft)[0]
+    pa, pft, vmp = PV_EX_AMPS, PV_EX_FEET, PV_EX_VMP
+    p1, p4 = dc_wire(vmp, pa, pft)[0], dc_wire(vmp * 4, pa, pft)[0]
+    ans = guides.answer(
+        f"a {w:,} W load on a 12 V battery draws {w / 12:.0f} A; {ft} ft from the battery it needs {awg(s12)} copper to stay within 3 %. "
+        f"The same {w:,} W at 48 V draws {w / 48:.0f} A and needs {awg(s48)}. Higher voltage means less current, thinner wire and less loss.")
+    seg = lambda sid, label, opts: (f'<div class="seg" id="{sid}" role="group" aria-label="{label}">' + "".join(  # noqa: E731
+        f'<button data-v="{v}" aria-pressed="{"true" if on else "false"}">{t}</button>' for v, t, on in opts) + "</div>")
+    form = f"""<div class="full"><label>System voltage <small>(the battery, or the string's Vmp for a panel run)</small></label>
+{seg("dc-vpre", "Common voltages", [(v, f"{v} V", v == 12) for v in DC_SYSTEMS])}</div>
+<div><label for="dc-v">Voltage <small>(V)</small></label><input id="dc-v" inputmode="decimal" value="12"></div>
+<div><label for="dc-load">Load <small id="dc-load-unit">(W)</small></label><input id="dc-load" inputmode="decimal" value="{w}"></div>
+<div class="full">{seg("dc-unit", "Load unit", [("w", "Watts", True), ("a", "Amps", False)])}</div>
+<div><label for="dc-len">Length <small id="dc-len-unit">(ft, one way)</small></label><input id="dc-len" inputmode="decimal" value="{ft}"></div>
+<div>{seg("dc-lenu", "Length unit", [("ft", "ft", True), ("m", "m", False)])}</div>
+<div class="full"><label>Voltage drop limit</label>{seg("dc-limit", "Voltage drop limit", [(n, f"{n} %", n == 3) for n in (1, 2, 3, 5)])}</div>
+<div class="full">{seg("cond", "Conductor", [("cu", "Copper", True), ("al", "Aluminum", False)])}</div>"""
+    result = """<div class="eyebrow">Wire size</div><div class="big" id="dc-size">–</div>
+<div class="rows"><div><span>Current and power</span><span id="dc-amps">–</span></div>
+<div><span id="dc-limit-label">Smallest size for ≤ 3 % drop</span><span id="dc-bydrop">–</span></div>
+<div><span>Smallest size for the current (NEC 310.16, 75 °C)</span><span id="dc-byamps">–</span></div>
+<div><span>Voltage drop</span><span id="dc-drop">–</span></div>
+<div><span>Voltage at the load</span><span id="dc-end">–</span></div>
+<div><span>Lost as heat in the wire</span><span id="dc-loss">–</span></div>
+<div><span id="dc-max-label">Longest run on this wire at 3 %</span><span id="dc-max">–</span></div></div>
+<div id="dc-verdict" class="verdict"></div>
+<p class="note">The fuse or breaker, derating for heat and bundling, and the rules for PV circuits are not checked.</p>"""
+    live = f"""{CSS}
+<section class="guide"><h2>The same power at a higher voltage</h2>
+<p class="muted">Your numbers at one, two and four times the voltage: panels wired in series, or a 24 V or 48 V battery instead of 12 V.</p>
+<div class="tablewrap"><table><thead><tr><th>Voltage</th><th>Current</th><th>Wire size</th><th>Lost in the wire</th></tr></thead><tbody id="dc-higher"></tbody></table></div>
+<p><label for="dc-url">Link to this result</label> <input id="dc-url" readonly> <button class="btn ghost" id="dc-copy" type="button">Copy link</button></p></section>
+<section class="guide"><h2>DC wire size examples</h2>
+{byline("Computed with the same formula as the voltage drop calculator on this site, set to DC.", DC_WIRE_CHECKED)}
+<h3>{w:,} W, {ft} ft from the battery, 3 % limit, copper</h3>{dc_power_table(w, ft, DC_SYSTEMS)}
+<h3>A {pa} A panel run of {pft} ft, 3 % limit, copper</h3>
+<p class="muted">One, two and four panels in series, taking {vmp} V as one panel's working voltage (Vmp) for the example. In series the voltages add and the current stays the same.</p>
+{table(["String voltage", "Wire size", "Drop", "Lost in the wire"], [[f"{vmp * n} V", awg(dc_wire(vmp * n, pa, pft)[0]), f"{dc_wire(vmp * n, pa, pft)[3]:.2f} V ({dc_wire(vmp * n, pa, pft)[3] / (vmp * n) * 100:.2f} %)", f"{dc_wire(vmp * n, pa, pft)[3] * pa:.1f} W"] for n in (1, 2, 4)])}
+<p class="note">Length is one way; both conductors are counted. For more currents and lengths at 12 V see the <a href="{REL}{VD_12V}">12 V DC wire size chart</a>.</p></section>
+{elec_links(DC_WIRE)}
+<p class="note">{ELEC_NOTE}</p>"""
+    faq_items = [
+        ("What size wire do I need for a 12 V inverter?",
+         f"It depends on the watts and the distance. A {w:,} W load draws {w / 12:.0f} A at 12 V. Voltage drop alone would allow {awg(d12)} over {ft} ft, "
+         f"but the current needs {awg(a12)}, so the calculator shows {awg(s12)}. Follow the cable size in the inverter's manual if it asks for more."),
+        ("Which voltage do I enter for a solar panel run?",
+         "The voltage the run works at. For panels in series, add up their working voltages (Vmp) and enter the string's current (Imp). "
+         "For the battery side, enter the battery voltage."),
+        ("Why does a higher voltage need thinner wire?",
+         "The same power at twice the voltage is half the current. Half the current loses half the volts in the same wire, and those volts are a "
+         "smaller share of a higher voltage. The table under the calculator shows it for your own numbers."),
+        ("What voltage drop should I allow?",
+         "There is no single rule. The NEC's informational notes recommend no more than 3 % on a branch circuit and 5 % in total. "
+         "If the manual of your inverter or charge controller asks for less, use that: the calculator offers 1, 2, 3 and 5 %."),
+        ("Is the length one way or round trip?",
+         "One way, from the source to the load. The formula already counts both the positive and the negative conductor."),
+        ("Does it check ampacity and the fuse?",
+         "It compares the current with NEC Table 310.16 at 75 °C (30 °C ambient, no more than three current-carrying conductors) and never shows "
+         "a size below that, or below 14 AWG. It does not size the fuse or breaker, apply derating or the rules for PV circuits. "
+         "Vehicles and boats have their own wiring standards; follow the one that applies."),
+        ("Why does another calculator give a slightly different number?",
+         f"Mostly the resistance it assumes. This one uses {K_NOTE}, which is under 1 % above the rounded table values. "
+         "DC has no power factor: a calculator that keeps a power factor below 1 in DC mode shows a smaller drop than the wire really has."),
+    ]
+    desc = ("Free DC wire size calculator for solar and battery runs: 12, 24, 48 V or a panel string, from watts or amps. "
+            "Wire size for 1 to 5 % voltage drop with an ampacity check, power lost in the wire and the same load at a higher voltage.")
+    b.calc_page(path, "DC Wire Size Calculator for Solar and Battery Runs (12, 24, 48 V)", desc,
+                f'<a href="{REL}{HUB}">Electrical</a>', "Free electrical tool", "DC and solar wire size calculator",
+                "The wire for a battery, inverter or panel run: enter watts or amps, the one-way length and the voltage drop you allow. "
+                "AWG, copper or aluminum, with the power lost in the wire.",
+                form, result, faq_items, "t-elec", "dcwire",
+                promo_html=b.promo("electrician-calc", "dc-wire", "DC, single and three-phase voltage drop, solar PV strings and battery sizing in one app."),
+                note=live, answer_guide=(ans, "", []))
 
 
 # ---------- pages on the app's tables: subpanel feeders, conduit fill, box fill, EV chargers ----------
@@ -1212,6 +1322,7 @@ def hub_page(b):
         (VD_CALC, "Calculator", "Voltage drop calculator", "AWG or mm², copper or aluminum, single phase, three phase and DC."),
         (WIRE_CALC, "Calculator", "Wire size calculator", "Conductor and breaker by NEC Table 310.16, with a voltage drop check."),
         (AWG_MM2, "Calculator", "AWG to mm² converter", "AWG and kcmil to mm² and back."),
+        (DC_WIRE, "Calculator", "DC and solar wire size calculator", "12, 24 and 48 V battery runs and panel strings, from watts or amps."),
         (AMPACITY_PAGE, "Chart", "Ampacity chart (NEC 310.16)", "Copper and aluminum, 60/75/90 °C, with correction factors."),
         (BY_DISTANCE, "Chart", "Wire size by amps and distance", "15 to 100 A over 25 to 300 ft at 120 V and 240 V."),
         (VD_12AWG, "Chart", "12 AWG voltage drop per foot", "Millivolts per amp per foot and maximum run length."),
@@ -1246,6 +1357,7 @@ CARDS = [
     (VD_12AWG, "Electrical", "12 AWG voltage drop per foot", "Per amp per foot, with maximum run length.", "t-elec"),
     (VD_3PH, "Electrical", "Three-phase voltage drop", "Formula, chart and example.", "t-elec"),
     (VD_12V, "Electrical", "12 V DC voltage drop", "Wire size for 3 % and 10 % drop.", "t-elec"),
+    (DC_WIRE, "Electrical", "DC and solar wire size calculator", "12, 24 and 48 V runs and panel strings, from watts or amps.", "t-elec"),
     (SUBPANEL, "Electrical", "Wire size for a 50 amp sub panel", "50, 60 and 100 A feeders by distance, copper and aluminum.", "t-elec"),
     (EV_WIRE, "Electrical", "EV charger wire size", "32 to 80 A chargers: breaker and wire by run length.", "t-elec"),
     (FILL_CHART, "Electrical", "Conduit fill chart", "THHN in EMT and PVC Schedule 40 at 40 % fill.", "t-elec"),
@@ -1262,6 +1374,7 @@ def build(b):
     vd_12awg_page(b)
     vd_3ph_page(b)
     vd_12v_page(b)
+    dc_wire_page(b)
     subpanel_page(b)
     fill_chart_page(b)
     fill_12_emt_page(b)

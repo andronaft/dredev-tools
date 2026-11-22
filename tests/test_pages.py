@@ -762,6 +762,35 @@ class Electrical(unittest.TestCase):
         self.assertIn(f"has to be {got['min']}:", h)
         self.assertIn(f"drop {got['v']}, which is", h)
 
+    def test_dc_wire_calculator_matches_calc_js(self):
+        h = page(pe.DC_WIRE)
+        self.assertIn('data-calc="dcwire"', h)
+        self.assertEqual(crumb_names(h)[2], "Electrical")
+        cases = ([(v, pe.DC_EX_WATTS / v, pe.DC_EX_FEET) for v in pe.DC_SYSTEMS]
+                 + [(pe.PV_EX_VMP * n, pe.PV_EX_AMPS, pe.PV_EX_FEET) for n in (1, 2, 4)]
+                 + [(12, 2, 10), (12, 500, 10), (48, 30, 5)])  # under 14 AWG by drop, nothing fits, ampacity governs
+        code = "JSON.stringify(dcWire({volts:%r,amps:%r,metres:%r*0.3048,cond:'cu',limit:3}))"
+        for (v, a, ft), raw in zip(cases, js([{"op": "eval", "code": code % c} for c in cases])):
+            got, mine = json.loads(raw), pe.dc_wire(v, a, ft)
+            if mine is None:
+                self.assertIsNone(got["size"], (v, a, ft))
+                continue
+            size, by_drop, by_amps, dv = mine
+            self.assertEqual((got["size"], got["byDrop"], got["byAmps"]), tuple(guides.awg(x) for x in (size, by_drop, by_amps)), (v, a, ft))
+            self.assertAlmostEqual(got["dv"], dv, places=9)
+            self.assertLessEqual(got["pct"], 3)
+            self.assertGreaterEqual(got["rated"], a)
+        for v, a, ft in cases[:6]:  # the rows printed on the page
+            size, _, _, dv = pe.dc_wire(v, a, ft)
+            self.assertIn(f"<td>{guides.awg(size)}</td><td>{dv:.2f} V ({dv / v * 100:.2f} %)</td><td>{dv * a:.1f} W</td>", h)
+        self.assertEqual(pe.dc_wire(12, 2, 10)[:3], ("14", "18", "14"))
+        size, by_drop, by_amps, _ = pe.dc_wire(48, 30, 5)
+        self.assertEqual((size, by_amps), ("10", "10"))
+        self.assertLess(pe.ALL_SIZES.index(by_drop), pe.ALL_SIZES.index(by_amps))
+        # The voltage drop calculator and the 12 V chart send DC readers here.
+        self.assertIn("dc-wire-size-calculator.html", page(pe.VD_CALC))
+        self.assertIn("dc-wire-size-calculator.html", page(pe.VD_12V))
+
     def test_page_furniture(self):
         for path in (pe.AMPACITY_PAGE, pe.BY_DISTANCE, pe.VD_12AWG, pe.VD_3PH, pe.VD_12V):
             h = page(path)

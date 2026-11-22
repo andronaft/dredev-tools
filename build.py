@@ -739,6 +739,7 @@ def build_vd():
 <p class="note">Checks voltage drop only. Size the wire for ampacity and overcurrent protection too.</p>
 </div>
 </div>
+<p class="note">Battery, inverter or solar panel run? The <a href="{{rel}}electrical/dc-wire-size-calculator.html">DC wire size calculator</a> starts from watts and 12, 24 or 48 V.</p>
 
 {guide_html}
 {promo("electrician-calc", "vd-calc", "Wire size with ampacity and derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports.")}
