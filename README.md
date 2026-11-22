@@ -9,6 +9,7 @@ Free calculators for the trades (HVAC, electrical, floor coating) that promote t
 - `assets/calc.js` mirrors the apps' Dart engines (PT interpolation, voltage drop, coating coverage). Keep them in step.
 - Trust pages (`trust.py`): `methodology.html`, `verification.html` (checked examples) and `changelog.html`. Add a line to `CHANGES` in `trust.py` whenever a formula or a number changes.
 - `verification.json`: rows from the sources next to the expected answer. `build.py` runs them through `assets/calc.js` (`tools/verify.mjs`, needs `node`) and stops if one is off. Change `"checked"` only after reading the sources again: that date is printed on the calculator pages.
+- Pages load scripts and styles as `assets/calc.js?v=<8 hex of the file's SHA-256>` (`version_assets()` at the end of `build.py`): Cloudflare and browsers keep assets for up to 4 hours, so a changed file needs a new address. Write plain `assets/calc.js` in page code; the build adds the version.
 - `lastmod.json`: hash and date of each page's content, so the sitemap's `lastmod` and `dateModified` move only when a page really changes. Commit it with `site/`.
 - The apps have no pages here any more: links go to `zhukovskyi.space/apps/<slug>/`. `config.json` still decides the buttons: set `google_play_live` or `app_store_url` and the "Become a tester" button becomes a store link.
 - Tests: `python3 build.py && python3 -m unittest discover tests && node --test "tests/*.test.mjs"`.
