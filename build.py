@@ -1160,10 +1160,33 @@ def main():
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\n{SEARCH_BOTS}Allow: /\n\nSitemap: {BASE}/sitemap.xml\n")
     urls = "".join(f"<url><loc>{u}</loc><lastmod>{page_dates[u]}</lastmod></url>" for u in pages)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
+    version_assets()
     # Keep hash and date only for pages that still exist.
     LASTMOD_FILE.write_text(json.dumps({u: LASTMOD[u] for u in sorted(page_dates)}, indent=1) + "\n")
     build_legacy()
     print(f"{len(pages)} pages, {len(PT)} PT charts -> {OUT}; redirects -> {LEGACY_OUT}")
+
+
+ASSET_REF = re.compile(r'((?:src|href)="(?:\.\./)*assets/)([\w.-]+\.(?:js|css))"')
+
+
+def version_assets():
+    """Every page asks for its scripts and styles as assets/calc.js?v=<first 8 hex of the file's SHA-256>.
+    Cloudflare and browsers keep assets for hours (max-age 14400); a new address on every change means a page
+    never runs with an older calc.js than the one it was built for, while unchanged files stay cached."""
+    hashes = {}
+    for f in sorted(OUT.rglob("*.html")):
+        text = f.read_text()
+
+        def ref(m):
+            name = m.group(2)
+            if name not in hashes:
+                src = OUT / "assets" / name
+                hashes[name] = hashlib.sha256(src.read_bytes()).hexdigest()[:8] if src.exists() else None
+            return f'{m.group(1)}{name}?v={hashes[name]}"' if hashes[name] else m.group(0)
+        new = ASSET_REF.sub(ref, text)
+        if new != text:
+            f.write_text(new)
 
 
 def build_legacy():
