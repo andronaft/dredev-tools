@@ -14,6 +14,10 @@ import guides
 
 # (date, kind, text). Newest first. "Correction" marks a wrong number or a broken calculator that was fixed.
 CHANGES = [
+    ("2026-11-22", "New", "DC and solar wire size calculator: 12, 24 and 48 V battery runs and panel strings from watts or "
+     "amps, a voltage drop limit of 1, 2, 3 or 5 %, a check against the 75 °C ampacity of NEC Table 310.16, the power "
+     "lost in the wire and the same load at a higher voltage. The voltage drop calculator no longer shows the power "
+     "factor field in DC mode; its DC results never used it."),
     ("2026-11-16", "New", "Five electrical reference pages: wire size for 50, 60 and 100 A subpanels by distance, a conduit "
      "fill chart for THHN in EMT and PVC Schedule 40, how many 12 AWG wires fit in 3/4 in. EMT with the ampacity "
      "adjustment, box fill by NEC 314.16 and EV charger wire size by amps and distance. Their numbers are computed "
@@ -78,6 +82,17 @@ METHODS = [
      "A balanced load and one conductor per phase."],
      ["It checks voltage drop only. Size the conductor for ampacity and overcurrent protection as well.",
       "The NEC-mode result runs about 0.5 % above the rounded K-factor formula (K = 12.9)."]),
+    ("DC and solar wire size calculator", "electrical/dc-wire-size-calculator.html",
+     ["The voltage drop calculator's DC formula: conductor areas from NEC Chapter 9, Table 8, with resistivity at "
+      "20 &deg;C raised by 25 % for operating temperature.",
+      "NEC (NFPA 70) 2023, Table 310.16, 75 &deg;C column, for the smallest size that carries the current."],
+     ["One-way length; both conductors are counted. Watts are turned into amps at the voltage you enter.",
+      "30 &deg;C ambient and no more than three current-carrying conductors.",
+      "The size shown is the larger of the two: by voltage drop and by ampacity. It never goes below 14 AWG."],
+     ["No fuse or breaker sizing, no derating, none of the rules for PV circuits, no parallel conductors.",
+      "Vehicle and boat wiring follow their own standards, which this page does not apply.",
+      "Compared on 22 November 2026 with another published voltage drop calculator on seven DC runs: results "
+      "agreed within 1 %."]),
     ("AWG to mm&sup2; converter", "electrical/awg-to-mm2.html",
      ["NEC Chapter 9, Table 8: areas in circular mils, converted with 1 cmil = 0.000506707 mm&sup2;.",
       "Metric sizes are the IEC 60228 series."],

@@ -176,6 +176,8 @@ function initVoltageDrop() {
     const volts = num('volts');
     let pf = num('pf');
     if (!Number.isFinite(pf) || pf <= 0 || pf > 1) pf = 1;
+    const pfBox = $('pf').parentElement; // DC has no power factor: the field would only confuse
+    if (pfBox) pfBox.hidden = supply() === 'dc';
     const args = { supply: supply(), cond: cond(), metres, amps, iec: !nec, pf };
     const dv = dropVolts({ ...args, mm2: s.mm2 });
     const pct = (dv / volts) * 100;
@@ -340,6 +342,111 @@ function initWireSize() {
   }
   ['amps', 'len', 'volts'].forEach((id) => $(id).addEventListener('input', run));
   ['wire', 'term', 'phase'].forEach((id) => $(id).addEventListener('change', run));
+  run();
+}
+
+/* ---------- DC wire size (solar, battery and other low-voltage runs) ---------- */
+
+// The wire for a DC run: the smallest size from 18 AWG to 500 kcmil that keeps the drop within `limit` percent, the
+// smallest size whose NEC Table 310.16 ampacity at 75 °C covers the current (14 AWG and up), and the larger of the two
+// with what it loses. pages_electrical.dc_wire() mirrors this for the static tables.
+function dcWire({ volts, amps, metres, cond, limit }) {
+  const list = sizesFor('nec');
+  const dvOf = (i) => dropVolts({ supply: 'dc', cond, mm2: list[i].mm2, metres, amps });
+  const byDrop = list.findIndex((_, i) => (dvOf(i) / volts) * 100 <= limit);
+  const k = NEC_SIZES.findIndex((_, j) => AMPACITY[cond][75][j] >= amps);
+  const byAmps = k < 0 ? -1 : k + 2; // NEC_SIZES starts at 14 AWG, two rows after 18 AWG in the list
+  const out = { byDrop: byDrop < 0 ? null : list[byDrop].label, byAmps: byAmps < 0 ? null : list[byAmps].label, size: null };
+  if (byDrop < 0 || byAmps < 0) return out;
+  const i = Math.max(byDrop, byAmps);
+  const dv = dvOf(i);
+  return { ...out, size: list[i].label, mm2: list[i].mm2, dv, pct: (dv / volts) * 100, lossW: dv * amps,
+    rated: AMPACITY[cond][75][i - 2], maxMetres: (metres * limit * volts) / (dv * 100), governs: byAmps <= byDrop ? 'drop' : byDrop < 2 && byAmps === 2 ? 'floor' : 'amps' };
+}
+
+function initDcWire() {
+  const press = (id, v) => $(id).querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === String(v))));
+  const preset = segmented('dc-vpre', () => { $('dc-v').value = preset(); run(); });
+  const unit = segmented('dc-unit', run);
+  const lenu = segmented('dc-lenu', run);
+  const limitSeg = segmented('dc-limit', run);
+  const cond = segmented('cond', run);
+
+  function run() {
+    const volts = num('dc-v');
+    const load = num('dc-load');
+    const len = num('dc-len');
+    const watts = unit() === 'w';
+    const ft = lenu() === 'ft';
+    const limit = +limitSeg();
+    $('dc-load-unit').textContent = watts ? '(W)' : '(A)';
+    $('dc-len-unit').textContent = ft ? '(ft, one way)' : '(m, one way)';
+    const ok = [volts, load, len].every((v) => Number.isFinite(v) && v > 0);
+    const amps = watts ? load / volts : load;
+    const metres = ft ? len * 0.3048 : len;
+    const args = { volts, amps, metres, cond: cond(), limit };
+    const r = ok ? dcWire(args) : null;
+    const metal = cond() === 'cu' ? 'copper' : 'aluminum';
+    const set = (id, txt) => { $(id).textContent = txt; };
+    const v = $('dc-verdict');
+    $('dc-size').innerHTML = !ok ? '–' : r.size ? `${r.size}<small> ${metal} · ${fmt(r.mm2, 1)} mm²</small>` : 'no single wire fits';
+    set('dc-amps', ok ? `${fmt(amps, 1)} A · ${fmt(amps * volts, 0)} W` : '–');
+    set('dc-bydrop', !ok ? '–' : r.byDrop || 'over 500 kcmil');
+    set('dc-byamps', !ok ? '–' : r.byAmps || 'over 500 kcmil');
+    const full = ok && r.size;
+    set('dc-drop', full ? `${fmt(r.dv, 2)} V · ${fmt(r.pct, 2)} %` : '–');
+    set('dc-end', full ? `${fmt(volts - r.dv, 2)} V` : '–');
+    set('dc-loss', full ? `${fmt(r.lossW, 1)} W` : '–');
+    set('dc-max', full ? `${fmt(ft ? r.maxMetres / 0.3048 : r.maxMetres, 0)} ${ft ? 'ft' : 'm'}` : '–');
+    $('dc-limit-label').textContent = `Smallest size for ≤ ${limit} % drop`;
+    $('dc-max-label').textContent = `Longest run on this wire at ${limit} %`;
+    if (!ok) { v.className = 'verdict'; v.textContent = ''; }
+    else if (!r.size) {
+      v.className = 'verdict bad';
+      v.textContent = 'No single conductor up to 500 kcmil carries this. Raise the system voltage, shorten the run or split the load.';
+    } else if (r.governs === 'floor') {
+      v.className = 'verdict good';
+      v.textContent = `Voltage drop alone would allow ${r.byDrop}. The result stops at 14 AWG, the smallest size with a 75 °C ampacity in NEC Table 310.16.`;
+    } else if (r.governs === 'amps') {
+      v.className = 'verdict warn';
+      v.textContent = `Voltage drop alone would allow ${r.byDrop}, but the current needs ${r.byAmps} (rated ${r.rated} A at 75 °C). The larger size is shown.`;
+    } else {
+      v.className = 'verdict good';
+      v.textContent = `${r.size} keeps the drop within ${limit} % and is rated ${r.rated} A at 75 °C, above the ${fmt(amps, 1)} A load.`;
+    }
+    // The same power at a higher voltage: panels in series, or a 24 V or 48 V battery instead of 12 V.
+    $('dc-higher').innerHTML = !ok ? '' : [1, 2, 4].map((n) => {
+      const x = dcWire({ ...args, volts: volts * n, amps: amps / n });
+      return `<tr><td>${fmt(volts * n, 0)} V</td><td>${fmt(amps / n, 1)} A</td><td>${x.size || 'no single wire fits'}</td><td>${x.size ? `${fmt(x.lossW, 1)} W` : '–'}</td></tr>`;
+    }).join('');
+    if (typeof location !== 'undefined') {
+      const q = new URLSearchParams({ v: $('dc-v').value, load: $('dc-load').value, unit: unit(), len: $('dc-len').value, lenu: lenu(), limit: String(limit), cond: cond() });
+      $('dc-url').value = `${location.origin}${location.pathname}?${q}`;
+    }
+  }
+
+  // A link made with "Copy link" opens the calculator on the same numbers.
+  if (typeof location !== 'undefined' && location.search) {
+    const q = new URLSearchParams(location.search);
+    const pick = (id, key, allowed) => { if (allowed.includes(q.get(key))) press(id, q.get(key)); };
+    [['dc-v', 'v'], ['dc-load', 'load'], ['dc-len', 'len']].forEach(([id, key]) => {
+      const x = parseFloat(q.get(key));
+      if (Number.isFinite(x) && x > 0) $(id).value = String(x);
+    });
+    pick('dc-unit', 'unit', ['w', 'a']);
+    pick('dc-lenu', 'lenu', ['ft', 'm']);
+    pick('dc-limit', 'limit', ['1', '2', '3', '5']);
+    pick('cond', 'cond', ['cu', 'al']);
+    press('dc-vpre', $('dc-v').value);
+  }
+  $('dc-v').addEventListener('input', () => { press('dc-vpre', num('dc-v')); run(); });
+  ['dc-load', 'dc-len'].forEach((id) => $(id).addEventListener('input', run));
+  $('dc-copy').addEventListener('click', () => {
+    $('dc-url').select();
+    const done = () => { $('dc-copy').textContent = 'Link copied'; };
+    if (navigator.clipboard) navigator.clipboard.writeText($('dc-url').value).then(done, () => {});
+    else if (document.execCommand('copy')) done();
+  });
   run();
 }
 
@@ -508,6 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (page === 'xmas') initCountdown();
   if (page === 'awg') initAwg();
   if (page === 'wire') initWireSize();
+  if (page === 'dcwire') initDcWire();
   if (page === 'pool') initPool();
   if (page === 'bread') initBread();
   if (page === 'lye') initLye();
