@@ -4,8 +4,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/bread/bakers-percentage-calculator.html": {
-  "hash": "396905921d4c3f58",
-  "date": "2026-11-13"
+  "hash": "40952166b25f7c98",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/brewing/honey-per-gallon-calculator.html": {
   "hash": "1fb901efa410ca8d",
@@ -24,12 +24,12 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
-  "hash": "0128a9001377a02e",
-  "date": "2026-11-16"
+  "hash": "0dd9754e503f0a9b",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
-  "hash": "9754861fb68f75ab",
-  "date": "2026-11-21"
+  "hash": "ab8c2040beba9b5f",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/coating/garage-floor-epoxy-calculator.html": {
   "hash": "d9eae22307d8bcd1",
@@ -44,68 +44,72 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/countdown/christmas-countdown.html": {
-  "hash": "f5898eb618468ff1",
-  "date": "2026-11-21"
+  "hash": "d7107c7ebb88fa00",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/": {
-  "hash": "224b84b5c74cc6ee",
-  "date": "2026-11-17"
+  "hash": "b7ecec8240fbddcf",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/12-awg-voltage-drop-per-foot.html": {
-  "hash": "1aebc41402468296",
+  "hash": "fc63e2db7d73e6a6",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html": {
-  "hash": "0444dfe5df213441",
+  "hash": "d238e51a257cd09a",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/ampacity-chart-nec-310-16.html": {
-  "hash": "821c17ef2fa249f1",
+  "hash": "6c969b03983a1658",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/awg-to-mm2.html": {
-  "hash": "c2602011baa4ad00",
-  "date": "2026-11-19"
+  "hash": "ee3b5371c0373c74",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/box-fill-nec-314-16.html": {
-  "hash": "0fabe50d4ed2d84c",
-  "date": "2026-11-19"
+  "hash": "750bd3fcfcdab3bd",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/conduit-fill-chart.html": {
-  "hash": "46381f3b66fdd8c3",
+  "hash": "19090496830bf8ca",
+  "date": "2026-11-22"
+ },
+ "https://zhukovskyi.space/calculators/electrical/dc-wire-size-calculator.html": {
+  "hash": "b770d4592d981e7b",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/ev-charger-wire-size.html": {
-  "hash": "d1e487af217227fd",
+  "hash": "bc782973c7415b9f",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/how-many-12-awg-wires-in-3-4-emt.html": {
-  "hash": "7f31e24eebf88e9e",
+  "hash": "ccfb4ad561a134ce",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/nec-edition-by-state.html": {
-  "hash": "ba46e0cc66d6d8ea",
+  "hash": "86796153a4ff263d",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html": {
-  "hash": "f8f5a094fdaee921",
-  "date": "2026-11-19"
+  "hash": "d75e0712d4db7865",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html": {
-  "hash": "e1edcc3ada05b6fb",
-  "date": "2026-11-19"
+  "hash": "c73a47cc1ede2923",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-50-amp-sub-panel.html": {
-  "hash": "6bf31c7661898f96",
+  "hash": "b7774a583cadddee",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-by-amps-and-distance.html": {
-  "hash": "8b1c1175dfb728c1",
+  "hash": "c5341af10a824744",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html": {
-  "hash": "4ef443846412dce9",
-  "date": "2026-11-19"
+  "hash": "ab36dd17e704ce24",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/embed/": {
   "hash": "8069520f8441a217",
@@ -252,32 +256,32 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-134a.html": {
-  "hash": "3b60813d8d173049",
-  "date": "2026-11-21"
+  "hash": "a06421136dab6cc3",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-22.html": {
-  "hash": "05496df345327784",
-  "date": "2026-11-21"
+  "hash": "ec4610119c5cbfea",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-32.html": {
-  "hash": "1648271bb584b7ed",
-  "date": "2026-11-21"
+  "hash": "e18905731d5bfcce",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-404a.html": {
-  "hash": "101fa82fe3969c3a",
-  "date": "2026-11-21"
+  "hash": "53e8e09a3cb3c910",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-410a.html": {
-  "hash": "dc5b5b659c46637f",
-  "date": "2026-11-21"
+  "hash": "22f31ac0e2340336",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-454b.html": {
-  "hash": "f162f639835713ed",
-  "date": "2026-11-21"
+  "hash": "b41c2e50baa976b7",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html": {
-  "hash": "5a8c12f408a64891",
-  "date": "2026-11-21"
+  "hash": "d8c6b1c3d108c76c",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/target-superheat-calculator.html": {
   "hash": "ab5bd965b5d0f3a3",
@@ -300,16 +304,16 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/methodology.html": {
-  "hash": "ba86e41e8fa7fac7",
-  "date": "2026-11-13"
+  "hash": "4f99fb214a7f44df",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html": {
   "hash": "ee82da7bf6a85c24",
   "date": "2026-11-21"
  },
  "https://zhukovskyi.space/calculators/pool/pool-chemical-calculator.html": {
-  "hash": "6e649937b8b67382",
-  "date": "2026-11-21"
+  "hash": "5f41eed6418fa76a",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html": {
   "hash": "d5dc21551d41bb3a",
@@ -348,8 +352,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/soap/lye-calculator.html": {
-  "hash": "fea82395f6e02801",
-  "date": "2026-11-21"
+  "hash": "aaf67d6e7ebe9b5e",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/verification.html": {
   "hash": "31318989def77840",
