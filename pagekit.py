@@ -74,7 +74,8 @@ def article_ld(b, path, headline, desc, modified=None):
 
 def dataset_ld(b, path, name, desc, based_on, variables, modified=None):
     return {"@context": "https://schema.org", "@type": "Dataset", "name": name, "description": desc, "url": url(b, path),
-            "creator": person(b), "dateModified": modified or refdata.CHECKED_ISO, "isAccessibleForFree": True, "isBasedOn": based_on,
+            "creator": person(b), "dateModified": modified or refdata.CHECKED_ISO, "license": "https://creativecommons.org/licenses/by/4.0/",
+            "isAccessibleForFree": True, "isBasedOn": based_on,
             "variableMeasured": [{"@type": "PropertyValue", "name": n, "unitText": u} for n, u in variables]}
 
 
