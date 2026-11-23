@@ -1232,6 +1232,20 @@ def names(rows):
     return n[0] if len(n) == 1 else ", ".join(n[:-1]) + " and " + n[-1]
 
 
+def leaders(by_ed):
+    """The editions in force in the most states (newest first: a tie is possible), how many states that is, and the
+    other editions, newest first."""
+    top_n = max(by_ed.values())
+    lead = sorted((y for y, n in by_ed.items() if n == top_n), reverse=True)
+    return lead, top_n, [y for y in sorted(by_ed, reverse=True) if y not in lead]
+
+
+def eds(years):
+    """NEC 2023, NEC 2020 and NEC 2017."""
+    t = [f"NEC {y}" for y in years]
+    return t[0] if len(t) == 1 else ", ".join(t[:-1]) + " and " + t[-1]
+
+
 def nec_by_state_page(b):
     path = NEC_BY_STATE
     crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB), ("NEC edition by state", path)])
@@ -1239,9 +1253,11 @@ def nec_by_state_page(b):
     by_ed = Counter(r["edition"] for r in rows if r["edition"])
     of = lambda year: [r for r in rows if r["edition"] == year]  # noqa: E731
     local = [r for r in rows if not r["edition"] and not r["unconfirmed"]]
-    top = by_ed.most_common(1)[0][0]
-    rest = ", ".join(f"NEC {y} in {by_ed[y]}" for y in sorted(by_ed, reverse=True) if y != top)
-    answer = (f"NEC {top} is the most common statewide edition, in force in {by_ed[top]} states. The others: {rest}. "
+    lead, top_n, rest = leaders(by_ed)
+    rest_txt = ", ".join(f"NEC {y} in {by_ed[y]}" for y in rest)
+    lead_txt = (f"NEC {lead[0]} is the most common statewide edition, in force in {top_n} states" if len(lead) == 1 else
+                f"{eds(lead)} are tied as the most common statewide editions, each in force in {top_n} states")
+    answer = (f"{lead_txt}. The others: {rest_txt}. "
               f"NEC 2026 is in force in {names(of(2026))}. {names(local)} have no statewide edition that covers houses: "
               "there the city or county decides. Counts include the District of Columbia.")
 
@@ -1270,7 +1286,8 @@ def nec_by_state_page(b):
          f"{names(local)}. In Arizona, Mississippi and Missouri the NEC is adopted city by city or county by county. Illinois and Kansas have a state rule based on NEC 2008, "
          "but it does not cover houses in places with their own code, so the local edition is the one that counts."),
         ("Which NEC edition do most states use?",
-         f"NEC {top}: {by_ed[top]} states enforce it statewide. " + " ".join(f"NEC {y}: {by_ed[y]}." for y in sorted(by_ed, reverse=True) if y != top)),
+         (f"NEC {lead[0]}: {top_n} states enforce it statewide. " if len(lead) == 1 else f"{eds(lead)}: {top_n} states each enforce them statewide. ")
+         + " ".join(f"NEC {y}: {by_ed[y]}." for y in rest)),
         ("Is the NEC a federal law?",
          "No. The National Electrical Code is a model code published by NFPA as NFPA 70. It becomes law only where a state, county or city adopts an edition, often with its own amendments."),
         ("How often is the NEC updated?",
@@ -1310,7 +1327,7 @@ States not listed here have not been checked: ask the local building department.
 <p class="note">{ELEC_NOTE}</p>
 """
     desc = (f"Which NEC edition each state enforces in 2026: all 50 states and DC with the effective date, pending adoptions and local-adoption states. "
-            f"NEC {top} leads with {by_ed[top]} states. Checked {STATES_CHECKED[0]}.")
+            f"{eds(lead)} {'leads' if len(lead) == 1 else 'lead'} with {top_n} states{'' if len(lead) == 1 else ' each'}. Checked {STATES_CHECKED[0]}.")
     ld = dataset_ld(b, path, "NEC edition in force by US state", desc, "NFPA, NEC enforcement table",
                     [("NEC edition", "year"), ("Effective date", "date")], STATES_CHECKED[1])
     b.shell(path, "NEC Edition by State (2026): Which Electrical Code Each State Uses", desc, body, "t-elec", None, [ld, faq_ld], JS)
