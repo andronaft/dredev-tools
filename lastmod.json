@@ -1,11 +1,19 @@
 {
  "https://zhukovskyi.space/calculators/": {
-  "hash": "c46dcdd5ea10278f",
-  "date": "2026-11-13"
+  "hash": "e648d7a81e73450a",
+  "date": "2026-11-25"
+ },
+ "https://zhukovskyi.space/calculators/bread/": {
+  "hash": "324ac69a9c599c44",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/bread/bakers-percentage-calculator.html": {
   "hash": "40952166b25f7c98",
   "date": "2026-11-22"
+ },
+ "https://zhukovskyi.space/calculators/brewing/": {
+  "hash": "ee53cfed477fdd80",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/brewing/honey-per-gallon-calculator.html": {
   "hash": "1fb901efa410ca8d",
@@ -14,6 +22,10 @@
  "https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html": {
   "hash": "6b3bfa12f3d469c5",
   "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/candles/": {
+  "hash": "1812d996752f984a",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/candles/candle-wax-calculator.html": {
   "hash": "c5a0a6e1f4a6574e",
@@ -27,6 +39,10 @@
   "hash": "0cc7ceece1d197c8",
   "date": "2026-11-25"
  },
+ "https://zhukovskyi.space/calculators/coating/": {
+  "hash": "acf235bcf451e196",
+  "date": "2026-11-25"
+ },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
   "hash": "ab8c2040beba9b5f",
   "date": "2026-11-22"
@@ -35,13 +51,25 @@
   "hash": "d9eae22307d8bcd1",
   "date": "2026-11-21"
  },
+ "https://zhukovskyi.space/calculators/coffee/": {
+  "hash": "3ef6b4dab4740e4c",
+  "date": "2026-11-25"
+ },
  "https://zhukovskyi.space/calculators/coffee/espresso-ratio-calculator.html": {
   "hash": "87e7f4f4217fb862",
   "date": "2026-11-13"
  },
+ "https://zhukovskyi.space/calculators/concrete/": {
+  "hash": "aa707dc01d1d5a8f",
+  "date": "2026-11-25"
+ },
  "https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html": {
   "hash": "1a7d1e2bc6bda912",
   "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/countdown/": {
+  "hash": "58f97dc6e7dd858e",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/countdown/christmas-countdown.html": {
   "hash": "d7107c7ebb88fa00",
@@ -299,6 +327,10 @@
   "hash": "ab5bd965b5d0f3a3",
   "date": "2026-11-22"
  },
+ "https://zhukovskyi.space/calculators/hydroponics/": {
+  "hash": "87e79780a012d0d0",
+  "date": "2026-11-25"
+ },
  "https://zhukovskyi.space/calculators/hydroponics/ec-chart-by-crop.html": {
   "hash": "4bddb09967e0c861",
   "date": "2026-11-13"
@@ -306,6 +338,10 @@
  "https://zhukovskyi.space/calculators/hydroponics/ec-to-ppm-converter.html": {
   "hash": "13e845a922f6b3e1",
   "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/knitting/": {
+  "hash": "86d6b3bd85b126d9",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/knitting/gauge-calculator.html": {
   "hash": "9d75cc1c114cd7e1",
@@ -319,6 +355,10 @@
   "hash": "75b28366d48fb966",
   "date": "2026-11-22"
  },
+ "https://zhukovskyi.space/calculators/pool/": {
+  "hash": "d5118745080ba404",
+  "date": "2026-11-25"
+ },
  "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html": {
   "hash": "ee82da7bf6a85c24",
   "date": "2026-11-21"
@@ -326,6 +366,10 @@
  "https://zhukovskyi.space/calculators/pool/pool-chemical-calculator.html": {
   "hash": "5f41eed6418fa76a",
   "date": "2026-11-22"
+ },
+ "https://zhukovskyi.space/calculators/roofing/": {
+  "hash": "f9895ec91553aefd",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html": {
   "hash": "d5dc21551d41bb3a",
@@ -362,6 +406,10 @@
  "https://zhukovskyi.space/calculators/shifts/dupont.html": {
   "hash": "e9a94f2010583c06",
   "date": "2026-11-13"
+ },
+ "https://zhukovskyi.space/calculators/soap/": {
+  "hash": "87c1ae1a0f2ceda9",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/soap/lye-calculator.html": {
   "hash": "aaf67d6e7ebe9b5e",

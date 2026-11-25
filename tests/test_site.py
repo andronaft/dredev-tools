@@ -20,7 +20,8 @@ NEW_FILES = ("coating/garage-floor-epoxy-calculator.html", "pool/how-much-chlori
 
 
 def new_pages():
-    out = [p for d in NEW_DIRS for p in sorted((SITE / d).glob("*.html"))]
+    # index.html in these folders is a generated category hub (build_hubs), except the shifts page, which is real.
+    out = [p for d in NEW_DIRS for p in sorted((SITE / d).glob("*.html")) if p.name != "index.html" or d == "shifts"]
     return out + [SITE / f for f in NEW_FILES]
 
 
@@ -36,8 +37,8 @@ class Site(unittest.TestCase):
 
     def test_sizes_are_rows_not_pages(self):
         """Slab sizes and pool volumes live in one table on one page each; a row's link loads the size into the calculator."""
-        self.assertEqual([p.name for p in (SITE / "concrete").glob("*.html")], ["concrete-slab-calculator.html"])
-        self.assertEqual(sorted(p.name for p in (SITE / "pool").glob("*.html")), ["how-much-chlorine-to-add.html", "pool-chemical-calculator.html"])
+        self.assertEqual([p.name for p in (SITE / "concrete").glob("*.html") if p.name != "index.html"], ["concrete-slab-calculator.html"])
+        self.assertEqual(sorted(p.name for p in (SITE / "pool").glob("*.html") if p.name != "index.html"), ["how-much-chlorine-to-add.html", "pool-chemical-calculator.html"])
         slab = (SITE / pages_trades.SLAB_PAGE).read_text()
         for l, w in pages_trades.SLABS:
             self.assertIn(f'<a id="{l}x{w}" href="#{l}x{w}">', slab)
@@ -197,6 +198,20 @@ class Site(unittest.TestCase):
             tables = guide.count("<table>")
             notes = len(re.findall(r'</table></div><p class="note">', guide))
             self.assertEqual(tables, notes, p.name)
+
+    def test_category_hubs(self):
+        """Every calculator folder has an index page (a hub where there is no hand-made one), so no folder
+        address answers 403, and each hub is in the sitemap and links every calculator in its folder."""
+        for d in SITE.iterdir():
+            if not d.is_dir() or d.name in ("assets", "img", "embed", "data") or not list(d.glob("*.html")):
+                continue
+            self.assertTrue((d / "index.html").exists(), d.name)
+            hub = (d / "index.html").read_text()
+            self.assertIn(f"<loc>{BASE}/{d.name}/</loc>", self.sitemap, d.name)
+            if 'class="crumbs"><a href="../">Tools</a> › ' in hub and "<h1>" in hub and "calculators</h1>" in hub:
+                for f in d.glob("*.html"):
+                    if f.name != "index.html" and f"{BASE}/{d.name}/{f.name}" in self.sitemap:
+                        self.assertIn(f'href="../{d.name}/{f.name}"', hub, f"{d.name}: {f.name}")
 
 
 if __name__ == "__main__":

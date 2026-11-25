@@ -1054,6 +1054,23 @@ def app_href(key):
     return main_app_url(key)
 
 
+def availability_line():
+    """Which apps are in a store, from config.json (google_play_live, app_store_url), so the home page and
+    llms.txt never say "everything is in closed testing" after an app went live."""
+    apps = CFG["apps"]
+    play = [c["short"] for c in apps.values() if c.get("google_play_live")]
+    ios = [c["short"] for c in apps.values() if c.get("app_store_url")]
+
+    def names(xs):
+        return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+    if not play and not ios:
+        return "The apps are in a free closed test on Google Play right now, with the App Store next."
+    line = f"{names(play)} {'is' if len(play) == 1 else 'are'} on Google Play." if play else ""
+    if ios:
+        line += f" {names(ios)} {'is' if len(ios) == 1 else 'are'} also on the App Store."
+    return line.strip()
+
+
 # ---------- Home ----------
 
 CALCS = [
@@ -1092,7 +1109,7 @@ def build_home():
 <section class="prose"><h2>Why these tools</h2>
 <p>No account, no ads, no data leaving your phone. Built by an independent developer, <a href="{ABOUT_URL}">Andrii Zhukovskyi</a>, who answers every email: <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>.</p>
 <p>Every table and formula names its source. The <a href="{{rel}}methodology.html">methodology</a> lists the editions and the limits, and the <a href="{{rel}}verification.html">checked examples</a> put a row from each source next to what the calculator answers.</p>
-<p>Most of the apps are in a free closed test on Google Play right now, with the App Store next. <a href="{CFG["developer_site"]}/testers/">Become a tester</a> and get them before release.</p></section>
+<p>{e(availability_line())} <a href="{CFG["developer_site"]}/testers/">Become a tester</a> to get the others before release.</p></section>
 """
     shell("index.html", f"{CFG['brand']} Tools: free calculators for HVAC, electrical and floor coating",
           "Free online calculators for the trades: superheat and subcooling, refrigerant PT charts, voltage drop and epoxy coverage, plus offline phone apps.",
@@ -1132,7 +1149,7 @@ def write_llms():
 
 > Phone apps for HVAC techs, electricians, floor coating installers, roofers, concrete crews, pool techs, soft washers and makers, many with a free browser calculator that uses the same formulas. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC 60364). Every app works offline, has no account and no ads, and keeps data on the phone.
 
-Android apps are in closed testing on Google Play and anyone can join for free: {dev}/testers/ . iPhone versions are on their way to the App Store. Made by Andrii Zhukovskyi ({dev}/). Support: {CFG["support_email"]}.
+{availability_line()} The other Android apps are in closed testing on Google Play and anyone can join for free: {dev}/testers/ . Last updated: {TODAY}. Made by Andrii Zhukovskyi ({dev}/). Support: {CFG["support_email"]}.
 
 ## Apps you can install now
 
@@ -1162,6 +1179,61 @@ Pressure-temperature tables with bubble and dew columns: {pt_lines}.
 SEARCH_BOTS = "".join(f"User-agent: {b}\n" for b in ("OAI-SearchBot", "Claude-SearchBot", "PerplexityBot", "Bingbot"))
 
 
+# Folders with calculators but no page of their own get a short hub (a CollectionPage, from site_graph), so
+# /calculators/soap/ and the like answer with a list instead of 403. Folders with their own hub are left alone.
+HUB_SKIP = {"assets", "img", "embed", "data"}
+HUB_INTRO = {
+    "Coatings": "Epoxy and floor coating calculators: gallons and kits from area, film thickness and solids.",
+    "Pool": "Pool chemistry: chlorine, alkalinity, stabilizer and salt doses for your pool's volume.",
+    "Baking": "Sourdough and bread: baker's percentages for flour, water, starter and salt.",
+    "Soap": "Cold process soap: lye (NaOH) and water from your oils and superfat.",
+    "Countdown": "Live countdowns to holidays and dates.",
+    "Roofing": "Roofing: squares, shingle bundles and pitch multipliers.",
+    "Concrete": "Concrete: slab volume in cubic yards and meters, with bags and waste.",
+    "Brewing": "Mead and cider: ABV from gravity readings and honey per gallon.",
+    "Hydroponics": "Hydroponics: EC to ppm on each meter scale, and EC and pH targets by crop.",
+    "Candles": "Candle making: wax for your vessels and fragrance load.",
+    "Coffee": "Espresso: dose, yield and brew ratio.",
+    "Knitting": "Knitting: gauge and yarn yardage.",
+}
+
+
+def build_hubs():
+    import pagekit
+    labels = {p.split("/")[0]: t for t, p in SUBNAV}
+    labels.update({p.split("/")[0]: tag for p, tag, *_ in CALCS})
+    cards = {p: (h, d) for p, _, h, d, _ in CALCS}
+    for d in sorted(x for x in OUT.iterdir() if x.is_dir() and x.name not in HUB_SKIP and not (x / "index.html").exists()):
+        files = sorted(d.glob("*.html"))
+        if not files:
+            continue
+        label = labels.get(d.name, d.name.capitalize())
+        items = []
+        for f in files:
+            rel = f"{d.name}/{f.name}"
+            text = f.read_text()
+            if 'name="robots" content="noindex' in text or '<link rel="canonical" href="' + f"{BASE}/{rel}" + '"' not in text:
+                continue  # copies whose canonical points elsewhere do not belong on the hub
+            h, desc = cards.get(rel) or (page_name(text, ""), html.unescape(re.search(r'<meta name="description" content="([^"]*)"', text).group(1)))
+            items.append((rel, h, desc))
+        if not items:
+            continue
+        intro = HUB_INTRO.get(label, f"Free {label.lower()} calculators.")
+        lis = "".join(f'<a class="card" href="{{rel}}{p}"><span class="tag">{e(label)}</span><h3>{e(h)}</h3><p>{e(t)}</p></a>' for p, h, t in items)
+        body = f"""
+{pagekit.crumbs([("Tools", "index.html"), (label, f"{d.name}/index.html")])}
+<div class="hero"><div class="eyebrow">Free {e(label.lower())} tools</div>
+<h1>{e(label)} calculators</h1>
+<p class="lead">{e(intro)} Free in the browser, no sign-up; every formula names its source in the <a href="{{rel}}methodology.html">methodology</a>.</p></div>
+<section><div class="grid">{lis}</div></section>
+"""
+        item_list = {"@context": "https://schema.org", "@type": "ItemList", "name": f"{label} calculators",
+                     "itemListElement": [{"@type": "ListItem", "position": i, "name": h, "url": f"{BASE}/{p}"}
+                                         for i, (p, h, _) in enumerate(items, 1)]}
+        shell(f"{d.name}/index.html", f"Free {label} Calculators | {CFG['brand']} Tools",
+              f"{intro} {len(items)} free {'tool' if len(items) == 1 else 'tools'}, no sign-up.", body, jsonld=[item_list])
+
+
 def main():
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -1182,6 +1254,7 @@ def main():
     pages_data.build(sys.modules[__name__])  # the PT tables as CSV and JSON, with their page
     calcs_more.build_embed()  # after every calculator: the embed page lists the copies registered above
     trust.build(sys.modules[__name__])
+    build_hubs()
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
     if CFG.get("indexnow_key"):  # IndexNow (Bing, Yandex): the key file proves the site is ours
