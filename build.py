@@ -21,6 +21,7 @@ from urllib.parse import quote, urljoin
 
 import calcs_more
 import guides
+import pages_data
 import pages_electrical
 import pages_hvac
 import trust
@@ -684,7 +685,8 @@ def build_hvac():
         for rid, r in PT.items())
     shell("hvac/pt-chart/index.html", "Refrigerant PT Charts: R-454B, R-32, R-410A, R-22 and more",
           f"Free pressure-temperature charts for {len(PT)} refrigerants, including the new A2L refrigerants R-454B and R-32.",
-          f'<div class="hero"><h1>Refrigerant PT charts</h1><p class="lead">Pressure–temperature tables for {len(PT)} refrigerants.</p></div><div class="grid">{index_rows}</div>',
+          f'<div class="hero"><h1>Refrigerant PT charts</h1><p class="lead">Pressure–temperature tables for {len(PT)} refrigerants.</p></div><div class="grid">{index_rows}</div>'
+          f'<p class="note">The same tables as files: <a href="{{rel}}{pages_data.PATH}">refrigerant PT data, CSV and JSON</a>.</p>',
           "t-hvac")
 
 
@@ -707,13 +709,7 @@ def build_vd():
          "On AC circuits the drop depends on resistance and reactance. With motor loads (power factor below 1) the reactive part grows, "
          "which matters most on large conductors."),
     ])
-    body = f"""
-<div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Electrical</div>
-<div class="hero"><div class="eyebrow">Free electrical tool</div>
-<h1>Voltage Drop Calculator</h1>
-<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p>{ans}</div>
-
-<div class="calc card">
+    card = """<div class="calc card">
 <div class="fields">
 <div class="full"><div class="seg" id="std" role="group" aria-label="Standard">
 <button data-v="nec" aria-pressed="true">NEC · AWG · ft</button><button data-v="iec" aria-pressed="false">IEC · mm² · m</button></div></div>
@@ -738,7 +734,14 @@ def build_vd():
 <div id="vd-verdict" class="verdict"></div>
 <p class="note">Checks voltage drop only. Size the wire for ampacity and overcurrent protection too.</p>
 </div>
-</div>
+</div>"""
+    body = f"""
+<div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Electrical</div>
+<div class="hero"><div class="eyebrow">Free electrical tool</div>
+<h1>Voltage Drop Calculator</h1>
+<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p>{ans}</div>
+
+{card}
 <p class="note">Battery, inverter or solar panel run? The <a href="{{rel}}electrical/dc-wire-size-calculator.html">DC wire size calculator</a> starts from watts and 12, 24 or 48 V.</p>
 
 {guide_html}
@@ -750,6 +753,8 @@ def build_vd():
           body, "t-elec", "vd",
           [webapp_ld("Voltage Drop Calculator", path, "Voltage drop for NEC and IEC wire sizes."), faq_ld],
           '<script src="{rel}assets/calc.js"></script>')
+    calcs_more.calcs_common.embed_copy("voltage-drop", 950, "Voltage drop calculator", path, "t-elec", "vd", card,
+                                       '<script src="{rel}assets/calc.js"></script>')
 
 
 # ---------- Coatings ----------
@@ -830,19 +835,25 @@ def load_oils():
     return out
 
 
-def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None):
+def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None,
+              embed=None):
+    """[embed] is (name, iframe height) for a calculator that also gets a bare copy for iframes (pages_embed.py)."""
     ans, guide_html, extra_faq = answer_guide or ("", "", [])
     faq_html, faq_ld = faq(faq_items + extra_faq)
+    card = f'<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>'
     body = f"""
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › {crumb}</div>
 <div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p>{ans}</div>
-<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>
+{card}
 {note}
 {guide_html}
 {promo_html}
 {faq_html}
 """
-    shell(path, title, desc, body, theme, calc, [webapp_ld(h1, path, desc), faq_ld], extra_scripts + '<script src="{rel}assets/calc.js"></script>')
+    scripts = extra_scripts + '<script src="{rel}assets/calc.js"></script>'
+    shell(path, title, desc, body, theme, calc, [webapp_ld(h1, path, desc), faq_ld], scripts)
+    if embed:
+        calcs_more.calcs_common.embed_copy(embed[0], embed[1], h1, path, theme, calc, card, scripts)
 
 
 def build_more():
@@ -948,7 +959,7 @@ def build_more():
          ("Where do the SAP values come from?", "From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point.")],
         "t-soap", "lye", answer_guide=guides.lye_guide(load_oils()),
         promo_html=calcs_more.app_promo("lye-calc", "lye", "Save your recipes, see soap qualities and the fatty acid profile, and get batch cost and cost per bar."),
-        extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>')
+        extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>', embed=("lye", 930))
 
 
 # ---------- Countdown ----------
@@ -1150,6 +1161,8 @@ def main():
     build_more()
     pages_hvac.build(sys.modules[__name__])
     pages_electrical.build(sys.modules[__name__])
+    pages_data.build(sys.modules[__name__])  # the PT tables as CSV and JSON, with their page
+    calcs_more.build_embed()  # after every calculator: the embed page lists the copies registered above
     trust.build(sys.modules[__name__])
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")
@@ -1160,10 +1173,33 @@ def main():
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\n{SEARCH_BOTS}Allow: /\n\nSitemap: {BASE}/sitemap.xml\n")
     urls = "".join(f"<url><loc>{u}</loc><lastmod>{page_dates[u]}</lastmod></url>" for u in pages)
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
+    version_assets()
     # Keep hash and date only for pages that still exist.
     LASTMOD_FILE.write_text(json.dumps({u: LASTMOD[u] for u in sorted(page_dates)}, indent=1) + "\n")
     build_legacy()
     print(f"{len(pages)} pages, {len(PT)} PT charts -> {OUT}; redirects -> {LEGACY_OUT}")
+
+
+ASSET_REF = re.compile(r'((?:src|href)="(?:\.\./)*assets/)([\w.-]+\.(?:js|css))"')
+
+
+def version_assets():
+    """Every page asks for its scripts and styles as assets/calc.js?v=<first 8 hex of the file's SHA-256>.
+    Cloudflare and browsers keep assets for hours (max-age 14400); a new address on every change means a page
+    never runs with an older calc.js than the one it was built for, while unchanged files stay cached."""
+    hashes = {}
+    for f in sorted(OUT.rglob("*.html")):
+        text = f.read_text()
+
+        def ref(m):
+            name = m.group(2)
+            if name not in hashes:
+                src = OUT / "assets" / name
+                hashes[name] = hashlib.sha256(src.read_bytes()).hexdigest()[:8] if src.exists() else None
+            return f'{m.group(1)}{name}?v={hashes[name]}"' if hashes[name] else m.group(0)
+        new = ASSET_REF.sub(ref, text)
+        if new != text:
+            f.write_text(new)
 
 
 def build_legacy():

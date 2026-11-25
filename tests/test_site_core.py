@@ -205,3 +205,18 @@ class BuiltSite(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AssetVersions(unittest.TestCase):
+    """Scripts and styles are asked for with the hash of their content, so a cached old calc.js never runs on a new page."""
+
+    def test_every_asset_reference_carries_its_content_hash(self):
+        import hashlib
+        refs = 0
+        for f in SITE.rglob("*.html"):
+            text = f.read_text()
+            self.assertIsNone(re.search(r'(?:src|href)="(?:\.\./)*assets/[\w.-]+\.(?:js|css)"', text), f"unversioned asset in {f}")
+            for name, v in re.findall(r'(?:src|href)="(?:\.\./)*assets/([\w.-]+\.(?:js|css))\?v=([0-9a-f]+)"', text):
+                self.assertEqual(v, hashlib.sha256((SITE / "assets" / name).read_bytes()).hexdigest()[:8], f"{f}: {name}")
+                refs += 1
+        self.assertGreater(refs, 200)

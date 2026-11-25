@@ -1049,6 +1049,20 @@ class NecByState(unittest.TestCase):
         self.assertIn("FAQPage", h)
         self.assertIn(pe.NFPA_MAP, h)
 
+    def test_most_common_edition_names_every_edition_in_a_tie(self):
+        from collections import Counter
+        self.assertEqual(pe.leaders(Counter({2023: 18, 2020: 17, 2026: 6})), ([2023], 18, [2026, 2020]))
+        self.assertEqual(pe.leaders(Counter({2020: 17, 2023: 17, 2026: 7})), ([2023, 2020], 17, [2026]))
+        self.assertEqual(pe.eds([2023, 2020]), "NEC 2023 and NEC 2020")
+        rows = pe.state_codes(build)
+        lead, n, _ = pe.leaders(Counter(r["edition"] for r in rows if r["edition"]))
+        h = page(pe.NEC_BY_STATE)
+        if len(lead) > 1:
+            self.assertIn(f"{pe.eds(lead)} are tied as the most common statewide editions, each in force in {n} states", h)
+            self.assertNotIn("is the most common statewide edition", h)
+        else:
+            self.assertIn(f"NEC {lead[0]} is the most common statewide edition, in force in {n} states", h)
+
 
 if __name__ == "__main__":
     unittest.main()

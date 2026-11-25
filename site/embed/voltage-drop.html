@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voltage drop calculator</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html">
+<base target="_blank">
+<link rel="stylesheet" href="../assets/style.css?v=fa90e2f0">
+<link rel="stylesheet" href="../assets/calc-more.css?v=08ebee9b">
+</head>
+<body class="t-elec embed" data-calc="vd">
+<main class="wrap">
+<h1 class="embed-title">Voltage drop calculator</h1>
+<div class="calc card">
+<div class="fields">
+<div class="full"><div class="seg" id="std" role="group" aria-label="Standard">
+<button data-v="nec" aria-pressed="true">NEC · AWG · ft</button><button data-v="iec" aria-pressed="false">IEC · mm² · m</button></div></div>
+<div class="full"><div class="seg" id="supply" role="group" aria-label="Supply">
+<button data-v="single" aria-pressed="true">1-phase</button><button data-v="three" aria-pressed="false">3-phase</button><button data-v="dc" aria-pressed="false">DC</button></div></div>
+<div class="full"><div class="seg" id="cond" role="group" aria-label="Conductor">
+<button data-v="cu" aria-pressed="true">Copper</button><button data-v="al" aria-pressed="false">Aluminum</button></div></div>
+<div><label for="size">Wire size</label><select id="size"></select></div>
+<div><label for="len">Length <small id="len-unit">(ft, one way)</small></label><input id="len" inputmode="decimal"></div>
+<div><label for="amps">Load <small>(A)</small></label><input id="amps" inputmode="decimal" value="16"></div>
+<div><label for="volts">Voltage <small>(V)</small></label><input id="volts" inputmode="decimal"></div>
+<div class="full"><label for="pf">Power factor <small>(1 for resistive loads, ~0.85 for motors)</small></label><input id="pf" inputmode="decimal" value="1"></div>
+</div>
+<div class="result" aria-live="polite">
+<div class="eyebrow">Voltage drop</div>
+<div class="big" id="vd-pct">–</div>
+<div class="rows">
+<div><span>Drop</span><span id="vd-v">–</span></div>
+<div><span>Voltage at load</span><span id="vd-end">–</span></div>
+<div><span>Smallest size for ≤ 3 %</span><span id="vd-min">–</span></div>
+</div>
+<div id="vd-verdict" class="verdict"></div>
+<p class="note">Checks voltage drop only. Size the wire for ampacity and overcurrent protection too.</p>
+</div>
+</div>
+<p class="powered">Powered by <a href="https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html" target="_blank" rel="noopener">Dre Dev Tools</a></p>
+</main>
+<script src="../assets/calc.js?v=95523d72"></script>
+</body>
+</html>

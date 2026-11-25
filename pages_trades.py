@@ -88,7 +88,7 @@ def build_pitch():
              "Hold a level horizontally against the roof or a rafter, mark 12 in along it and measure straight down to the roof. That drop in inches is the rise per 12."),
         ], "t-roof", ("roofcalc", "pitch-chart", ROOF_PITCH), "roof", roof_form(50, 40), ROOF_RESULT, "Pitch charts and worked example", ROOF_NOTE,
         extra=c.related("More roofing tools", [("roofing/shingle-bundles-calculator.html", "Shingle bundles calculator")]),
-        embed=("roof-pitch", 560))
+        embed=("roof-pitch", 660))
 
 
 def build_bundles():
@@ -379,7 +379,7 @@ def build_garage():
              "Because it goes on thinner and half of it evaporates. Coverage alone does not compare products: compare the dry film thickness you end up with."),
         ], "t-coat", ("coatcalc", "garage-epoxy", COAT_PITCH), "garage", form, result, "Garage charts and three worked examples",
         data={"products": products}, extra=c.related("More coating tools", [("coating/epoxy-coverage-calculator.html", "Epoxy coverage calculator")]),
-        embed=("garage-epoxy", 620))
+        embed=("garage-epoxy", 840))
 
 
 # ---------- SlabCalc ----------
@@ -476,7 +476,7 @@ def build_slab():
             ("Does the calculator handle footings, columns and stairs?",
              "This page is for rectangular slabs. The SlabCalc app does footings, pads, columns, sonotubes, post holes, walls and stairs, and adds mesh and forms."),
         ], "t-slab", ("slabcalc", "slab-calc", SLAB_PITCH), "slab", slab_form(20, 20), SLAB_RESULT, "Slab sizes and worked examples",
-        embed=("concrete-slab", 640))
+        embed=("concrete-slab", 860))
 
 
 # ---------- PoolPro ----------
@@ -591,7 +591,7 @@ def build_pool():
              "Follow the product label. As a rule, let the pump circulate the water, test again, and swim only when the free chlorine is back within the range for your pool."),
         ], "t-pool", ("poolpro", "chlorine", POOL_PITCH), "chlor", pool_form(15000), POOL_RESULT, "Chlorine charts and worked example", POOL_NOTE,
         extra=c.related("More pool tools", [("pool/pool-chemical-calculator.html", "Pool chemical calculator")]),
-        embed=("pool-chlorine", 600))
+        embed=("pool-chlorine", 800))
 
 
 def build():

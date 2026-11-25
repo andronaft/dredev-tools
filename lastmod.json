@@ -24,7 +24,7 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
-  "hash": "0dd9754e503f0a9b",
+  "hash": "dcc592100c0c6d66",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
@@ -52,15 +52,15 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/12-awg-voltage-drop-per-foot.html": {
-  "hash": "09d36decdb77c357",
+  "hash": "fc63e2db7d73e6a6",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/12v-dc-voltage-drop.html": {
-  "hash": "e4739df701802512",
+  "hash": "d238e51a257cd09a",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/ampacity-chart-nec-310-16.html": {
-  "hash": "a89790acd899e4bb",
+  "hash": "6c969b03983a1658",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/awg-to-mm2.html": {
@@ -72,7 +72,7 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/conduit-fill-chart.html": {
-  "hash": "b5640bd5b66ad2cd",
+  "hash": "19090496830bf8ca",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/dc-wire-size-calculator.html": {
@@ -80,16 +80,16 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/ev-charger-wire-size.html": {
-  "hash": "bd09fe076669e016",
+  "hash": "bc782973c7415b9f",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/how-many-12-awg-wires-in-3-4-emt.html": {
-  "hash": "c26bb758b8f358eb",
+  "hash": "ccfb4ad561a134ce",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/nec-edition-by-state.html": {
-  "hash": "432189ec01d70317",
-  "date": "2026-11-22"
+  "hash": "22d905519d8c76ae",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html": {
   "hash": "d75e0712d4db7865",
@@ -100,11 +100,11 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-50-amp-sub-panel.html": {
-  "hash": "c936e12d5f962e81",
+  "hash": "b7774a583cadddee",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-by-amps-and-distance.html": {
-  "hash": "982ba5394e02d492",
+  "hash": "c5341af10a824744",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/electrical/wire-size-calculator.html": {
@@ -112,8 +112,8 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/embed/": {
-  "hash": "8069520f8441a217",
-  "date": "2026-11-18"
+  "hash": "aba0ad7a88e52b5a",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/": {
   "hash": "cfd91f3429c74e92",
@@ -128,132 +128,136 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-32-vs-r-410a.html": {
-  "hash": "98785514eb5ff8ac",
-  "date": "2026-11-21"
+  "hash": "20fb348e955cf9a7",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-407c-vs-r-22.html": {
-  "hash": "a09c3868c54acf5b",
-  "date": "2026-11-21"
+  "hash": "49fdecdb9e063cc9",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-448a-vs-r-404a.html": {
-  "hash": "9ed57dd92bd417a2",
-  "date": "2026-11-21"
+  "hash": "d4456c03cdab4802",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-448a-vs-r-449a.html": {
-  "hash": "6443dbf8f23fd923",
-  "date": "2026-11-21"
+  "hash": "49528947d1243a0e",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-449a-vs-r-404a.html": {
-  "hash": "c1811965ea67fc29",
-  "date": "2026-11-21"
+  "hash": "866de1a0346b11ba",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-454b-vs-r-32.html": {
-  "hash": "1e268130b4ddc128",
-  "date": "2026-11-21"
+  "hash": "1e3d257dafc33bfe",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-454b-vs-r-410a.html": {
-  "hash": "4ece5e9679d2eb58",
-  "date": "2026-11-21"
+  "hash": "93e039e477a6fc29",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/compare/r-513a-vs-r-134a.html": {
-  "hash": "3b7922dab04fa229",
-  "date": "2026-11-21"
+  "hash": "df4e29658827ed13",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/how-to-charge-r-454b-by-subcooling.html": {
   "hash": "6c19a4d55ed38c12",
   "date": "2026-11-21"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/": {
-  "hash": "92d1d0795fccf4f2",
-  "date": "2026-11-12"
+  "hash": "b99f5574aeb0869f",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-12.html": {
-  "hash": "9a4d4c57551647e6",
-  "date": "2026-11-21"
+  "hash": "a6acd14791baee89",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-1234yf.html": {
-  "hash": "fc1033dfa74b68cc",
-  "date": "2026-11-21"
+  "hash": "b41763eb3dfc38b2",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-134a.html": {
-  "hash": "909e3c561b9667c1",
-  "date": "2026-11-21"
+  "hash": "c821390279482a76",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-22.html": {
-  "hash": "1ab739170d733f6f",
-  "date": "2026-11-21"
+  "hash": "bdbbd521765ab843",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-290.html": {
-  "hash": "5ff6a3dffdbf43d4",
-  "date": "2026-11-21"
+  "hash": "1d83cb69c8935a46",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-32.html": {
-  "hash": "afdc4f49e3b6b6b4",
-  "date": "2026-11-21"
+  "hash": "15cbd766dce346be",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-404a.html": {
-  "hash": "23b3918bb1d8dcf6",
-  "date": "2026-11-21"
+  "hash": "a349ccb10334de80",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-407a.html": {
-  "hash": "d3314148a436c920",
-  "date": "2026-11-21"
+  "hash": "3975a18b6edaf15f",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-407c.html": {
-  "hash": "3924966d5dadaccf",
-  "date": "2026-11-21"
+  "hash": "2452711dd2f0d332",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-408a.html": {
-  "hash": "7b46e5028a84a596",
-  "date": "2026-11-21"
+  "hash": "1902bff66e9ce6d9",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-409a.html": {
-  "hash": "3ae03c08b454aab9",
-  "date": "2026-11-21"
+  "hash": "8d8fab09ef261791",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-410a.html": {
-  "hash": "31fd08f41147deaa",
-  "date": "2026-11-21"
+  "hash": "4a80bd11cecc9439",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-427a.html": {
-  "hash": "18a51fa6ab63005d",
-  "date": "2026-11-21"
+  "hash": "a59f0b8f97bd62cd",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-448a.html": {
-  "hash": "88bb6a3b727a09a8",
-  "date": "2026-11-21"
+  "hash": "607763d43b671217",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-449a.html": {
-  "hash": "b0b7ad1ff5dea102",
-  "date": "2026-11-21"
+  "hash": "030b075db6cbe5b4",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-452a.html": {
-  "hash": "273d0d8f6b86e208",
-  "date": "2026-11-21"
+  "hash": "ef665c3298c87d81",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-454b.html": {
-  "hash": "06ab74bbdb311169",
-  "date": "2026-11-21"
+  "hash": "d8c8f7893f2c4aa0",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-507a.html": {
-  "hash": "257a49b13bdd28ff",
-  "date": "2026-11-21"
+  "hash": "a810c4f3674ee14a",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-513a.html": {
-  "hash": "61ab40b75235043e",
-  "date": "2026-11-21"
+  "hash": "f3de253f6400618f",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-600a.html": {
-  "hash": "ad554843373d7a08",
-  "date": "2026-11-21"
+  "hash": "09f5a91e68badb42",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-717.html": {
-  "hash": "c92658611e2718c0",
-  "date": "2026-11-21"
+  "hash": "03d82198b49cd721",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-744.html": {
-  "hash": "081a778153e012f3",
-  "date": "2026-11-21"
+  "hash": "486f1c6197474376",
+  "date": "2026-11-22"
+ },
+ "https://zhukovskyi.space/calculators/hvac/refrigerant-pt-data.html": {
+  "hash": "dda15906ae7179a5",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-134a.html": {
   "hash": "a06421136dab6cc3",
@@ -284,8 +288,8 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/target-superheat-calculator.html": {
-  "hash": "e6d5ba9e0d043ab7",
-  "date": "2026-11-21"
+  "hash": "ab5bd965b5d0f3a3",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hydroponics/ec-chart-by-crop.html": {
   "hash": "4bddb09967e0c861",
@@ -304,7 +308,7 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/methodology.html": {
-  "hash": "4f99fb214a7f44df",
+  "hash": "cb7042bf5a9fd5e8",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html": {
