@@ -94,6 +94,38 @@ class Site(unittest.TestCase):
             self.assertNotIn("cloudflareinsights", html, p.name)
             self.assertNotIn(f"/embed/{p.name}</loc>", self.sitemap)
             self.assertIn(f"{BASE}/embed/{p.name}", index, p.name)  # the iframe code on the embed page
+            canonical = re.search(r'<link rel="canonical" href="([^"]+)"', html).group(1)
+            self.assertTrue((SITE / canonical[len(BASE) + 1:]).is_file(), p.name)  # the full page it points to
+        for name in ("candle-wax", "lye", "voltage-drop", "superheat-subcooling"):  # the calc.js calculators too
+            self.assertTrue((SITE / f"embed/{name}.html").is_file(), name)
+
+    def test_open_pt_data(self):
+        """The CSV and JSON downloads hold the same cells as the PT chart pages, and the page describes them."""
+        import csv
+        import json
+        import build
+        import pages_data
+        rows = list(csv.DictReader((SITE / pages_data.CSV_PATH).open()))
+        data = json.loads((SITE / pages_data.JSON_PATH).read_text())
+        self.assertEqual(len(rows), len(data["rows"]))
+        self.assertEqual({r["refrigerant"] for r in rows}, set(build.PT))
+        self.assertEqual({r["source"] for r in rows}, {s["id"] for s in data["sources"]})
+        self.assertNotIn("nist-webbook", {r["source"] for r in rows})
+        self.assertEqual({r["refrigerant"] for r in rows if r["source"] == "coolprop"}, set(pages_data.COOLPROP["psia"]))
+        for r in rows:
+            curve = build.PT[r["refrigerant"]]["bubble"]
+            cell = curve["psig"][(int(r["temp_f"]) - curve["startF"]) // 5]
+            want = cell if cell >= 0 else cell * build.PSI_PER_INHG
+            # Computed (CoolProp) rows keep 0.01 psi; the chart cell they must match is rounded to 0.1 psi or 0.1 inHg.
+            self.assertAlmostEqual(float(r["liquid_psig"]), want, delta=0.06 if r["source"] == "coolprop" else 0.006, msg=str(r))
+            self.assertAlmostEqual(float(r["liquid_psia"]), float(r["liquid_psig"]) + build.ATM_PSIA, delta=0.006)
+        # One printed cell end to end: the chart page and the file agree for R-410A at 40 °F.
+        cell = re.search(r"<td>40</td><td>4.4</td><td>([0-9.]+)</td>", (SITE / "hvac/pt-chart/r-410a.html").read_text()).group(1)
+        self.assertEqual([r["liquid_psig"] for r in rows if r["refrigerant"] == "R-410A" and r["temp_f"] == "40"], [cell])
+        page = (SITE / pages_data.PATH).read_text()
+        for needle in ('"@type": "Dataset"', "creativecommons.org/licenses/by/4.0/", "How to cite", f"{BASE}/{pages_data.CSV_PATH}"):
+            self.assertIn(needle, page)
+        self.assertIn(f"<loc>{BASE}/{pages_data.PATH}</loc>", self.sitemap)
 
     def test_no_broken_internal_links(self):
         broken = []

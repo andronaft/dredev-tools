@@ -14,6 +14,12 @@ import guides
 
 # (date, kind, text). Newest first. "Correction" marks a wrong number or a broken calculator that was fixed.
 CHANGES = [
+    ("2026-11-23", "New", "Battery and UPS runtime calculator in Ukrainian, in metric units: hours from a battery bank through an "
+     "inverter, usable kWh, charge time at a given current and the bank needed for a number of hours. Runtime and capacity "
+     "use the formulas of the Electrician Calc app; depth of discharge, inverter and charge efficiency are named with their sources."),
+    ("2026-11-20", "New", "The refrigerant pressure-temperature tables can be downloaded as CSV and JSON files, with the "
+     "source of every row and a citation. The candle wax, lye, voltage drop and superheat calculators can now be "
+     "embedded on other sites as well."),
     ("2026-11-16", "New", "Five electrical reference pages: wire size for 50, 60 and 100 A subpanels by distance, a conduit "
      "fill chart for THHN in EMT and PVC Schedule 40, how many 12 AWG wires fit in 3/4 in. EMT with the ampacity "
      "adjustment, box fill by NEC 314.16 and EV charger wire size by amps and distance. Their numbers are computed "
@@ -83,6 +89,15 @@ METHODS = [
       "Metric sizes are the IEC 60228 series."],
      ["Area only."],
      ["An equal or larger area does not prove equal ampacity: insulation, installation method and the code in force decide that."]),
+    ("Battery and UPS runtime (in Ukrainian)", "electrical/uk/battery-runtime.html",
+     ["Runtime = V &times; Ah &times; depth of discharge &times; inverter efficiency &divide; load in W; capacity needed = load &times; hours "
+      "&divide; (V &times; depth of discharge &times; efficiency): batteryRuntime() and batteryCapacityFor() of the Electrician Calc app.",
+      "Charge time = Ah to put back &divide; (charge current &times; charge efficiency), the constant-current stage only.",
+      "Defaults, each editable: 50 % depth for AGM and gel and 80 % for LiFePO4 (Victron cycle-life ratings), 85 % inverter efficiency "
+      "(Victron Phoenix datasheet: 84&ndash;92 % peak), 90 % and 99 % charge efficiency (Battery University BU-808c). Read 23 November 2026."],
+     ["Nominal battery voltage and the capacity on the label.", "A steady load; appliance wattages are approximate (Minfin's appliance calculator)."],
+     ["Lead-acid capacity falls at high discharge rates and in the cold; old batteries hold less.",
+      "A lead-acid battery needs a slower absorption stage after the time shown.", "It does not size the inverter for starting currents."]),
     ("Epoxy coverage calculator", "coating/epoxy-coverage-calculator.html",
      ["One US gallon is 231 cubic inches, so it covers 1,604 sq ft at 1 mil. Gallons = area &times; mils &divide; "
       "(1,604 &times; solids by volume) &times; (1 + waste)."],
@@ -169,7 +184,7 @@ def methodology(b, spec, results):
 {sections}
 <section><h2>Sources of the refrigerant PT charts</h2>
 <div class="tablewrap"><table class="wraps"><thead><tr><th>Source</th><th>Refrigerants</th></tr></thead><tbody>{pt_rows}</tbody></table></div>
-<p class="note">Arkema and Bryant/Carrier documents were retrieved on 25 October 2026; Chemours Opteon&trade; YF and the NIST Chemistry WebBook on 26 October 2026.</p></section>
+<p class="note">Arkema and Bryant/Carrier documents were retrieved on 25 October 2026; Chemours Opteon&trade; YF and the NIST Chemistry WebBook on 26 October 2026. The tables can be downloaded as <a href="{{rel}}hvac/refrigerant-pt-data.html">CSV and JSON files</a>.</p></section>
 """
     b.shell("methodology.html", "Methodology and sources of the Dre Dev calculators",
             "Which tables and editions the calculators use (NEC 2023, IEC 60364, Arkema PT charts, SoapCalc, Pool Math), "

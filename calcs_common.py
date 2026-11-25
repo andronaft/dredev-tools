@@ -117,9 +117,10 @@ def article_ld(name, path, desc):
             "author": ld["author"], "publisher": ld["publisher"], "dateModified": ld["dateModified"]}
 
 
-def embed_page(name, title, full_path, theme, calc, card, data):
+def embed_page(name, title, full_path, theme, calc, card, data, page_scripts=None):
     """A bare copy of a calculator for iframes on other sites: no header, footer or analytics, a credit line
-    with the brand name only, noindex and a canonical link to the full page. Not in the sitemap."""
+    with the brand name only, noindex and a canonical link to the full page. Not in the sitemap.
+    [page_scripts] replaces calc-more.js for the calculators that run on calc.js ("{rel}" is the site root)."""
     full = f"{B.BASE}/{full_path}"
     doc = f"""<!doctype html>
 <html lang="en">
@@ -129,6 +130,7 @@ def embed_page(name, title, full_path, theme, calc, card, data):
 <title>{e(title)}</title>
 <meta name="robots" content="noindex">
 <link rel="canonical" href="{full}">
+<base target="_blank">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="stylesheet" href="../assets/calc-more.css">
 </head>
@@ -138,13 +140,19 @@ def embed_page(name, title, full_path, theme, calc, card, data):
 {card}
 <p class="powered">Powered by <a href="{full}" target="_blank" rel="noopener">{e(B.CFG["brand"])} Tools</a></p>
 </main>
-{scripts(data).replace("{rel}", "../")}
+{(page_scripts or scripts(data)).replace("{rel}", "../")}
 </body>
 </html>
 """
     dest = B.OUT / "embed" / f"{name}.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(doc)
+
+
+def embed_copy(name, height, title, full_path, theme, calc, card, page_scripts):
+    """An embed copy of a calculator that is not built with page() (calc.js: voltage drop, lye, superheat)."""
+    embed_page(name, title, full_path, theme, calc, card, None, page_scripts)
+    EMBEDS.append((name, title, full_path, height))
 
 
 def n(x, d=0):

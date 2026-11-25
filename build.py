@@ -21,6 +21,7 @@ from urllib.parse import quote, urljoin
 
 import calcs_more
 import guides
+import pages_data
 import pages_electrical
 import pages_hvac
 import trust
@@ -457,19 +458,34 @@ def error_mailto(url, name):
     return f'mailto:{CFG["support_email"]}?subject={quote("Calculator error: " + name)}&amp;body={quote(body)}'
 
 
-def trust_block(path, url, body, title, calc, rel):
+DISCLAIMER_UK = ("Лише для довідки. Результат залежить від того, що ви ввели, і від джерел, названих на сторінці. Перед купівлею "
+                 "обладнання та підключенням звірте його з паспортами й інструкціями виробника. Гарантій ці інструменти не дають.")
+# The shared header, footer and trust lines in Ukrainian, for pages built with shell(lang="uk").
+CHROME = {
+    "en": {"apps": "Apps", "tools": "Free tools", "blog": "Blog", "about": "About", "method": "Methodology and sources",
+           "checked": "Checked examples", "changes": "Changelog", "error": "Found an error? Tell me", "methodology": "Methodology",
+           "privacy": "Privacy", "tester": "Become a tester", "by": "apps and free tools by", "cookies": "No account, no tracking cookies."},
+    "uk": {"apps": "Застосунки", "tools": "Безкоштовні інструменти", "blog": "Блог", "about": "Про автора",
+           "method": "Методика і джерела (англ.)", "checked": "Перевірені приклади (англ.)", "changes": "Журнал змін (англ.)",
+           "error": "Знайшли помилку? Напишіть мені", "methodology": "Методика", "privacy": "Конфіденційність",
+           "tester": "Стати тестером", "by": "застосунки й безкоштовні інструменти від", "cookies": "Без акаунта і без cookie для стеження."},
+}
+
+
+def trust_block(path, url, body, title, calc, rel, lang="en"):
     """Under every page: who made it, one shared disclaimer, and the way to the methodology, the checked
     examples, the changelog and an error report."""
+    t = CHROME.get(lang, CHROME["en"])
     plain = path == "index.html" or path in TRUST_PAGES or calc == "xmas"
     by = ("" if plain or 'class="note byline"' in body else
           f'<p class="note">Made by <a href="{ABOUT_URL}">{guides.AUTHOR}</a> ({e(CFG["brand"])}). '
           f'How the numbers are checked: <a href="{rel}methodology.html">methodology and sources</a>.</p>')
-    disclaimer = "" if plain else f'<p class="note disclaimer">{DISCLAIMER}</p>'
-    links = " · ".join(f'<a href="{rel}{p}">{t}</a>' for p, t in (
-        ("methodology.html", "Methodology and sources"), ("verification.html", "Checked examples"),
-        ("changelog.html", "Changelog")) if p != path)
+    disclaimer = "" if plain else f'<p class="note disclaimer">{DISCLAIMER_UK if lang == "uk" else DISCLAIMER}</p>'
+    links = " · ".join(f'<a href="{rel}{p}">{t[k]}</a>' for p, k in (
+        ("methodology.html", "method"), ("verification.html", "checked"),
+        ("changelog.html", "changes")) if p != path)
     return (f'<aside class="trust">{by}{disclaimer}<p class="note">{links} · '
-            f'<a href="{error_mailto(url, page_name(body, title))}">Found an error? Tell me</a></p></aside>')
+            f'<a href="{error_mailto(url, page_name(body, title))}">{t["error"]}</a></p></aside>')
 
 
 # Guides on the main site that explain the method behind a page: path -> [(blog slug, anchor text)].
@@ -525,6 +541,7 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
            if (m := re.search(r"/id(\d+)", CFG["apps"][k]["app_store_url"] or ""))]
     itunes = f'<meta name="apple-itunes-app" content="app-id={ids[0]}">\n' if ids else ""
     subnav = "".join(f'<a href="{rel}{p}">{t}</a>' for t, p in SUBNAV)
+    t = CHROME.get(lang, CHROME["en"])
     doc = f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -552,27 +569,27 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
 <header class="top"><div class="wrap">
 <a class="brand" href="{home}"><i></i>{e(SITE_NAME)}</a>
 <nav aria-label="Main">
-<a href="{SITE}/apps/">Apps</a>
-<a href="{home}" aria-current="page">Free tools</a>
-<a href="{SITE}/blog/" class="hide-sm">Blog</a>
-<a href="{ABOUT_URL}">About</a>
+<a href="{SITE}/apps/">{t["apps"]}</a>
+<a href="{home}" aria-current="page">{t["tools"]}</a>
+<a href="{SITE}/blog/" class="hide-sm">{t["blog"]}</a>
+<a href="{ABOUT_URL}">{t["about"]}</a>
 </nav>
 </div>
 <div class="wrap"><nav class="subnav" aria-label="Calculators">{subnav}</nav></div></header>
 <main class="wrap">
 {body}
-{trust_block(path, own, body, title, calc, rel)}
+{trust_block(path, own, body, title, calc, rel, lang)}
 </main>
 <footer><div class="wrap">
-<span>© 2026 {e(CFG["brand"])} · apps and free tools by <a href="{ABOUT_URL}">{guides.AUTHOR}</a>. No account, no tracking cookies.</span>
+<span>© 2026 {e(CFG["brand"])} · {t["by"]} <a href="{ABOUT_URL}">{guides.AUTHOR}</a>. {t["cookies"]}</span>
 <nav aria-label="Footer">
-<a href="{ABOUT_URL}">About</a>
-<a href="{SITE}/apps/">Apps</a>
-<a href="{home}">Free tools</a>
-<a href="{rel}methodology.html">Methodology</a>
-<a href="{PRIVACY_URL}">Privacy</a>
-<a href="{SITE}/testers/">Become a tester</a>
-<a href="{SITE}/blog/">Blog</a>
+<a href="{ABOUT_URL}">{t["about"]}</a>
+<a href="{SITE}/apps/">{t["apps"]}</a>
+<a href="{home}">{t["tools"]}</a>
+<a href="{rel}methodology.html">{t["methodology"]}</a>
+<a href="{PRIVACY_URL}">{t["privacy"]}</a>
+<a href="{SITE}/testers/">{t["tester"]}</a>
+<a href="{SITE}/blog/">{t["blog"]}</a>
 <a href="https://github.com/andronaft">GitHub</a>
 <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>
 </nav>
@@ -684,7 +701,8 @@ def build_hvac():
         for rid, r in PT.items())
     shell("hvac/pt-chart/index.html", "Refrigerant PT Charts: R-454B, R-32, R-410A, R-22 and more",
           f"Free pressure-temperature charts for {len(PT)} refrigerants, including the new A2L refrigerants R-454B and R-32.",
-          f'<div class="hero"><h1>Refrigerant PT charts</h1><p class="lead">Pressure–temperature tables for {len(PT)} refrigerants.</p></div><div class="grid">{index_rows}</div>',
+          f'<div class="hero"><h1>Refrigerant PT charts</h1><p class="lead">Pressure–temperature tables for {len(PT)} refrigerants.</p></div><div class="grid">{index_rows}</div>'
+          f'<p class="note">The same tables as files: <a href="{{rel}}{pages_data.PATH}">refrigerant PT data, CSV and JSON</a>.</p>',
           "t-hvac")
 
 
@@ -707,13 +725,7 @@ def build_vd():
          "On AC circuits the drop depends on resistance and reactance. With motor loads (power factor below 1) the reactive part grows, "
          "which matters most on large conductors."),
     ])
-    body = f"""
-<div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Electrical</div>
-<div class="hero"><div class="eyebrow">Free electrical tool</div>
-<h1>Voltage Drop Calculator</h1>
-<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p>{ans}</div>
-
-<div class="calc card">
+    card = """<div class="calc card">
 <div class="fields">
 <div class="full"><div class="seg" id="std" role="group" aria-label="Standard">
 <button data-v="nec" aria-pressed="true">NEC · AWG · ft</button><button data-v="iec" aria-pressed="false">IEC · mm² · m</button></div></div>
@@ -738,7 +750,14 @@ def build_vd():
 <div id="vd-verdict" class="verdict"></div>
 <p class="note">Checks voltage drop only. Size the wire for ampacity and overcurrent protection too.</p>
 </div>
-</div>
+</div>"""
+    body = f"""
+<div class="crumbs"><a href="{{rel}}index.html">Tools</a> › Electrical</div>
+<div class="hero"><div class="eyebrow">Free electrical tool</div>
+<h1>Voltage Drop Calculator</h1>
+<p class="lead">Voltage drop in volts and percent, the voltage at the load and the smallest wire that stays under 3 %. NEC (AWG) or IEC (mm²), copper or aluminum.</p>{ans}</div>
+
+{card}
 
 {guide_html}
 {promo("electrician-calc", "vd-calc", "Wire size with ampacity and derating, panel planner, motors, solar and 21 calculators with step-by-step working and PDF reports.")}
@@ -749,6 +768,8 @@ def build_vd():
           body, "t-elec", "vd",
           [webapp_ld("Voltage Drop Calculator", path, "Voltage drop for NEC and IEC wire sizes."), faq_ld],
           '<script src="{rel}assets/calc.js"></script>')
+    calcs_more.calcs_common.embed_copy("voltage-drop", 950, "Voltage drop calculator", path, "t-elec", "vd", card,
+                                       '<script src="{rel}assets/calc.js"></script>')
 
 
 # ---------- Coatings ----------
@@ -829,19 +850,25 @@ def load_oils():
     return out
 
 
-def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None):
+def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None,
+              embed=None):
+    """[embed] is (name, iframe height) for a calculator that also gets a bare copy for iframes (pages_embed.py)."""
     ans, guide_html, extra_faq = answer_guide or ("", "", [])
     faq_html, faq_ld = faq(faq_items + extra_faq)
+    card = f'<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>'
     body = f"""
 <div class="crumbs"><a href="{{rel}}index.html">Tools</a> › {crumb}</div>
 <div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p>{ans}</div>
-<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>
+{card}
 {note}
 {guide_html}
 {promo_html}
 {faq_html}
 """
-    shell(path, title, desc, body, theme, calc, [webapp_ld(h1, path, desc), faq_ld], extra_scripts + '<script src="{rel}assets/calc.js"></script>')
+    scripts = extra_scripts + '<script src="{rel}assets/calc.js"></script>'
+    shell(path, title, desc, body, theme, calc, [webapp_ld(h1, path, desc), faq_ld], scripts)
+    if embed:
+        calcs_more.calcs_common.embed_copy(embed[0], embed[1], h1, path, theme, calc, card, scripts)
 
 
 def build_more():
@@ -947,7 +974,7 @@ def build_more():
          ("Where do the SAP values come from?", "From the SoapCalc oil list, cross-checked against published saponification values. Oils from different suppliers vary, so treat results as a starting point.")],
         "t-soap", "lye", answer_guide=guides.lye_guide(load_oils()),
         promo_html=calcs_more.app_promo("lye-calc", "lye", "Save your recipes, see soap qualities and the fatty acid profile, and get batch cost and cost per bar."),
-        extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>')
+        extra_scripts=f'<script>window.OILS = {json.dumps(load_oils())};</script>', embed=("lye", 930))
 
 
 # ---------- Countdown ----------
@@ -1149,6 +1176,8 @@ def main():
     build_more()
     pages_hvac.build(sys.modules[__name__])
     pages_electrical.build(sys.modules[__name__])
+    pages_data.build(sys.modules[__name__])  # the PT tables as CSV and JSON, with their page
+    calcs_more.build_embed()  # after every calculator: the embed page lists the copies registered above
     trust.build(sys.modules[__name__])
     (OUT / "404.html").write_text((OUT / "index.html").read_text())
     (OUT / ".nojekyll").write_text("")

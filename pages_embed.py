@@ -47,10 +47,17 @@ def build():
 <li>Paste it into your page where the calculator should appear (an HTML or code block in your site builder).</li>
 <li>Publish. If it looks cut off, change the <code>height</code> number.</li></ol>
 <p>The code has two parts: the calculator itself and one line of text under it that links to the full page with the charts and sources. Please keep both as they are.</p></section>
+<section class="prose"><h2>Terms, in plain words</h2>
+<ul><li>Free for any site, a shop or a paid course included. No sign-up, no key, no limit on page views.</li>
+<li>Keep the line with the link under the frame. That link is the only thing asked in return.</li>
+<li>Do not change the calculator, hide the "Powered by" line or present it as your own tool.</li>
+<li>The calculators are reference tools: the limits on the <a href="{{rel}}methodology.html">methodology page</a> apply on your site as well.</li>
+<li>A calculator may be updated when a number is corrected; corrections are listed in the <a href="{{rel}}changelog.html">changelog</a>. If one ever has to be withdrawn, its address will keep answering with a link to the full page.</li></ul>
+<p>The superheat calculator can open on one refrigerant: add it after a # sign in the frame address, for example <code>superheat-subcooling.html#r-454b</code>.</p></section>
 <section><h2>Calculators you can embed</h2>{"".join(blocks)}</section>
 {faq_html}
 <p class="note">Questions or a calculator you would like to embed that is not here: <a href="mailto:{c.B.CFG["support_email"]}">{c.B.CFG["support_email"]}</a>.</p>
 """
     c.B.shell("embed/index.html", "Embed a Free Calculator on Your Site (iframe code) | Dre Dev Tools",
-              "Free embeddable calculators for your blog or shop: concrete slab, roof pitch, mead ABV, EC to ppm and more. Copy the iframe code, no sign-up.",
+              "Free embeddable calculators for your blog, shop or course: concrete slab, candle wax, soap lye, voltage drop, superheat and more. Copy the iframe code, no sign-up.",
               body, "", "embed", [faq_ld], c.scripts())

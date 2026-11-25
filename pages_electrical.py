@@ -1206,6 +1206,199 @@ States not listed here have not been checked: ask the local building department.
     b.shell(path, "NEC Edition by State (2026): Which Electrical Code Each State Uses", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
+# ---------- Ukrainian: battery and UPS runtime (metric) ----------
+
+BATTERY_UK = "electrical/uk/battery-runtime.html"
+BATTERY_CHECKED = ("23 листопада 2026", "2026-11-23")  # the day the sources below were read
+BATTERY_UTM = "utm_source=site&utm_medium=calculator&utm_campaign=ua-backup"
+BATTERY_SRC = {
+    "agm": ("Victron Energy, паспорт GEL and AGM Batteries",
+            "https://www.victronenergy.com/upload/documents/Datasheet-GEL-and-AGM-Batteries-EN.pdf"),
+    "lfp": ("Victron Energy, Lithium Battery Smart, технічні дані",
+            "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html"),
+    "inv": ("Victron Energy, паспорт інверторів Phoenix VE.Direct 250–1600 Вт, 230 В",
+            "https://www.victronenergy.com/upload/documents/Datasheet-Inverter-VE.Direct-250W-1600W-230V-EN.pdf"),
+    "ce": ("Battery University, BU-808c: Coulombic and Energy Efficiency",
+           "https://batteryuniversity.com/article/bu-808c-coulombic-and-energy-efficiency-with-the-battery"),
+    "la": ("Battery University, BU-403: Charging Lead Acid", "https://batteryuniversity.com/article/bu-403-charging-lead-acid"),
+    "minfin": ("Мінфін, калькулятор потужності приладів", "https://index.minfin.com.ua/ua/calc/power/"),
+}
+# Load presets: (label, watts). Typical figures from Minfin's appliance calculator, editable on the page.
+BATTERY_PRESETS = [("Роутер + оптичний термінал", 13), ("Холодильник", 150), ("Газовий котел", 60), ("Ноутбук", 60), ("LED-лампа", 10)]
+BATTERY_VOLTS = [(12, "12 В"), (24, "24 В"), (48, "48 В"), (12.8, "12,8 В (LiFePO4)"), (25.6, "25,6 В (LiFePO4)"), (51.2, "51,2 В (LiFePO4)")]
+INV_EFF = 0.85  # default inverter efficiency: below the 84–92 % peak in Victron's datasheet, as inverters run at part load
+AGM_DOD, LFP_DOD = 0.5, 0.8
+AGM_CE, LFP_CE = 0.9, 0.99
+
+
+def ua(x, d=0):
+    """Ukrainian number format: 1 234,5."""
+    return f"{x:,.{d}f}".replace(",", " ").replace(".", ",")
+
+
+def ua_hm(t):
+    h = math.floor(t)
+    m = round((t - h) * 60)
+    if m == 60:
+        h, m = h + 1, 0
+    return f"{h} год {m:02d} хв"
+
+
+def bsrc(key):
+    title, link = BATTERY_SRC[key]
+    return f'<a href="{e(link)}" rel="noopener">{e(title)}</a>'
+
+
+def battery_uk_page(b):
+    path = BATTERY_UK
+    # The example from the electricians' chats: 2 × AGM 100 Ah on 12 V in parallel, charged at 20 A.
+    load = 13 + 150 + 60
+    v, ah, wh = cm.battery_bank(12, 100, 1, 2)
+    use = wh * AGM_DOD * INV_EFF
+    t = cm.battery_runtime(12, 100, 2, load, AGM_DOD, INV_EFF)
+    ch = cm.charge_hours(ah * AGM_DOD, 20, AGM_CE)
+    need8 = cm.battery_capacity_for(12, load, 8, AGM_DOD, INV_EFF)
+    strings8, total8 = cm.batteries_for(need8, 100, 1)
+    t_lfp = cm.battery_runtime(12.8, 100, 2, load, LFP_DOD, INV_EFF)
+    i12, i24 = 1000 / INV_EFF / 12, 1000 / INV_EFF / 24
+
+    def opt(options, chosen):
+        return "".join(f'<option value="{val}"{" selected" if val == chosen else ""}>{txt}</option>' for val, txt in options)
+
+    def field(i, label, small, value, full=False):
+        sm = f" <small>{small}</small>" if small else ""
+        return f'<div{" class=full" if full else ""}><label for="{i}">{label}{sm}</label><input id="{i}" inputmode="decimal" value="{value}"></div>'
+
+    presets = "".join(f'<button type="button" data-w="{w}">+ {e(n)} {w} Вт</button>' for n, w in BATTERY_PRESETS)
+    form = (f'<div><label for="bt-type">Тип АКБ</label><select id="bt-type">{opt([("agm", "AGM / гель"), ("lfp", "LiFePO4")], "agm")}</select></div>'
+            f'<div><label for="bt-v">Напруга однієї АКБ</label><select id="bt-v">{opt(BATTERY_VOLTS, 12)}</select></div>'
+            + field("bt-ah", "Ємність однієї АКБ", "(А·год)", "100")
+            + field("bt-s", "Послідовно", "(шт., додає вольти)", "1")
+            + field("bt-p", "Паралельно", "(гілок, додає А·год)", "2")
+            + field("bt-dod", "Глибина розряду", "(%, AGM ~50, LiFePO4 ~80–90)", "50")
+            + field("bt-eff", "ККД інвертора", "(%)", "85")
+            + field("bt-ceff", "ККД заряду", "(%, AGM ~90, LiFePO4 ~99)", "90")
+            + f'<div class="full"><label for="bt-load">Навантаження <small>(Вт, сума всіх приладів)</small></label>'
+              f'<input id="bt-load" inputmode="decimal" value="{load}">'
+              f'<div class="presets" id="bt-presets">{presets}<button type="button" class="clear" data-w="0">Очистити</button></div>'
+              f'<p class="note">Потужності орієнтовні (за калькулятором Мінфіну). Подивіться на табличку приладу або виміряйте ватметром.</p></div>'
+            + field("bt-amps", "Струм заряду", "(А)", "20")
+            + field("bt-hours", "Потрібно годин", "(для мінімального банку)", "8"))
+    result = ('<div class="eyebrow">Час роботи</div><div class="big" id="bt-time">–</div><div class="rows">'
+              + "".join(f'<div><span>{label}</span><span id="{i}">–</span></div>' for i, label in [
+                  ("bt-wh", "Енергія банку"), ("bt-use", "Корисна енергія на розетці"), ("bt-cur", "Струм з АКБ"),
+                  ("bt-charge", "Час заряду"), ("bt-crate", "Струм заряду в C"), ("bt-need", "Мінімальний банк"), ("bt-count", "Це АКБ такої ємності")])
+              + '</div><div id="bt-note" class="verdict"></div><ol class="work" id="bt-steps"></ol>')
+    card = f'<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>'
+
+    banks = [("12 В 100 А·год AGM", 12, 100, 1, AGM_DOD), ("2 × 12 В 100 А·год AGM", 12, 100, 2, AGM_DOD), ("4 × 12 В 100 А·год AGM", 12, 100, 4, AGM_DOD),
+             ("12,8 В 100 А·год LiFePO4", 12.8, 100, 1, LFP_DOD), ("25,6 В 100 А·год LiFePO4", 25.6, 100, 1, LFP_DOD),
+             ("51,2 В 100 А·год LiFePO4", 51.2, 100, 1, LFP_DOD)]
+    loads = [50, 100, 200, 300, 500, 1000]
+    rows = [[n, f"{ua(bv * bah * cnt / 1000, 2)} кВт·год"] + [f"{ua(cm.battery_runtime(bv, bah, cnt, w, dod, INV_EFF), 1)} год" for w in loads]
+            for n, bv, bah, cnt, dod in banks]
+    hours_table = (f'<h3>Скільки годин працює банк при різному навантаженні</h3>'
+                   + table(["Банк", "Енергія"] + [f"{w} Вт" for w in loads], rows)
+                   + f'<p class="note">Глибина розряду 50 % для AGM і 80 % для LiFePO4, ККД інвертора 85 %. Джерела: {bsrc("agm")}, {bsrc("lfp")}, {bsrc("inv")}. '
+                     f'Перевірено {BATTERY_CHECKED[0]}.</p>')
+    example = f"""<h3>Приклад: 2 × AGM 100 А·год на 12 В, заряд струмом 20 А</h3>
+<ol class="steps">
+<li>Дві АКБ паралельно: 12 В і 2 × 100 = 200 А·год. Енергія: 12 В × 200 А·год = {ua(wh)} Вт·год, тобто {ua(wh / 1000, 1)} кВт·год.</li>
+<li>AGM розряджаємо до 50 %, інвертор віддає 85 %: {ua(wh)} × 0,5 × 0,85 = {ua(use)} Вт·год на розетці.</li>
+<li>Навантаження: роутер з оптичним терміналом 13 Вт, холодильник 150 Вт, газовий котел 60 Вт, разом {load} Вт.</li>
+<li>Час роботи: {ua(use)} ÷ {load} = {ua(t, 2)} год, тобто {ua_hm(t)}. Струм з АКБ: {load} ÷ 0,85 ÷ 12 = {ua(load / INV_EFF / 12, 1)} А.</li>
+<li>Заряд: треба повернути 200 × 0,5 = 100 А·год. При 20 А і ККД заряду 90 %: 100 ÷ (20 × 0,9) = {ua(ch, 1)} год основного етапу; повний заряд AGM довший.</li>
+<li>Щоб тягнути ті самі {load} Вт 8 годин: {load} × 8 ÷ (12 × 0,5 × 0,85) = {ua(need8)} А·год при 12 В, тобто {total8} АКБ по 100 А·год паралельно.</li>
+</ol>
+<p><strong>Результат: близько {ua_hm(t)} роботи і {ua(ch, 1)} год заряду. Дві LiFePO4 12,8 В 100 А·год з розрядом 80 % дали б {ua(t_lfp, 1)} год.</strong></p>"""
+    s = BATTERY_CHECKED[0]
+    method = f"""<section class="guide" id="method"><h2>Як рахує калькулятор і звідки цифри</h2>
+<p>Формули ті самі, що в інструменті Battery &amp; UPS Runtime застосунку Electrician Calc; час заряду і кількість АКБ рахує лише ця сторінка.</p>
+<ul>
+<li>Енергія банку: Вт·год = U × А·год. Послідовне з'єднання додає вольти, паралельне додає ампер-години; енергія все одно = напруга × ємність однієї АКБ × кількість АКБ.</li>
+<li>Час роботи: t = U × А·год × глибина розряду × ККД інвертора ÷ P. Потрібна ємність: А·год = P × t ÷ (U × глибина розряду × ККД).</li>
+<li>Час заряду: t = А·год, які треба повернути ÷ (струм заряду × ККД заряду). Це основний етап зі сталим струмом.</li>
+</ul>
+<h3>Коефіцієнти і джерела</h3>
+<ul>
+<li><strong>AGM і гель, 50 %.</strong> Ресурс AGM Deep Cycle Victron: 400 циклів при розряді 80 %, 600 при 50 %, 1500 при 30 %; гелевих 500, 750 і 1800. Чим мілкіший розряд, тим довше живе АКБ. Той самий паспорт радить заряджати струмом не більше 0,2 C (20 А для 100 А·год). {bsrc("agm")}, перевірено {s}.</li>
+<li><strong>LiFePO4, 80 %.</strong> Lithium Battery Smart: 2500 циклів при розряді 80 %, 3000 при 70 %, 5000 при 50 %; рекомендований струм заряду до 50 А на 100 А·год (0,5 C). Номінал 12,8 і 25,6 В. {bsrc("lfp")}, перевірено {s}.</li>
+<li><strong>ККД інвертора, 85 %.</strong> Максимальний ККД інверторів Phoenix 250–1600 Вт: від 84 до 92 % залежно від моделі й напруги; власне споживання без навантаження 5–15 Вт. Біля малого навантаження ККД нижчий за максимальний, тому за замовчуванням 85 %. {bsrc("inv")}, перевірено {s}.</li>
+<li><strong>ККД заряду: AGM 90 %, LiFePO4 99 %.</strong> Кулонівський ККД свинцево-кислотних АКБ близько 90 %, літій-іонних понад 99 %. {bsrc("ce")}, перевірено {s}.</li>
+<li><strong>Повний заряд свинцевої АКБ довший.</strong> Звичайний заряд триває 12–16 годин; останню частину батарея добирає меншим струмом. {bsrc("la")}, перевірено {s}.</li>
+<li><strong>Потужність приладів.</strong> Wi-Fi роутер 8 Вт, оптичний конвертер 5 Вт, холодильник 150 Вт, газовий котел 60 Вт, ноутбук 60 Вт, LED-лампа 10 Вт: орієнтовні значення з {bsrc("minfin")}, перевірено {s}. Ваш прилад може споживати інакше.</li>
+</ul>
+<h3>Чого калькулятор не враховує</h3>
+<ul>
+<li>Швидкий розряд зменшує ємність свинцевих АКБ. За паспортом Victron AGM віддає 100 % ємності за 20 год розряду, 85 % за 5 год, 78 % за 3 год і 65 % за 1 год. На холоді ємність теж менша.</li>
+<li>Старі АКБ мають меншу ємність, ніж на етикетці.</li>
+<li>Холодильник працює циклами: середня потужність менша за 150 Вт, тож реальних годин може бути більше. Середню потужність можна оцінити з енергетичної етикетки: кВт·год на рік × 1000 ÷ 8760.</li>
+<li>Пусковий струм компресора і насоса важливий для вибору потужності інвертора, а не для годин роботи.</li>
+</ul>
+<p class="note">Перед підключенням звірте струми заряду й розряду, напругу відсічки і налаштування з інструкціями до своїх акумуляторів та інвертора.</p>
+<p class="note byline">Зробив і перевірив <a href="{guides.ABOUT}">Андрій Жуковський</a> (Dre Dev). Джерела прочитано <time datetime="{BATTERY_CHECKED[1]}">{s}</time>.
+Формули перевіряються тестами разом із контрольними значеннями застосунку.</p>
+</section>"""
+    faq_items = [
+        ("На скільки годин вистачить 2 АКБ AGM по 100 А·год на 12 В?",
+         f"Залежить від навантаження. Банк має {ua(wh / 1000, 1)} кВт·год, а з розрядом до 50 % і ККД інвертора 85 % на розетці буде близько {ua(use / 1000, 2)} кВт·год. "
+         f"Роутер, холодильник і газовий котел ({load} Вт) пропрацюють близько {ua(t, 1)} год, сам роутер з терміналом (13 Вт) значно довше. "
+         "Холодильник більшу частину часу стоїть, тому з ним реальних годин часто більше, ніж за паспортною потужністю."),
+        ("Скільки часу заряджати акумулятор струмом 20 А?",
+         f"Поділіть ампер-години, які треба повернути, на струм і ККД заряду. Для 200 А·год AGM, розряджених на 50 %: 100 ÷ (20 × 0,9) = {ua(ch, 1)} год основного етапу. "
+         "Повний заряд свинцевої АКБ триває довше, бо в кінці струм зменшується. LiFePO4 заряджається майже до кінця повним струмом, якщо BMS його не обмежує, наприклад на холоді."),
+        ("Інвертор на 12 чи на 24 В: що краще для резервного живлення?",
+         f"Енергія банку однакова, різниця в струмі. Щоб віддати 1000 Вт при ККД 85 %, з 12 В треба брати близько {ua(i12)} А, а з 24 В близько {ua(i24)} А. "
+         "Менший струм означає менші втрати в кабелях і тонші кабелі між АКБ та інвертором. Напруга банку має відповідати вхідній напрузі інвертора."),
+        ("Чому AGM рахують на 50 %, а LiFePO4 на 80–90 %?",
+         "Через ресурс. За паспортом Victron AGM витримує 600 циклів при розряді 50 % і лише 400 при 80 %. LiFePO4 Victron має 2500 циклів при розряді 80 %. "
+         "Глибину розряду в калькуляторі можна змінити, якщо паспорт ваших АКБ дає інші цифри."),
+    ]
+    faq_html, faq_ld = b.faq(faq_items)
+    faq_html = faq_html.replace("<h2>Questions</h2>", "<h2>Питання</h2>")
+    app = b.APPS["electrician-calc"]
+    icon = f'<img class="icon" src="{REL}{app["icon"]}" alt="" width="72" height="72">' if app["icon"] else ""
+    play = f'https://play.google.com/store/apps/details?id={b.CFG["apps"]["electrician-calc"]["package"]}&amp;referrer={BATTERY_UTM.replace("=", "%3D").replace("&", "%26")}'
+    site = f'{b.SITE}/apps/electrician-calc/?{BATTERY_UTM.replace("&", "&amp;")}'
+    # No <!-- app:electrician-calc --> marker: my_space/build.py would swap these buttons for its English store buttons.
+    promo = f"""<section class="promo">{icon}<div>
+<div class="eyebrow">Офлайн, коли немає світла</div>
+<h3>Electrician Calc для Android</h3>
+<p>Застосунок працює без інтернету і має українську мову. Інструмент «Автономність АКБ і ДБЖ» (Battery &amp; UPS Runtime) рахує час роботи або потрібну ємність, а Backup Power підбирає інвертор, батарею й генератор. Обидва в Pro; безкоштовно є переріз кабелю, падіння напруги та закон Ома, а будь-який Pro-інструмент можна спершу спробувати на прикладі.</p>
+<div class="btns"><a class="btn" href="{play}">Завантажити з Google Play</a><a class="btn ghost" href="{site}">Про застосунок</a></div>
+</div></section>"""
+    answer = (f"години = В × А·год × глибина розряду × ККД інвертора ÷ навантаження у Вт. Дві AGM по 100 А·год на 12 В ({ua(wh / 1000, 1)} кВт·год) з розрядом до 50 % "
+              f"і ККД 85 % дають {ua(use / 1000, 2)} кВт·год: роутер, холодильник і газовий котел ({load} Вт) пропрацюють близько {ua_hm(t)}. "
+              f"Заряд струмом 20 А триває від {ua(ch, 1)} год.")
+    crumb_html = crumbs([("Інструменти", "index.html"), ("Електрика", HUB), ("Акумулятор і ДБЖ", path)])
+    body = f"""{CSS}
+<link rel="stylesheet" href="{REL}assets/calc-more.css">
+<link rel="stylesheet" href="{REL}assets/battery-uk.css">
+{crumb_html}
+<div class="hero"><div class="eyebrow">Безкоштовний калькулятор</div>
+<h1>На скільки вистачить акумулятора або ДБЖ</h1>
+<p class="lead">Години роботи від АКБ через інвертор, корисні кВт·год, час заряду і мінімальний банк на потрібну кількість годин. У вольтах, ампер-годинах і ватах.</p>
+<p class="answer"><strong>Коротко:</strong> {answer}</p></div>
+{card}
+<section class="guide"><h2>Таблиця і приклад</h2>
+{hours_table}
+{example}
+</section>
+{method}
+{promo}
+{faq_html}
+<p class="note">Сторінка українською для тих, хто рахує резервне живлення в метричних одиницях. Інші калькулятори англійською: <a href="{REL}{HUB}">усі електричні інструменти</a>.</p>
+"""
+    title = "На скільки вистачить акумулятора або ДБЖ: калькулятор (В, А·год, Вт)"
+    desc = ("Безкоштовний калькулятор: скільки годин пропрацює АКБ AGM, гель чи LiFePO4 через інвертор, скільки кВт·год корисно, скільки заряджати "
+            "струмом у амперах і яка ємність потрібна на N годин. З формулами і джерелами.")
+    ld = b.webapp_ld("На скільки вистачить акумулятора або ДБЖ", path, desc)
+    ld["inLanguage"] = "uk"
+    ld["offers"]["priceCurrency"] = "UAH"
+    faq_ld["inLanguage"] = "uk"
+    b.shell(path, title, desc, body, "t-elec", "battery", [ld, faq_ld], '<script src="{rel}assets/battery-uk.js"></script>', lang="uk")
+
+
 def hub_page(b):
     crumb_html = crumbs([("Tools", "index.html"), ("Electrical", HUB)])
     cards = [
@@ -1223,6 +1416,7 @@ def hub_page(b):
         (FILL_12_EMT, "Guide", "How many 12 AWG wires in 3/4 EMT", "The fill count, and what derating leaves of it."),
         (BOX_FILL, "Guide", "Box fill (NEC 314.16)", "Volume per conductor, what counts and two worked examples."),
         (NEC_BY_STATE, "Reference", "NEC edition by state", "The edition each state enforces, its effective date and what is pending."),
+        (BATTERY_UK, "Українською", "На скільки вистачить акумулятора / ДБЖ", "Години роботи від АКБ, кВт·год, час заряду і потрібна ємність: В, А·год, Вт."),
     ]
     grid = "".join(f'<a class="card" href="{REL}{p}"><span class="tag">{tag}</span><h3>{e(h)}</h3><p>{e(d)}</p></a>' for p, tag, h, d in cards)
     body = f"""{CSS}
@@ -1252,6 +1446,7 @@ CARDS = [
     (FILL_12_EMT, "Electrical", "How many 12 AWG wires in 3/4 EMT", "Fill count and the derating that limits it.", "t-elec"),
     (BOX_FILL, "Electrical", "Box fill (NEC 314.16)", "Volume per conductor, what counts, worked examples.", "t-elec"),
     (NEC_BY_STATE, "Electrical", "NEC edition by state", "Which NEC edition each state enforces, with dates and sources.", "t-elec"),
+    (BATTERY_UK, "Electrical", "Battery and UPS runtime (in Ukrainian)", "Hours from a battery bank through an inverter, charge time and bank size, metric.", "t-elec"),
 ]
 
 
@@ -1268,3 +1463,4 @@ def build(b):
     box_fill_page(b)
     ev_wire_page(b)
     nec_by_state_page(b)
+    battery_uk_page(b)

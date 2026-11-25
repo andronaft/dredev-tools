@@ -24,8 +24,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
-  "hash": "0128a9001377a02e",
-  "date": "2026-11-16"
+  "hash": "f82303b8f05a3511",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
   "hash": "c7dcb1a88bb188a6",
@@ -48,8 +48,8 @@
   "date": "2026-11-12"
  },
  "https://zhukovskyi.space/calculators/electrical/": {
-  "hash": "224b84b5c74cc6ee",
-  "date": "2026-11-17"
+  "hash": "ffd4365108a0f2b9",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/electrical/12-awg-voltage-drop-per-foot.html": {
   "hash": "d332052020eeb486",
@@ -84,12 +84,16 @@
   "date": "2026-11-19"
  },
  "https://zhukovskyi.space/calculators/electrical/nec-edition-by-state.html": {
-  "hash": "1492658a08e69954",
-  "date": "2026-11-19"
+  "hash": "9e1725a63a843105",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/electrical/three-phase-voltage-drop.html": {
   "hash": "f8f5a094fdaee921",
   "date": "2026-11-19"
+ },
+ "https://zhukovskyi.space/calculators/electrical/uk/battery-runtime.html": {
+  "hash": "e3799c01c5ecc6d0",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html": {
   "hash": "e1edcc3ada05b6fb",
@@ -108,8 +112,8 @@
   "date": "2026-11-19"
  },
  "https://zhukovskyi.space/calculators/embed/": {
-  "hash": "8069520f8441a217",
-  "date": "2026-11-18"
+  "hash": "aba0ad7a88e52b5a",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/hvac/": {
   "hash": "e8cef85b514df55d",
@@ -160,8 +164,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/": {
-  "hash": "92d1d0795fccf4f2",
-  "date": "2026-11-12"
+  "hash": "b99f5574aeb0869f",
+  "date": "2026-11-20"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-12.html": {
   "hash": "db30a4de766534a3",
@@ -251,6 +255,10 @@
   "hash": "531c11541ca013ad",
   "date": "2026-11-13"
  },
+ "https://zhukovskyi.space/calculators/hvac/refrigerant-pt-data.html": {
+  "hash": "dda15906ae7179a5",
+  "date": "2026-11-20"
+ },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-134a.html": {
   "hash": "729ba6bb9af4fddc",
   "date": "2026-11-13"
@@ -300,8 +308,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/methodology.html": {
-  "hash": "ba86e41e8fa7fac7",
-  "date": "2026-11-13"
+  "hash": "7d023de07aad9fb0",
+  "date": "2026-11-23"
  },
  "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html": {
   "hash": "3fb2c32a0d8f6a62",
