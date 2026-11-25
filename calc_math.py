@@ -265,6 +265,37 @@ def egc_upsized(ocpd, table, cmil, sizes, minimum, installed, copper=True):
     return installed if cmil[size] > cmil[installed] else size
 
 
+# Battery & UPS Runtime: batteryRuntime() and batteryCapacityFor() in electrical.dart. The bank, the charge time and the
+# battery count are the web page's own (electrical/uk/battery-runtime.html); the app has no charge time.
+
+def battery_bank(volts, ah, series=1, parallel=1):
+    """(bank volts, bank Ah, nominal Wh): series adds voltage, parallel adds Ah."""
+    v, c = volts * series, ah * parallel
+    return v, c, v * c
+
+
+def battery_runtime(volts, ah, count, load_w, dod=0.8, eff=0.9):
+    """Hours: U × Ah × n × DoD × η / P (batteryRuntime). n counts every battery, in series or in parallel."""
+    return volts * ah * count * dod * eff / load_w if load_w > 0 else 0.0
+
+
+def battery_capacity_for(volts, load_w, hours, dod=0.8, eff=0.9):
+    """Ah at [volts] for [hours]: P × t / (U × DoD × η) (batteryCapacityFor)."""
+    return load_w * hours / (volts * dod * eff)
+
+
+def charge_hours(ah, amps, charge_eff):
+    """Hours to put back [ah] at a steady [amps] with the coulombic efficiency [charge_eff]. The bulk stage only:
+    a lead-acid battery then needs a slower absorption stage on top."""
+    return ah / (amps * charge_eff) if amps > 0 and charge_eff > 0 else 0.0
+
+
+def batteries_for(need_ah, ah_one, series=1):
+    """(strings in parallel, batteries in all) so the bank holds at least [need_ah] at its voltage."""
+    strings = ceil_count(need_ah / ah_one) if ah_one > 0 else 0
+    return strings, strings * series
+
+
 # ---------- CoatCalc: coatcalc-app/lib/feature/calc.dart ----------
 
 SQFT_PER_GAL_1MIL = 1604.0

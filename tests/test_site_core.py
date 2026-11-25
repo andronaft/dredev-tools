@@ -162,7 +162,7 @@ class BuiltSite(unittest.TestCase):
             with self.subTest(page=name):
                 plain = name in {"index.html", *build.TRUST_PAGES} or 'data-calc="xmas"' in text
                 self.assertEqual(text.count('class="note disclaimer"'), 0 if plain else 1)
-                self.assertIn("Found an error? Tell me", text)
+                self.assertIn("Знайшли помилку? Напишіть мені" if '<html lang="uk">' in text else "Found an error? Tell me", text)
                 for page in build.TRUST_PAGES - {name}:
                     self.assertRegex(text, rf'href="(\.\./)*{page}"')
                 self.assertIn('href="https://zhukovskyi.space/about/"', text)

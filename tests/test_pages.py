@@ -23,6 +23,7 @@ sys.path.insert(0, str(REPO))
 
 import build  # noqa: E402
 import guides  # noqa: E402
+import calc_math as cm  # noqa: E402
 import pages_electrical as pe  # noqa: E402
 import pages_hvac as ph  # noqa: E402
 import refdata  # noqa: E402
@@ -1062,6 +1063,57 @@ class NecByState(unittest.TestCase):
             self.assertNotIn("is the most common statewide edition", h)
         else:
             self.assertIn(f"NEC {lead[0]} is the most common statewide edition, in force in {n} states", h)
+
+
+
+class BatteryUk(unittest.TestCase):
+    """The Ukrainian battery and UPS runtime page: metric, sourced, reachable, and its numbers are calc_math.py's."""
+
+    def setUp(self):
+        self.h = page(pe.BATTERY_UK)
+
+    def test_language_and_place(self):
+        self.assertIn('<html lang="uk">', self.h)
+        self.assertIn('data-calc="battery"', self.h)
+        self.assertIn('assets/battery-uk.js"></script>', self.h)
+        self.assertNotIn("{rel}", self.h)
+        self.assertIn(f"<loc>{build.BASE}/{pe.BATTERY_UK}</loc>", (SITE / "sitemap.xml").read_text())
+        self.assertIn('href="../electrical/uk/battery-runtime.html"', page(pe.HUB))
+        for ld in jsonld(self.h):
+            self.assertEqual(ld["inLanguage"], "uk", ld["@type"])
+        self.assertEqual({ld["@type"] for ld in jsonld(self.h)}, {"WebApplication", "FAQPage"})
+        self.assertEqual(len(jsonld(self.h)[1]["mainEntity"]), 4)
+
+    def test_no_imperial_units(self):
+        body = text(self.h.split("<main", 1)[1].split("</main>", 1)[0])
+        for unit in ("AWG", " ft", "°F", "gallon", "inch"):
+            self.assertNotIn(unit, body, unit)
+
+    def test_every_factor_has_a_source_and_a_date(self):
+        method = self.h.split('id="method"', 1)[1].split("</section>", 1)[0]
+        for _, link in pe.BATTERY_SRC.values():
+            self.assertIn(f'href="{html.escape(link)}"', method, link)
+        self.assertEqual(method.count(f"перевірено {pe.BATTERY_CHECKED[0]}"), len(pe.BATTERY_SRC))
+        self.assertIn("інструкціями до своїх акумуляторів та інвертора", method)
+
+    def test_example_and_table_use_calc_math(self):
+        t = cm.battery_runtime(12, 100, 2, 223, pe.AGM_DOD, pe.INV_EFF)
+        self.assertIn(pe.ua_hm(t), self.h)
+        self.assertIn(f"{pe.ua(cm.charge_hours(100, 20, pe.AGM_CE), 1)} год", self.h)
+        rows = next(t for t in tables(self.h) if t[0][0] == "Банк")
+        self.assertEqual(rows[2][2:], [f"{pe.ua(cm.battery_runtime(12, 100, 2, w, 0.5, 0.85), 1)} год" for w in (50, 100, 200, 300, 500, 1000)])
+
+    def test_cta(self):
+        utm = "utm_source=site&amp;utm_medium=calculator&amp;utm_campaign=ua-backup"
+        self.assertIn('href="https://play.google.com/store/apps/details?id=com.andrii.electriccalc&amp;referrer=utm_source%3Dsite%26utm_medium%3Dcalculator%26utm_campaign%3Dua-backup"', self.h)
+        self.assertIn(f'href="https://zhukovskyi.space/apps/electrician-calc/?{utm}"', self.h)
+        self.assertIn("Battery &amp; UPS Runtime", self.h)
+        self.assertIn("Знайшли помилку? Напишіть мені", self.h)
+
+    def test_presets_are_editable_defaults(self):
+        for name, w in pe.BATTERY_PRESETS:
+            self.assertIn(f'data-w="{w}">+ {html.escape(name)} {w} Вт</button>', self.h)
+        self.assertIn("Потужності орієнтовні", self.h)
 
 
 if __name__ == "__main__":

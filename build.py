@@ -458,19 +458,34 @@ def error_mailto(url, name):
     return f'mailto:{CFG["support_email"]}?subject={quote("Calculator error: " + name)}&amp;body={quote(body)}'
 
 
-def trust_block(path, url, body, title, calc, rel):
+DISCLAIMER_UK = ("Лише для довідки. Результат залежить від того, що ви ввели, і від джерел, названих на сторінці. Перед купівлею "
+                 "обладнання та підключенням звірте його з паспортами й інструкціями виробника. Гарантій ці інструменти не дають.")
+# The shared header, footer and trust lines in Ukrainian, for pages built with shell(lang="uk").
+CHROME = {
+    "en": {"apps": "Apps", "tools": "Free tools", "blog": "Blog", "about": "About", "method": "Methodology and sources",
+           "checked": "Checked examples", "changes": "Changelog", "error": "Found an error? Tell me", "methodology": "Methodology",
+           "privacy": "Privacy", "tester": "Become a tester", "by": "apps and free tools by", "cookies": "No account, no tracking cookies."},
+    "uk": {"apps": "Застосунки", "tools": "Безкоштовні інструменти", "blog": "Блог", "about": "Про автора",
+           "method": "Методика і джерела (англ.)", "checked": "Перевірені приклади (англ.)", "changes": "Журнал змін (англ.)",
+           "error": "Знайшли помилку? Напишіть мені", "methodology": "Методика", "privacy": "Конфіденційність",
+           "tester": "Стати тестером", "by": "застосунки й безкоштовні інструменти від", "cookies": "Без акаунта і без cookie для стеження."},
+}
+
+
+def trust_block(path, url, body, title, calc, rel, lang="en"):
     """Under every page: who made it, one shared disclaimer, and the way to the methodology, the checked
     examples, the changelog and an error report."""
+    t = CHROME.get(lang, CHROME["en"])
     plain = path == "index.html" or path in TRUST_PAGES or calc == "xmas"
     by = ("" if plain or 'class="note byline"' in body else
           f'<p class="note">Made by <a href="{ABOUT_URL}">{guides.AUTHOR}</a> ({e(CFG["brand"])}). '
           f'How the numbers are checked: <a href="{rel}methodology.html">methodology and sources</a>.</p>')
-    disclaimer = "" if plain else f'<p class="note disclaimer">{DISCLAIMER}</p>'
-    links = " · ".join(f'<a href="{rel}{p}">{t}</a>' for p, t in (
-        ("methodology.html", "Methodology and sources"), ("verification.html", "Checked examples"),
-        ("changelog.html", "Changelog")) if p != path)
+    disclaimer = "" if plain else f'<p class="note disclaimer">{DISCLAIMER_UK if lang == "uk" else DISCLAIMER}</p>'
+    links = " · ".join(f'<a href="{rel}{p}">{t[k]}</a>' for p, k in (
+        ("methodology.html", "method"), ("verification.html", "checked"),
+        ("changelog.html", "changes")) if p != path)
     return (f'<aside class="trust">{by}{disclaimer}<p class="note">{links} · '
-            f'<a href="{error_mailto(url, page_name(body, title))}">Found an error? Tell me</a></p></aside>')
+            f'<a href="{error_mailto(url, page_name(body, title))}">{t["error"]}</a></p></aside>')
 
 
 # Guides on the main site that explain the method behind a page: path -> [(blog slug, anchor text)].
@@ -526,6 +541,7 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
            if (m := re.search(r"/id(\d+)", CFG["apps"][k]["app_store_url"] or ""))]
     itunes = f'<meta name="apple-itunes-app" content="app-id={ids[0]}">\n' if ids else ""
     subnav = "".join(f'<a href="{rel}{p}">{t}</a>' for t, p in SUBNAV)
+    t = CHROME.get(lang, CHROME["en"])
     doc = f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -553,27 +569,27 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
 <header class="top"><div class="wrap">
 <a class="brand" href="{home}"><i></i>{e(SITE_NAME)}</a>
 <nav aria-label="Main">
-<a href="{SITE}/apps/">Apps</a>
-<a href="{home}" aria-current="page">Free tools</a>
-<a href="{SITE}/blog/" class="hide-sm">Blog</a>
-<a href="{ABOUT_URL}">About</a>
+<a href="{SITE}/apps/">{t["apps"]}</a>
+<a href="{home}" aria-current="page">{t["tools"]}</a>
+<a href="{SITE}/blog/" class="hide-sm">{t["blog"]}</a>
+<a href="{ABOUT_URL}">{t["about"]}</a>
 </nav>
 </div>
 <div class="wrap"><nav class="subnav" aria-label="Calculators">{subnav}</nav></div></header>
 <main class="wrap">
 {body}
-{trust_block(path, own, body, title, calc, rel)}
+{trust_block(path, own, body, title, calc, rel, lang)}
 </main>
 <footer><div class="wrap">
-<span>© 2026 {e(CFG["brand"])} · apps and free tools by <a href="{ABOUT_URL}">{guides.AUTHOR}</a>. No account, no tracking cookies.</span>
+<span>© 2026 {e(CFG["brand"])} · {t["by"]} <a href="{ABOUT_URL}">{guides.AUTHOR}</a>. {t["cookies"]}</span>
 <nav aria-label="Footer">
-<a href="{ABOUT_URL}">About</a>
-<a href="{SITE}/apps/">Apps</a>
-<a href="{home}">Free tools</a>
-<a href="{rel}methodology.html">Methodology</a>
-<a href="{PRIVACY_URL}">Privacy</a>
-<a href="{SITE}/testers/">Become a tester</a>
-<a href="{SITE}/blog/">Blog</a>
+<a href="{ABOUT_URL}">{t["about"]}</a>
+<a href="{SITE}/apps/">{t["apps"]}</a>
+<a href="{home}">{t["tools"]}</a>
+<a href="{rel}methodology.html">{t["methodology"]}</a>
+<a href="{PRIVACY_URL}">{t["privacy"]}</a>
+<a href="{SITE}/testers/">{t["tester"]}</a>
+<a href="{SITE}/blog/">{t["blog"]}</a>
 <a href="https://github.com/andronaft">GitHub</a>
 <a href="mailto:{CFG["support_email"]}">{CFG["support_email"]}</a>
 </nav>

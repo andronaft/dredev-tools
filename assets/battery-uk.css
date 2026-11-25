@@ -1,0 +1,6 @@
+/* battery runtime page: load presets and the working under the result */
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.presets button { font: inherit; font-size: 14px; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--fg); cursor: pointer; }
+.presets button.clear { color: var(--muted); }
+.result ol.work { margin: 14px 0 0; padding-left: 20px; font-size: 14px; color: var(--muted); }
+.result ol.work li { margin: 4px 0; }

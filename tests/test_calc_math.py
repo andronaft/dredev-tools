@@ -208,6 +208,46 @@ class ElectricianCalc(unittest.TestCase):
         self.assertEqual(guides.wire_size(40)[1], 50)  # without a factor the ampacity stays the table's whole number
 
 
+class BatteryRuntime(unittest.TestCase):
+    """Battery & UPS Runtime (electrical.dart) and the Ukrainian battery page (assets/battery-uk.js)."""
+
+    def test_app_control_values(self):  # Calculator_for_electrical/test/electrical_test.dart
+        self.assertAlmostEqual(m.battery_runtime(12, 100, 2, 432), 4, places=9)
+        self.assertAlmostEqual(m.battery_capacity_for(24, 432, 4), 100, places=9)
+
+    def test_bank_series_and_parallel(self):
+        self.assertEqual(m.battery_bank(12, 100, 1, 2), (12, 200, 2400))  # parallel adds Ah
+        self.assertEqual(m.battery_bank(12, 100, 2, 1), (24, 100, 2400))  # series adds volts, same energy
+        self.assertEqual(m.battery_bank(12, 100, 4, 2), (48, 200, 9600))
+
+    def test_chat_example(self):  # 2 × AGM 100 Ah on 12 V, router, fridge and boiler (223 W), charged at 20 A
+        self.assertAlmostEqual(m.battery_runtime(12, 100, 2, 223, 0.5, 0.85), 1020 / 223, places=9)
+        self.assertAlmostEqual(m.charge_hours(100, 20, 0.9), 5.5556, delta=1e-4)
+        need = m.battery_capacity_for(12, 223, 8, 0.5, 0.85)
+        self.assertAlmostEqual(need, 349.8, delta=0.05)
+        self.assertEqual(m.batteries_for(need, 100, 1), (4, 4))
+        self.assertEqual(m.batteries_for(need / 2, 100, 2), (2, 4))  # the same energy at 24 V: two strings of two
+
+    def test_edges(self):
+        self.assertEqual(m.battery_runtime(12, 100, 1, 0), 0)
+        self.assertEqual(m.charge_hours(100, 0, 0.9), 0)
+        self.assertEqual(m.batteries_for(200, 100), (2, 2))  # exactly full: no extra battery for rounding dust
+        self.assertEqual(m.batteries_for(200.0000000001, 100), (2, 2))
+        self.assertEqual(m.batteries_for(201, 100), (3, 3))
+
+    def test_js(self):
+        code = (f"const m = require({json.dumps(str(ROOT / 'assets/battery-uk.js'))}); console.log(JSON.stringify(["
+                "m.batteryRuntime(12, 100, 2, 432, 0.8, 0.9), m.batteryCapacityFor(24, 432, 4, 0.8, 0.9), m.batteryBank(12, 100, 4, 2), "
+                "m.batteryRuntime(12.8, 100, 2, 223, 0.8, 0.85), m.chargeHours(100, 20, 0.9), m.batteriesFor(349.8, 100, 2)]));")
+        got = json.loads(subprocess.run(["node", "-e", code], check=True, capture_output=True, text=True).stdout)
+        self.assertAlmostEqual(got[0], m.battery_runtime(12, 100, 2, 432), places=9)
+        self.assertAlmostEqual(got[1], m.battery_capacity_for(24, 432, 4), places=9)
+        self.assertEqual((got[2]["volts"], got[2]["ah"], got[2]["wh"]), m.battery_bank(12, 100, 4, 2))
+        self.assertAlmostEqual(got[3], m.battery_runtime(12.8, 100, 2, 223, 0.8, 0.85), places=9)
+        self.assertAlmostEqual(got[4], m.charge_hours(100, 20, 0.9), places=9)
+        self.assertEqual((got[5]["strings"], got[5]["total"]), m.batteries_for(349.8, 100, 2))
+
+
 class CoatCalc(unittest.TestCase):
     def test_coverage(self):  # coatcalc-app/test/calc_test.dart
         self.assertAlmostEqual(m.coat_rate(10, 1), 160.4, delta=0.01)

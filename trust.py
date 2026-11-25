@@ -14,6 +14,9 @@ import guides
 
 # (date, kind, text). Newest first. "Correction" marks a wrong number or a broken calculator that was fixed.
 CHANGES = [
+    ("2026-11-23", "New", "Battery and UPS runtime calculator in Ukrainian, in metric units: hours from a battery bank through an "
+     "inverter, usable kWh, charge time at a given current and the bank needed for a number of hours. Runtime and capacity "
+     "use the formulas of the Electrician Calc app; depth of discharge, inverter and charge efficiency are named with their sources."),
     ("2026-11-22", "New", "DC and solar wire size calculator: 12, 24 and 48 V battery runs and panel strings from watts or "
      "amps, a voltage drop limit of 1, 2, 3 or 5 %, a check against the 75 °C ampacity of NEC Table 310.16, the power "
      "lost in the wire and the same load at a higher voltage. The voltage drop calculator no longer shows the power "
@@ -101,6 +104,15 @@ METHODS = [
       "Metric sizes are the IEC 60228 series."],
      ["Area only."],
      ["An equal or larger area does not prove equal ampacity: insulation, installation method and the code in force decide that."]),
+    ("Battery and UPS runtime (in Ukrainian)", "electrical/uk/battery-runtime.html",
+     ["Runtime = V &times; Ah &times; depth of discharge &times; inverter efficiency &divide; load in W; capacity needed = load &times; hours "
+      "&divide; (V &times; depth of discharge &times; efficiency): batteryRuntime() and batteryCapacityFor() of the Electrician Calc app.",
+      "Charge time = Ah to put back &divide; (charge current &times; charge efficiency), the constant-current stage only.",
+      "Defaults, each editable: 50 % depth for AGM and gel and 80 % for LiFePO4 (Victron cycle-life ratings), 85 % inverter efficiency "
+      "(Victron Phoenix datasheet: 84&ndash;92 % peak), 90 % and 99 % charge efficiency (Battery University BU-808c). Read 23 November 2026."],
+     ["Nominal battery voltage and the capacity on the label.", "A steady load; appliance wattages are approximate (Minfin's appliance calculator)."],
+     ["Lead-acid capacity falls at high discharge rates and in the cold; old batteries hold less.",
+      "A lead-acid battery needs a slower absorption stage after the time shown.", "It does not size the inverter for starting currents."]),
     ("Epoxy coverage calculator", "coating/epoxy-coverage-calculator.html",
      ["One US gallon is 231 cubic inches, so it covers 1,604 sq ft at 1 mil. Gallons = area &times; mils &divide; "
       "(1,604 &times; solids by volume) &times; (1 + waste)."],
