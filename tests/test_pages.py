@@ -1075,7 +1075,7 @@ class BatteryUk(unittest.TestCase):
     def test_language_and_place(self):
         self.assertIn('<html lang="uk">', self.h)
         self.assertIn('data-calc="battery"', self.h)
-        self.assertIn('assets/battery-uk.js"></script>', self.h)
+        self.assertRegex(self.h, r'assets/battery-uk\.js\?v=[0-9a-f]+"></script>')  # content hash since PR #12
         self.assertNotIn("{rel}", self.h)
         self.assertIn(f"<loc>{build.BASE}/{pe.BATTERY_UK}</loc>", (SITE / "sitemap.xml").read_text())
         self.assertIn('href="../electrical/uk/battery-runtime.html"', page(pe.HUB))
