@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>На скільки вистачить акумулятора або ДБЖ</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/electrical/uk/battery-runtime.html">
+<base target="_blank">
+<link rel="stylesheet" href="../../assets/style.css?v=fa90e2f0">
+<link rel="stylesheet" href="../../assets/calc-more.css?v=08ebee9b">
+<link rel="stylesheet" href="../../assets/battery-uk.css?v=21782833">
+</head>
+<body class="t-elec embed" data-calc="battery">
+<main class="wrap">
+<h1 class="embed-title">На скільки вистачить акумулятора або ДБЖ</h1>
+<div class="calc card"><div class="fields"><div><label for="bt-type">Тип АКБ</label><select id="bt-type"><option value="agm" selected>AGM / гель</option><option value="lfp">LiFePO4</option></select></div><div><label for="bt-v">Напруга однієї АКБ</label><select id="bt-v"><option value="12" selected>12 В</option><option value="24">24 В</option><option value="48">48 В</option><option value="12.8">12,8 В (LiFePO4)</option><option value="25.6">25,6 В (LiFePO4)</option><option value="51.2">51,2 В (LiFePO4)</option></select></div><div><label for="bt-ah">Ємність однієї АКБ <small>(А·год)</small></label><input id="bt-ah" inputmode="decimal" value="100"></div><div><label for="bt-s">Послідовно <small>(шт., додає вольти)</small></label><input id="bt-s" inputmode="decimal" value="1"></div><div><label for="bt-p">Паралельно <small>(гілок, додає А·год)</small></label><input id="bt-p" inputmode="decimal" value="2"></div><div><label for="bt-dod">Глибина розряду <small>(%, AGM ~50, LiFePO4 ~80–90)</small></label><input id="bt-dod" inputmode="decimal" value="50"></div><div><label for="bt-eff">ККД інвертора <small>(%)</small></label><input id="bt-eff" inputmode="decimal" value="85"></div><div><label for="bt-ceff">ККД заряду <small>(%, AGM ~90, LiFePO4 ~99)</small></label><input id="bt-ceff" inputmode="decimal" value="90"></div><div class="full"><label for="bt-load">Навантаження <small>(Вт, сума всіх приладів)</small></label><input id="bt-load" inputmode="decimal" value="223"><div class="presets" id="bt-presets"><button type="button" data-w="13">+ Роутер + оптичний термінал 13 Вт</button><button type="button" data-w="150">+ Холодильник 150 Вт</button><button type="button" data-w="60">+ Газовий котел 60 Вт</button><button type="button" data-w="60">+ Ноутбук 60 Вт</button><button type="button" data-w="10">+ LED-лампа 10 Вт</button><button type="button" class="clear" data-w="0">Очистити</button></div><p class="note">Потужності орієнтовні (за калькулятором Мінфіну). Подивіться на табличку приладу або виміряйте ватметром.</p></div><div><label for="bt-amps">Струм заряду <small>(А)</small></label><input id="bt-amps" inputmode="decimal" value="20"></div><div><label for="bt-hours">Потрібно годин <small>(для мінімального банку)</small></label><input id="bt-hours" inputmode="decimal" value="8"></div></div><div class="result" aria-live="polite"><div class="eyebrow">Час роботи</div><div class="big" id="bt-time">–</div><div class="rows"><div><span>Енергія банку</span><span id="bt-wh">–</span></div><div><span>Корисна енергія на розетці</span><span id="bt-use">–</span></div><div><span>Струм з АКБ</span><span id="bt-cur">–</span></div><div><span>Час заряду</span><span id="bt-charge">–</span></div><div><span>Струм заряду в C</span><span id="bt-crate">–</span></div><div><span>Мінімальний банк</span><span id="bt-need">–</span></div><div><span>Це АКБ такої ємності</span><span id="bt-count">–</span></div></div><div id="bt-note" class="verdict"></div><ol class="work" id="bt-steps"></ol></div></div>
+<p class="powered">Калькулятор: <a href="https://zhukovskyi.space/calculators/electrical/uk/battery-runtime.html" target="_blank" rel="noopener">Dre Dev Tools</a></p>
+</main>
+<script src="../../assets/battery-uk.js?v=93a056ab"></script>
+</body>
+</html>

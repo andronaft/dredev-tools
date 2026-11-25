@@ -1336,6 +1336,7 @@ States not listed here have not been checked: ask the local building department.
 # ---------- Ukrainian: battery and UPS runtime (metric) ----------
 
 BATTERY_UK = "electrical/uk/battery-runtime.html"
+UK_CARDS = {}  # calculator cards of the Ukrainian pages, reused by their embed copies
 BATTERY_CHECKED = ("23 листопада 2026", "2026-11-23")  # the day the sources below were read
 BATTERY_UTM = "utm_source=site&utm_medium=calculator&utm_campaign=ua-backup"
 BATTERY_SRC = {
@@ -1417,6 +1418,7 @@ def battery_uk_page(b):
                   ("bt-charge", "Час заряду"), ("bt-crate", "Струм заряду в C"), ("bt-need", "Мінімальний банк"), ("bt-count", "Це АКБ такої ємності")])
               + '</div><div id="bt-note" class="verdict"></div><ol class="work" id="bt-steps"></ol>')
     card = f'<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>'
+    UK_CARDS["battery-runtime"] = card  # the Ukrainian embed copy (pages_embed.build_uk)
 
     banks = [("12 В 100 А·год AGM", 12, 100, 1, AGM_DOD), ("2 × 12 В 100 А·год AGM", 12, 100, 2, AGM_DOD), ("4 × 12 В 100 А·год AGM", 12, 100, 4, AGM_DOD),
              ("12,8 В 100 А·год LiFePO4", 12.8, 100, 1, LFP_DOD), ("25,6 В 100 А·год LiFePO4", 25.6, 100, 1, LFP_DOD),

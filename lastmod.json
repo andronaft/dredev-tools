@@ -24,8 +24,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
-  "hash": "73c1f3d45188755d",
-  "date": "2026-11-22"
+  "hash": "0cc7ceece1d197c8",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/coating/epoxy-coverage-calculator.html": {
   "hash": "ab8c2040beba9b5f",
@@ -116,8 +116,12 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/embed/": {
-  "hash": "aba0ad7a88e52b5a",
-  "date": "2026-11-22"
+  "hash": "aca07012cfabade5",
+  "date": "2026-11-25"
+ },
+ "https://zhukovskyi.space/calculators/embed/uk/": {
+  "hash": "3dee7c424465b52b",
+  "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/hvac/": {
   "hash": "cfd91f3429c74e92",

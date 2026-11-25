@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор падіння напруги</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html">
+<base target="_blank">
+<link rel="stylesheet" href="../../assets/style.css?v=fa90e2f0">
+<link rel="stylesheet" href="../../assets/calc-more.css?v=08ebee9b">
+</head>
+<body class="t-elec embed" data-calc="vd-uk">
+<main class="wrap">
+<h1 class="embed-title">Калькулятор падіння напруги</h1>
+<div class="calc card">
+<div class="fields">
+<div class="full"><div class="seg" id="supply" role="group" aria-label="Мережа">
+<button data-v="single" aria-pressed="true">1 фаза</button><button data-v="three" aria-pressed="false">3 фази</button><button data-v="dc" aria-pressed="false">Постійний струм</button></div></div>
+<div class="full"><div class="seg" id="cond" role="group" aria-label="Провідник">
+<button data-v="cu" aria-pressed="true">Мідь</button><button data-v="al" aria-pressed="false">Алюміній</button></div></div>
+<div><label for="size">Переріз жили</label><select id="size"></select></div>
+<div><label for="len">Довжина <small>(м, в один бік)</small></label><input id="len" inputmode="decimal" value="30"></div>
+<div><label for="amps">Струм навантаження <small>(А)</small></label><input id="amps" inputmode="decimal" value="16"></div>
+<div><label for="volts">Напруга <small>(В)</small></label><input id="volts" inputmode="decimal" value="230"></div>
+<div class="full"><label for="pf">Коефіцієнт потужності <small>(1 для нагрівачів і ламп, ~0,85 для двигунів)</small></label><input id="pf" inputmode="decimal" value="1"></div>
+</div>
+<div class="result" aria-live="polite">
+<div class="eyebrow">Падіння напруги</div>
+<div class="big" id="vd-pct">–</div>
+<div class="rows">
+<div><span>Падіння</span><span id="vd-v">–</span></div>
+<div><span>Напруга на навантаженні</span><span id="vd-end">–</span></div>
+<div><span>Найменший переріз для ≤ 3 %</span><span id="vd-min">–</span></div>
+</div>
+<div id="vd-verdict" class="verdict"></div>
+<p class="note">Лише падіння напруги. Переріз за допустимим струмом і автомат треба перевірити окремо.</p>
+</div>
+</div>
+<p class="powered">Калькулятор: <a href="https://zhukovskyi.space/calculators/electrical/voltage-drop-calculator.html" target="_blank" rel="noopener">Dre Dev Tools</a></p>
+</main>
+<script src="../../assets/embed-uk.js?v=a2b83cc6"></script>
+</body>
+</html>

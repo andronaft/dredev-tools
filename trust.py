@@ -14,6 +14,9 @@ import guides
 
 # (date, kind, text). Newest first. "Correction" marks a wrong number or a broken calculator that was fixed.
 CHANGES = [
+    ("2026-11-25", "New", "Three calculators in Ukrainian can be embedded on other sites: battery and UPS runtime, the cable "
+     "from the battery to the inverter (size by voltage drop and by the current-carrying capacity of IEC 60364-5-52 Table B.52.2) "
+     "and voltage drop in mm². The line under every embedded calculator now names the brand only and its link is nofollow."),
     ("2026-11-23", "New", "Battery and UPS runtime calculator in Ukrainian, in metric units: hours from a battery bank through an "
      "inverter, usable kWh, charge time at a given current and the bank needed for a number of hours. Runtime and capacity "
      "use the formulas of the Electrician Calc app; depth of discharge, inverter and charge efficiency are named with their sources."),

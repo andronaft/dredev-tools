@@ -117,13 +117,16 @@ def article_ld(name, path, desc):
             "author": ld["author"], "publisher": ld["publisher"], "dateModified": ld["dateModified"]}
 
 
-def embed_page(name, title, full_path, theme, calc, card, data, page_scripts=None):
+def embed_page(name, title, full_path, theme, calc, card, data, page_scripts=None, lang="en", sub="", head=""):
     """A bare copy of a calculator for iframes on other sites: no header, footer or analytics, a credit line
     with the brand name only, noindex and a canonical link to the full page. Not in the sitemap.
-    [page_scripts] replaces calc-more.js for the calculators that run on calc.js ("{rel}" is the site root)."""
+    [page_scripts] replaces calc-more.js for the calculators that run on calc.js ("{rel}" is the site root).
+    [sub] is a folder under embed/ ("uk/" for the Ukrainian copies); [head] adds stylesheets."""
     full = f"{B.BASE}/{full_path}"
+    rel = "../" * (1 + sub.count("/"))
+    credit = "Калькулятор:" if lang == "uk" else "Powered by"
     doc = f"""<!doctype html>
-<html lang="en">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -131,20 +134,20 @@ def embed_page(name, title, full_path, theme, calc, card, data, page_scripts=Non
 <meta name="robots" content="noindex">
 <link rel="canonical" href="{full}">
 <base target="_blank">
-<link rel="stylesheet" href="../assets/style.css">
-<link rel="stylesheet" href="../assets/calc-more.css">
-</head>
+<link rel="stylesheet" href="{rel}assets/style.css">
+<link rel="stylesheet" href="{rel}assets/calc-more.css">
+{head.replace("{rel}", rel)}</head>
 <body class="{theme} embed" data-calc="{calc}">
 <main class="wrap">
 <h1 class="embed-title">{e(title)}</h1>
 {card}
-<p class="powered">Powered by <a href="{full}" target="_blank" rel="noopener">{e(B.CFG["brand"])} Tools</a></p>
+<p class="powered">{credit} <a href="{full}" target="_blank" rel="noopener">{e(B.CFG["brand"])} Tools</a></p>
 </main>
-{(page_scripts or scripts(data)).replace("{rel}", "../")}
+{(page_scripts or scripts(data)).replace("{rel}", rel)}
 </body>
 </html>
 """
-    dest = B.OUT / "embed" / f"{name}.html"
+    dest = B.OUT / "embed" / f"{sub}{name}.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(doc)
 

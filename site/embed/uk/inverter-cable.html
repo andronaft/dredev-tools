@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Переріз кабелю від АКБ до інвертора</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/electrical/dc-wire-size-calculator.html">
+<base target="_blank">
+<link rel="stylesheet" href="../../assets/style.css?v=fa90e2f0">
+<link rel="stylesheet" href="../../assets/calc-more.css?v=08ebee9b">
+</head>
+<body class="t-elec embed" data-calc="cable-uk">
+<main class="wrap">
+<h1 class="embed-title">Переріз кабелю від АКБ до інвертора</h1>
+<div class="calc card"><div class="fields">
+<div class="full"><label>Напруга банку АКБ</label>
+<div class="seg" id="ic-vpre" role="group" aria-label="Типові напруги"><button data-v="12" aria-pressed="true">12 В</button><button data-v="24" aria-pressed="false">24 В</button><button data-v="48" aria-pressed="false">48 В</button></div></div>
+<div><label for="ic-v">Напруга <small>(В)</small></label><input id="ic-v" inputmode="decimal" value="12"></div>
+<div><label for="ic-w">Потужність інвертора <small>(Вт, найбільше навантаження)</small></label><input id="ic-w" inputmode="decimal" value="1000"></div>
+<div><label for="ic-eff">ККД інвертора <small>(%)</small></label><input id="ic-eff" inputmode="decimal" value="85"></div>
+<div><label for="ic-len">Довжина кабелю <small>(м, в один бік)</small></label><input id="ic-len" inputmode="decimal" value="1.5"></div>
+<div class="full"><label>Допустиме падіння напруги</label><div class="seg" id="ic-limit" role="group" aria-label="Допустиме падіння напруги"><button data-v="1" aria-pressed="false">1 %</button><button data-v="2" aria-pressed="true">2 %</button><button data-v="3" aria-pressed="false">3 %</button></div></div>
+</div><div class="result" aria-live="polite"><div class="eyebrow">Переріз кабелю</div><div class="big" id="ic-size">–</div>
+<div class="rows"><div><span>Струм з АКБ</span><span id="ic-amps">–</span></div>
+<div><span id="ic-limit-label">Найменший переріз для падіння ≤ 2 %</span><span id="ic-bydrop">–</span></div>
+<div><span>Найменший переріз за струмом (IEC 60364-5-52, B.52.2, метод C)</span><span id="ic-byamps">–</span></div>
+<div><span>Падіння напруги</span><span id="ic-drop">–</span></div>
+<div><span>Втрати в кабелі</span><span id="ic-loss">–</span></div></div>
+<div id="ic-verdict" class="verdict"></div>
+<p class="note">Мідь, ізоляція ПВХ 70 °C, повітря 30 °C. Запобіжник між АКБ і інвертором, нагрів у пучку і пускові струми не перевіряються.</p></div></div>
+<p class="powered">Калькулятор: <a href="https://zhukovskyi.space/calculators/electrical/dc-wire-size-calculator.html" target="_blank" rel="noopener">Dre Dev Tools</a></p>
+</main>
+<script src="../../assets/embed-uk.js?v=a2b83cc6"></script>
+</body>
+</html>

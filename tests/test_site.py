@@ -1,6 +1,8 @@
 """Checks on the built site (run python3 build.py first): the hobby and trade pages exist, follow the page pattern,
 are in the sitemap and on the home page, and no internal link is broken."""
+import json
 import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -98,6 +100,49 @@ class Site(unittest.TestCase):
             self.assertTrue((SITE / canonical[len(BASE) + 1:]).is_file(), p.name)  # the full page it points to
         for name in ("candle-wax", "lye", "voltage-drop", "superheat-subcooling"):  # the calc.js calculators too
             self.assertTrue((SITE / f"embed/{name}.html").is_file(), name)
+
+    def test_embed_credit_is_branded_and_nofollow(self):
+        """The line under the frame links with the brand only and rel="nofollow" (Google: widget links)."""
+        import html as h
+        for index in ("embed/index.html", "embed/uk/index.html"):
+            code = h.unescape("".join(re.findall(r'<textarea class="embed-code"[^>]*>(.*?)</textarea>', (SITE / index).read_text(), re.S)))
+            credits = re.findall(r'<p style="font-size:14px;margin:6px 0 0">(.*?)</p>', code)
+            self.assertGreaterEqual(len(credits), 3, index)
+            for line in credits:
+                self.assertRegex(line, r'^(Calculator|Калькулятор): <a href="[^"]+" rel="nofollow">Dre Dev Tools</a>$', index)
+
+    def test_embed_uk(self):
+        """The Ukrainian widgets: bare, noindex, in Ukrainian, listed on embed/uk/, which pairs with embed/ by hreflang."""
+        index = (SITE / "embed/uk/index.html").read_text()
+        self.assertIn('<html lang="uk">', index)
+        self.assertIn(f"<loc>{BASE}/embed/uk/</loc>", self.sitemap)
+        for page in ("embed/index.html", "embed/uk/index.html"):
+            text = (SITE / page).read_text()
+            self.assertIn(f'<link rel="alternate" hreflang="uk" href="{BASE}/embed/uk/">', text, page)
+            self.assertIn(f'<link rel="alternate" hreflang="en" href="{BASE}/embed/">', text, page)
+        for name, calc in (("battery-runtime", "battery"), ("inverter-cable", "cable-uk"), ("voltage-drop", "vd-uk")):
+            html = (SITE / f"embed/uk/{name}.html").read_text()
+            self.assertIn('<html lang="uk">', html, name)
+            self.assertIn('<meta name="robots" content="noindex">', html, name)
+            self.assertIn(f'data-calc="{calc}"', html, name)
+            self.assertIn('Калькулятор: <a href=', html, name)
+            self.assertIn('href="../../assets/style.css', html, name)
+            self.assertNotIn("cloudflareinsights", html, name)
+            self.assertNotIn(f"/embed/uk/{name}.html</loc>", self.sitemap)
+            self.assertIn(f"{BASE}/embed/uk/{name}.html", index, name)
+
+    def test_embed_uk_maths(self):
+        """assets/embed-uk.js: the drop equals calc.js's IEC formula, the cable is the larger of the two sizes."""
+        code = ("const m=require('./assets/embed-uk.js');console.log(JSON.stringify(["
+                "m.dropVolts({supply:'single',cond:'cu',mm2:2.5,metres:30,amps:16,pf:1}),"
+                "m.inverterCable({volts:12,watts:1000,eff:0.85,metres:1.5,limit:2}),"
+                "m.inverterCable({volts:48,watts:3000,eff:0.9,metres:1,limit:3})]))")
+        vd, a, b = json.loads(subprocess.run(["node", "-e", code], cwd=ROOT, check=True, capture_output=True, text=True).stdout)
+        self.assertAlmostEqual(vd, 2 * 16 * 30 * 0.0225 / 2.5)  # 8.64 V
+        self.assertAlmostEqual(a["amps"], 1000 / (12 * 0.85))  # 98 A
+        self.assertEqual((a["byDrop"], a["byAmps"], a["size"]), (35, 25, 35))  # drop decides; 25 mm² carries 112 A
+        self.assertAlmostEqual(b["amps"], 3000 / (48 * 0.9))  # 69 A
+        self.assertEqual((b["byDrop"], b["byAmps"], b["size"]), (2.5, 16, 16))  # current decides: 10 mm² is 63 A, 16 mm² 85 A
 
     def test_open_pt_data(self):
         """The CSV and JSON downloads hold the same cells as the PT chart pages, and the page describes them."""

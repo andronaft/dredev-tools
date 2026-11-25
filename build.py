@@ -522,7 +522,8 @@ def guide_line(path, body):
     return body.replace('<section class="related">', line + '\n<section class="related">', 1)
 
 
-def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en", canonical=None):
+def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="", lang="en", canonical=None, alternates=None):
+    """[alternates]: (hreflang, url) pairs for the same page in other languages, x-default included."""
     body = guide_line(path, body)
     depth = path.count("/")
     rel = "../" * depth
@@ -539,6 +540,7 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
     # Smart App Banner on iPhone, only where the page promotes an app that is on the App Store.
     ids = [m.group(1) for k in re.findall(r"<!-- app:([\w-]+) -->", body)
            if (m := re.search(r"/id(\d+)", CFG["apps"][k]["app_store_url"] or ""))]
+    alt = "".join(f'<link rel="alternate" hreflang="{h}" href="{u}">\n' for h, u in (alternates or []))
     itunes = f'<meta name="apple-itunes-app" content="app-id={ids[0]}">\n' if ids else ""
     subnav = "".join(f'<a href="{rel}{p}">{t}</a>' for t, p in SUBNAV)
     t = CHROME.get(lang, CHROME["en"])
@@ -550,7 +552,7 @@ def shell(path, title, desc, body, theme="", calc=None, jsonld=None, scripts="",
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
 <link rel="canonical" href="{canonical}">
-<meta property="og:type" content="website">
+{alt}<meta property="og:type" content="website">
 <meta property="og:site_name" content="{e(SITE_NAME)}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
