@@ -37,6 +37,12 @@ EV_WIRE = "electrical/ev-charger-wire-size.html"
 NEC_BY_STATE = "electrical/nec-edition-by-state.html"
 
 NEC_EDITION = "NFPA 70, National Electrical Code, 2023 edition"
+
+
+def nfpa_source(tables):
+    """Visible source line under a table built from NFPA 70 values. NFPA holds the copyright, so these pages carry
+    no CC BY licence (dataset_ld(..., license=None))."""
+    return f'<p class="note source">Values from NFPA 70 (NEC 2023), {tables}. © NFPA.</p>'
 # The K factor (Ω·cmil/ft) behind every number here: calc.js takes resistivity at 20 °C and adds 25 % for operating
 # temperature. Handbooks round copper to 12.9, which gives about 0.5 % less.
 K_CU = guides.RHO20["cu"] * 1.25 * 0.3048 / guides.MM2_PER_CMIL
@@ -176,6 +182,7 @@ def ampacity_page(b):
 <section><h2>Allowable ampacity, amperes</h2>
 <p class="muted">Not more than three current-carrying conductors in a raceway, cable or earth, ambient 30 °C (86 °F). Insulated conductors rated up to 2000 V.</p>
 {chart}
+{nfpa_source("Table 310.16")}
 <p class="note">Common wire types by column: UF at 60 °C; THW and THWN at 75 °C; THHN, THWN-2 and XHHW-2 at 90 °C. The aluminum columns also cover copper-clad aluminum. 14 AWG aluminum is not listed.</p>
 <p class="note print-only">{b.BASE}/{path} · checked {refdata.CHECKED}</p></section>
 <section class="guide"><h2>Correction factors and worked examples</h2>
@@ -191,7 +198,7 @@ def ampacity_page(b):
     desc = ("Ampacity chart from NEC Table 310.16 (2023): copper and aluminum, 14 AWG to 500 kcmil, 60/75/90 °C columns, "
             "with ambient and conductor-count correction factors and worked examples. Printable.")
     ld = dataset_ld(b, path, "Conductor ampacity chart (NEC Table 310.16)", desc, f"{NEC_EDITION}, Table 310.16",
-                    [("Conductor size", "AWG or kcmil"), ("Allowable ampacity, copper", "A"), ("Allowable ampacity, aluminum", "A")])
+                    [("Conductor size", "AWG or kcmil"), ("Allowable ampacity, copper", "A"), ("Allowable ampacity, aluminum", "A")], license=None)
     b.shell(path, "Ampacity Chart: NEC Table 310.16 (Copper & Aluminum, 60/75/90 °C)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
@@ -266,6 +273,7 @@ On 240 V, 30 A needs {reach(30, 240)}, and 50 A needs {reach(50, 240)}.</p></div
 <h3>Copper, 120 V single phase</h3>{dist_table(120)}
 <h3>Copper, 240 V single phase</h3>{dist_table(240)}
 <h3>Aluminum, 240 V single phase</h3>{dist_table(240, "al")}
+{nfpa_source("Table 310.16")}
 <p class="note">For continuous loads (3 hours or more, such as EV chargers) size for 125 % of the load first. NM-B cable uses the 60 °C column and is often one size larger at short lengths.
 “&gt; 500” means even 500 kcmil is over 3 %: use parallel runs or a higher voltage.</p>
 {ex}
@@ -279,7 +287,7 @@ On 240 V, 30 A needs {reach(30, 240)}, and 50 A needs {reach(50, 240)}.</p></div
     desc = ("Wire size chart by amps and distance: copper and aluminum for 15 to 100 A over 25 to 300 ft at 120 V and 240 V, "
             "sized for NEC Table 310.16 ampacity and 3 % voltage drop, with a worked example.")
     ld = dataset_ld(b, path, "Wire size by amps and distance", desc, f"{NEC_EDITION}, Table 310.16",
-                    [("Load", "A"), ("One-way length", "ft"), ("Conductor size", "AWG or kcmil")])
+                    [("Load", "A"), ("One-way length", "ft"), ("Conductor size", "AWG or kcmil")], license=None)
     b.shell(path, "Wire Size Chart by Amps and Distance (120 V and 240 V)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
@@ -775,6 +783,7 @@ def subpanel_page(b):
 non-continuous load, THHN/THWN-2 or XHHW-2 conductors (SER cable for aluminum) on 75 °C terminals, 30 °C ambient, power factor 1. Length is one way.</p>
 <h3>Copper</h3>{run_table(SUB_FEEDERS, SUB_FEET)}
 <h3>Aluminum</h3>{run_table(SUB_FEEDERS, SUB_FEET, "al")}
+{nfpa_source("Tables 310.16 and 250.122")}
 <p class="note">The breaker in the main panel is the feeder rating: 50, 60 or 100 A. A longer run does not change it; it only makes the wire larger.
 If the subpanel's real load is lower than the breaker, the drop is lower in the same proportion. <strong>Why other sites show a different number:</strong> {nmb_why}</p>
 <h3>Four conductors, and the size of the ground</h3>
@@ -794,7 +803,7 @@ The charts above size the two hots; run the neutral the same size unless a load 
     desc = ("What size wire for a 50 amp sub panel: copper and aluminum feeder sizes for 50, 60 and 100 A subpanels from 25 to 250 ft, "
             "with voltage drop at each length, the ground wire size and the four-wire rule. NEC 2023.")
     ld = dataset_ld(b, path, "Subpanel feeder wire size by distance", desc, f"{NEC_EDITION}, Tables 310.16 and 250.122",
-                    [("Feeder rating", "A"), ("One-way length", "ft"), ("Conductor size", "AWG or kcmil"), ("Voltage drop", "%")], ENGINE_CHECKED[1])
+                    [("Feeder rating", "A"), ("One-way length", "ft"), ("Conductor size", "AWG or kcmil"), ("Voltage drop", "%")], ENGINE_CHECKED[1], license=None)
     b.shell(path, "What Size Wire for a 50 Amp Sub Panel? 60 A and 100 A Chart", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
@@ -883,6 +892,7 @@ def fill_chart_page(b):
 <p class="muted">All conductors the same size, THHN or THWN-2, counted by NEC Chapter 9, Table 1: {one * 100:.0f} % fill for one conductor, {two * 100:.0f} % for two, {more * 100:.0f} % for more than two. Grounds count.</p>
 <h3>{e(names['emt'])} (electrical metallic tubing)</h3>{fill_table(t, 'emt')}
 <h3>{e(names['pvc40'])}</h3>{fill_table(t, 'pvc40')}
+{nfpa_source("Chapter 9, Tables 1, 4 and 5")}
 <p class="note">{marks}</p>
 <p class="note">Fill is only the space. More than three current-carrying conductors in one raceway also lowers their ampacity (NEC 310.15(C)(1)).
 Other raceway types have their own areas in Table 4 and are not covered here.</p>
@@ -898,7 +908,7 @@ Other raceway types have their own areas in Table 4 and are not covered here.</p
     desc = ("Conduit fill chart: how many THHN conductors from 14 AWG to 1/0 fit in 1/2 to 2 in. EMT and PVC Schedule 40 at 40 % fill, "
             "with raceway and wire areas from NEC Chapter 9, Tables 1, 4 and 5 (2023) and worked examples.")
     ld = dataset_ld(b, path, "Conduit fill chart for THHN conductors", desc, f"{NEC_EDITION}, Chapter 9, Tables 1, 4 and 5",
-                    [("Conductor size", "AWG"), ("Trade size", "in"), ("Maximum number of conductors", "")], ENGINE_CHECKED[1])
+                    [("Conductor size", "AWG"), ("Trade size", "in"), ("Maximum number of conductors", "")], ENGINE_CHECKED[1], license=None)
     b.shell(path, "Conduit Fill Chart: THHN in EMT and PVC Schedule 40 (NEC 2023)", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
@@ -982,6 +992,7 @@ For 10 AWG THHN it is {n('3/4', '10')} and {n('1/2', '10')} (NEC Chapter 9, Tabl
 {derate}
 <p class="note">THHN is a 90 °C conductor, so the adjustment starts from the 90 °C column of Table 310.16 ({ampacity('cu', 90, '12')} A for 12 AWG, {ampacity('cu', 90, '10')} A for 10 AWG) and the result may not exceed the 75 °C termination value
 ({ampacity('cu', 75, '12')} A and {ampacity('cu', 75, '10')} A). 30 °C ambient; a hot attic or roof lowers these further. Breakers on 12 and 10 AWG copper stay at 20 and 30 A (240.4(D)).</p>
+{nfpa_source("Chapter 9, Tables 1, 4 and 5; Tables 310.16 and 310.15(C)(1)")}
 {ex}
 {checked_note(b, path)}</section>
 <p><a class="btn" href="{REL}{FILL_CHART}">Conduit fill chart, 14 AWG to 1/0</a> <a class="btn ghost" href="{REL}{AMPACITY_PAGE}">Ampacity chart</a></p>
@@ -992,7 +1003,7 @@ For 10 AWG THHN it is {n('3/4', '10')} and {n('1/2', '10')} (NEC Chapter 9, Tabl
     desc = (f"How many 12 AWG wires fit in 3/4 EMT: {n('3/4', '12')} THHN conductors by NEC conduit fill ({n('1/2', '12')} in 1/2 in. EMT; 10 AWG: {n('3/4', '10')} and {n('1/2', '10')}), "
             "and how the ampacity adjustment of 310.15(C)(1) limits the number of 20 A circuits.")
     ld = dataset_ld(b, path, "12 AWG and 10 AWG THHN in 1/2 and 3/4 in. EMT", desc, f"{NEC_EDITION}, Chapter 9, Tables 1, 4 and 5; Tables 310.16 and 310.15(C)(1)",
-                    [("Conductor size", "AWG"), ("Trade size", "in"), ("Maximum number of conductors", ""), ("Adjusted ampacity", "A")], ENGINE_CHECKED[1])
+                    [("Conductor size", "AWG"), ("Trade size", "in"), ("Maximum number of conductors", ""), ("Adjusted ampacity", "A")], ENGINE_CHECKED[1], license=None)
     b.shell(path, "How Many 12 AWG Wires in 3/4 EMT? Fill Count and Derating", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 
@@ -1172,6 +1183,7 @@ That is copper THHN in conduit on 75 °C terminals (NEC Table 310.16, 2023 editi
 <h3>Copper THHN by run length</h3>
 <p class="muted">The smallest wire that carries the charger and keeps voltage drop at or under 3 % at the charger current, with the drop at that size. Length is one way.</p>
 {run_table(EV_AMPS, EV_FEET, cont=True)}
+{nfpa_source("Tables 310.16 and 250.122")}
 {ex}
 {checked_note(b, path)}</section>
 <p><a class="btn" href="{REL}{WIRE_CALC}">Wire size calculator</a> <a class="btn ghost" href="{REL}{BY_DISTANCE}">Wire size by amps and distance</a></p>
@@ -1182,7 +1194,7 @@ That is copper THHN in conduit on 75 °C terminals (NEC Table 310.16, 2023 editi
     desc = ("EV charger wire size chart: breaker and copper wire for 32, 40, 48 and 80 A Level 2 chargers with the 125 % continuous-load rule, "
             "THHN and NM-B, by run length from 25 to 200 ft with voltage drop. NEC 2023.")
     ld = dataset_ld(b, path, "EV charger wire size by amps and distance", desc, f"{NEC_EDITION}, Tables 310.16 and 250.122",
-                    [("Charger current", "A"), ("Breaker", "A"), ("One-way length", "ft"), ("Conductor size", "AWG"), ("Voltage drop", "%")], ENGINE_CHECKED[1])
+                    [("Charger current", "A"), ("Breaker", "A"), ("One-way length", "ft"), ("Conductor size", "AWG"), ("Voltage drop", "%")], ENGINE_CHECKED[1], license=None)
     b.shell(path, "EV Charger Wire Size Chart: 32, 40, 48 and 80 Amp by Distance", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 

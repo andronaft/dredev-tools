@@ -72,11 +72,19 @@ def article_ld(b, path, headline, desc, modified=None):
             "url": url(b, path), "author": person(b), "publisher": {"@id": b.ORG_ID}, "dateModified": modified or refdata.CHECKED_ISO, "inLanguage": "en"}
 
 
-def dataset_ld(b, path, name, desc, based_on, variables, modified=None):
-    return {"@context": "https://schema.org", "@type": "Dataset", "name": name, "description": desc, "url": url(b, path),
-            "creator": person(b), "dateModified": modified or refdata.CHECKED_ISO, "license": "https://creativecommons.org/licenses/by/4.0/",
-            "isAccessibleForFree": True, "isBasedOn": based_on,
-            "variableMeasured": [{"@type": "PropertyValue", "name": n, "unitText": u} for n, u in variables]}
+CC_BY = "https://creativecommons.org/licenses/by/4.0/"
+
+
+def dataset_ld(b, path, name, desc, based_on, variables, modified=None, license=CC_BY):
+    """license=None leaves the licence out: for tables whose values come from a copyrighted code (NFPA 70) that we
+    cannot license to anyone."""
+    ld = {"@context": "https://schema.org", "@type": "Dataset", "name": name, "description": desc, "url": url(b, path),
+          "creator": person(b), "dateModified": modified or refdata.CHECKED_ISO}
+    if license:
+        ld["license"] = license
+    ld.update({"isAccessibleForFree": True, "isBasedOn": based_on,
+               "variableMeasured": [{"@type": "PropertyValue", "name": n, "unitText": u} for n, u in variables]})
+    return ld
 
 
 def plain(html_text):

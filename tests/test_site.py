@@ -172,6 +172,16 @@ class Site(unittest.TestCase):
             self.assertIn(needle, page)
         self.assertIn(f"<loc>{BASE}/{pages_data.PATH}</loc>", self.sitemap)
 
+    def test_nfpa_tables_not_licensed(self):
+        # NFPA holds the copyright on NEC tables: no CC BY claim on pages that reproduce them, and a visible source line.
+        for f in ("ampacity-chart-nec-310-16", "wire-size-by-amps-and-distance", "wire-size-50-amp-sub-panel",
+                  "conduit-fill-chart", "how-many-12-awg-wires-in-3-4-emt", "ev-charger-wire-size"):
+            page = (SITE / "electrical" / f"{f}.html").read_text()
+            self.assertIn('"@type": "Dataset"', page, f)
+            self.assertNotIn("creativecommons.org", page, f)
+            self.assertIn("Values from NFPA 70 (NEC 2023)", page, f)
+            self.assertIn("© NFPA.", page, f)
+
     def test_no_broken_internal_links(self):
         broken = []
         for p in SITE.rglob("*.html"):
