@@ -112,8 +112,8 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/embed/": {
-  "hash": "8069520f8441a217",
-  "date": "2026-11-18"
+  "hash": "aba0ad7a88e52b5a",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/": {
   "hash": "cfd91f3429c74e92",
@@ -164,8 +164,8 @@
   "date": "2026-11-21"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/": {
-  "hash": "92d1d0795fccf4f2",
-  "date": "2026-11-12"
+  "hash": "b99f5574aeb0869f",
+  "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-12.html": {
   "hash": "a6acd14791baee89",
@@ -253,6 +253,10 @@
  },
  "https://zhukovskyi.space/calculators/hvac/pt-chart/r-744.html": {
   "hash": "486f1c6197474376",
+  "date": "2026-11-22"
+ },
+ "https://zhukovskyi.space/calculators/hvac/refrigerant-pt-data.html": {
+  "hash": "dda15906ae7179a5",
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-134a.html": {

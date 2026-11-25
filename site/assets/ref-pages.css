@@ -26,6 +26,9 @@ p.btns { margin: 16px 0; }
 .stack td small { display: block; font-size: 12px; color: var(--muted); }
 .appline { margin: 14px 0 6px; max-width: 760px; }
 .appline p { margin: 0 0 10px; }
+/* open data page (pages_data.py) */
+.datacols th, .datacols td { text-align: left; white-space: normal; vertical-align: top; }
+pre.sample { font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--soft); border: 1px solid var(--line); border-radius: 12px; padding: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; max-width: 760px; }
 
 
 @media print {

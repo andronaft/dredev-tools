@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Superheat &amp; subcooling calculator</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html">
+<base target="_blank">
+<link rel="stylesheet" href="../assets/style.css?v=fa90e2f0">
+<link rel="stylesheet" href="../assets/calc-more.css?v=08ebee9b">
+</head>
+<body class="t-hvac embed" data-calc="hvac">
+<main class="wrap">
+<h1 class="embed-title">Superheat &amp; subcooling calculator</h1>
+
+<div class="calc card">
+<div class="fields">
+<div class="full"><div class="seg" id="mode" role="group" aria-label="Measurement">
+<button data-v="sh" aria-pressed="true">Superheat</button><button data-v="sc" aria-pressed="false">Subcooling</button></div></div>
+<div class="full"><label for="ref">Refrigerant</label><select id="ref"><option value="R-410A">R-410A</option><option value="R-454B">R-454B (glide)</option><option value="R-32">R-32</option><option value="R-22">R-22</option><option value="R-134a">R-134a</option><option value="R-404A">R-404A</option><option value="R-407C">R-407C (glide)</option><option value="R-407A">R-407A (glide)</option><option value="R-448A">R-448A (glide)</option><option value="R-449A">R-449A (glide)</option><option value="R-452A">R-452A (glide)</option><option value="R-513A">R-513A (glide)</option><option value="R-1234yf">R-1234yf</option><option value="R-507A">R-507A</option><option value="R-427A">R-427A (glide)</option><option value="R-408A">R-408A</option><option value="R-409A">R-409A (glide)</option><option value="R-290">R-290</option><option value="R-600a">R-600a</option><option value="R-744">R-744</option><option value="R-717">R-717</option><option value="R-12">R-12</option></select><p class="note" id="ref-info" data-charts="https://zhukovskyi.space/calculators/hvac/pt-chart/"></p></div>
+<div><label for="p" id="p-label">Suction pressure <small>(psig)</small></label><input id="p" inputmode="decimal" value="119"></div>
+<div><label for="t" id="t-label">Suction line temp <small>(°F)</small></label><input id="t" inputmode="decimal" value="52"></div>
+</div>
+<div class="result" aria-live="polite">
+<div id="out-title" class="eyebrow">Superheat</div>
+<div class="big" id="out">–</div>
+<div class="rows"><div><span>In kelvin</span><span id="out-c"></span></div>
+<div><span id="sat-label">Saturation temp</span><span id="sat">–</span></div></div>
+<div id="hvac-warn" class="verdict"></div>
+</div>
+</div>
+
+<section class="calc card" style="margin-top:20px">
+<div class="fields">
+<div class="full"><h2 style="margin:0">PT lookup</h2></div>
+<div class="full"><div class="seg" id="ptmode" role="group" aria-label="Lookup direction">
+<button data-v="p2t" aria-pressed="true">Pressure → temp</button><button data-v="t2p" aria-pressed="false">Temp → pressure</button></div></div>
+<div class="full"><label for="pt-in" id="pt-in-label">Pressure <small>(psig)</small></label><input id="pt-in" inputmode="decimal" value="119"></div>
+</div>
+<div class="result"><div class="eyebrow">Saturation</div><div class="rows" id="pt-out"></div></div>
+</section>
+
+<p class="powered">Powered by <a href="https://zhukovskyi.space/calculators/hvac/superheat-subcooling-calculator.html" target="_blank" rel="noopener">Dre Dev Tools</a></p>
+</main>
+<script>window.HVAC_EXAMPLES = {"R-410A":{"sh":[119,52],"sc":[366,100]},"R-454B":{"sh":[107,52],"sc":[346,100]},"R-32":{"sh":[121,52],"sc":[375,100]},"R-22":{"sh":[69,52],"sc":[226,100]},"R-134a":{"sh":[18,31],"sc":[135,95]},"R-404A":{"sh":[25,2],"sc":[254,95]},"R-407C":{"sh":[63,52],"sc":[260,100]},"R-407A":{"sh":[15,2],"sc":[255,95]},"R-448A":{"sh":[16,1],"sc":[262,95]},"R-449A":{"sh":[16,1],"sc":[258,95]},"R-452A":{"sh":[20,1],"sc":[266,95]},"R-513A":{"sh":[22,31],"sc":[143,95]},"R-1234yf":{"sh":[38,52],"sc":[146,100]},"R-507A":{"sh":[26,3],"sc":[260,95]},"R-427A":{"sh":[61,52],"sc":[249,100]},"R-408A":{"sh":[22,2],"sc":[235,95]},"R-409A":{"sh":[18,32],"sc":[159,95]},"R-290":{"sh":[41,32],"sc":[187,95]},"R-600a":{"sh":[3,31],"sc":[63,95]},"R-744":{"sh":[407,32],"sc":[838,60]},"R-717":{"sh":[33,32],"sc":[214,95]},"R-12":{"sh":[21,32],"sc":[126,95]}};window.HVAC_PAGES = {"R-410A":"https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-410a.html","R-454B":"https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-454b.html","R-32":"https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-32.html","R-22":"https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-22.html","R-134a":"https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-134a.html","R-404A":"https://zhukovskyi.space/calculators/hvac/superheat-calculator/r-404a.html"};</script><script src="../assets/pt-data.js?v=4fe7ba3e"></script><script src="../assets/calc.js?v=95523d72"></script><script src="../assets/ref-pages.js?v=cdc64083"></script>
+</body>
+</html>

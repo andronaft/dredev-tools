@@ -96,7 +96,7 @@ def build_abv():
              f'or use the <a href="{{rel}}brewing/honey-per-gallon-calculator.html">honey calculator</a> to find the points each addition gave.'),
         ], "t-bread", ("ferment", "abv", FERMENT_PITCH), "abv", form, result, "ABV charts and worked example",
         extra=c.related("More brewing tools", [("brewing/honey-per-gallon-calculator.html", "Honey per gallon calculator")]),
-        embed=("mead-abv", 560))
+        embed=("mead-abv", 760))
 
 
 def build_honey():
@@ -223,7 +223,7 @@ def build_ec(crops):
              "with the ranges published by Oklahoma State University Extension."),
         ], "t-site", ("growlab", "ec-ppm", GROW_PITCH), "ec", form, result, "Conversion charts and worked example",
         data={"crops": crops}, extra=c.related("More hydroponics tools", [("hydroponics/ec-chart-by-crop.html", "EC and pH chart by crop")]),
-        embed=("ec-ppm", 600))
+        embed=("ec-ppm", 740))
 
 
 def build_crops(crops):
@@ -324,7 +324,7 @@ def build_fragrance():
              "The arithmetic is the same: wax weight × load. Melt waxes have their own limits, so use the figure from that wax's data sheet."),
         ], "t-elec", ("wickcalc", "fragrance", WICK_PITCH), "frag", form, result, "Fragrance charts and worked example",
         data={"waxes": WAXES}, extra=c.related("More candle tools", [("candles/candle-wax-calculator.html", "Candle wax calculator")]),
-        embed=("fragrance-load", 560))
+        embed=("fragrance-load", 680))
 
 
 def build_jar():
@@ -377,7 +377,8 @@ def build_jar():
              "No. Jars are named by the volume they hold, not by the weight of wax. An 8 fl oz jar filled to the brim holds about 8.3 oz of water by weight, "
              "and you normally stop below the brim, so measure to your own fill line."),
         ], "t-elec", ("wickcalc", "wax", WICK_PITCH), "jar", form, result, "Jar chart and worked example",
-        extra=c.related("More candle tools", [("candles/fragrance-load-calculator.html", "Fragrance load calculator")]))
+        extra=c.related("More candle tools", [("candles/fragrance-load-calculator.html", "Fragrance load calculator")]),
+        embed=("candle-wax", 820))
 
 
 # ---------- Dial In ----------
@@ -426,7 +427,7 @@ def build_espresso():
             ("Why weigh the shot instead of measuring millilitres?",
              "Crema is mostly gas, so the volume in the cup changes with the freshness of the beans while the weight does not. A small scale under the cup gives repeatable shots."),
         ], "t-roof", ("dial-in", "espresso-ratio", DIAL_PITCH), "ratio", form, result, "Yield chart and worked example",
-        embed=("espresso-ratio", 520))
+        embed=("espresso-ratio", 740))
 
 
 # ---------- RowKeeper ----------

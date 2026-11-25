@@ -34,4 +34,9 @@ def build(b):
         trust.CHANGES.insert(0, CHANGE)
     pages_trades.build()
     pages_hobby.build()
-    pages_embed.build()  # last: it lists the calculators the pages above registered
+
+
+def build_embed():
+    """The embed page. build.py calls it after its own calculators (voltage drop, lye, superheat) have registered
+    their copies too."""
+    pages_embed.build()

@@ -511,6 +511,13 @@ that refrigerant: they show the arithmetic and are not charging targets.</p>
                f'<script src="{REL}assets/pt-data.js"></script><script src="{REL}assets/calc.js"></script>' + JS)
     b.shell(path, f"Superheat & Subcooling Calculator: {n} Refrigerants, Free", desc, body, "t-hvac", "hvac",
             [b.webapp_ld("Superheat & Subcooling Calculator", path, f"Superheat, subcooling and PT lookup for {n} refrigerants."), faq_ld], scripts)
+    # The embed copy (calcs_common.embed_copy): the same fields and scripts; the links under the select are absolute
+    # because the copy lives in embed/ and is shown on other sites.
+    here = f"{b.BASE}/hvac/"
+    b.calcs_more.calcs_common.embed_copy(
+        "superheat-subcooling", 1130, "Superheat & subcooling calculator", path, "t-hvac", "hvac",
+        calc_widget(ref_field.replace('data-charts="pt-chart/"', f'data-charts="{here}pt-chart/"'), ex, "PT lookup"),
+        scripts.replace('"superheat-calculator/', f'"{here}superheat-calculator/'))
 
 
 # What is particular about each refrigerant that has its own page. Every function returns the text written for that
