@@ -3,8 +3,8 @@
 The DOIs tie the site's Dataset markup to the Zenodo records, so Google Dataset Search treats them as one dataset.
 GWP_LD and AWG_LD are copied from experimental/open-data (schema-org-dataset.jsonld, built by its build.py); the
 refrigerant-pt and NEC pages build their own Dataset and only add the DOI here.
-SHIFT_PATTERNS_LD and HOLIDAYS_REST_LD (the shift pages) are copied the same way but not published yet: their DOI is
-"" until the session that owns open-data publishes them, and with_doi() adds the DOI and downloads once it is set.
+The Dataset blocks of the newer pages (shifts, aquarium, roofing, rebar, pool, VPD, Brix) are copied the same way;
+with_doi() / dataset_ld() add the DOI and the Zenodo downloads from DOI.
 """
 
 DOI = {
@@ -12,7 +12,6 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
-    # Not published yet: the session that owns open-data fills these in after Zenodo publishes them.
     "shift-rota-patterns": "10.5281/zenodo.24547071",
     "public-holidays-rest-rules": "10.5281/zenodo.24547077",
     "aquarium-ammonia-fraction": "10.5281/zenodo.24547079",
@@ -899,8 +898,8 @@ POOL_CHLORINE_LD.update(doi_props("pool-chlorine-dose"))
 
 
 
-# Datasets from experimental/open-data that are not on Zenodo yet (vpd-table, brix-plato-specific-gravity). Copied
-# from their schema-org-dataset.jsonld without the download links, which only exist once there is a DOI.
+# vpd-table and brix-plato-specific-gravity, copied from their schema-org-dataset.jsonld without the download links;
+# with_doi() adds them from DOI.
 
 VPD_LD = {
     "@context": "https://schema.org",
