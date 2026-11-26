@@ -10,8 +10,8 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
-    "aquarium-ammonia-fraction": "",
-    "seawater-salinity-specific-gravity": "",
+    "aquarium-ammonia-fraction": "10.5281/zenodo.24547079",
+    "seawater-salinity-specific-gravity": "10.5281/zenodo.24547081",
 }
 
 

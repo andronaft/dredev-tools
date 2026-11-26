@@ -155,6 +155,9 @@ class Pages(unittest.TestCase):
                 self.assertNotIn("identifier", ds)
                 self.assertNotIn("distribution", ds)
                 self.assertNotIn("zenodo", h)
+            else:  # on Zenodo: the DOI is the identifier and the files download from the record
+                self.assertIn(f"https://doi.org/{opendata.DOI[key]}", ds["identifier"])
+                self.assertIn("zenodo.org/records/", ds["distribution"][0]["contentUrl"])
 
     def test_doi_fills_the_markup(self):
         with mock.patch.dict(opendata.DOI, {"aquarium-ammonia-fraction": "10.5281/zenodo.1234567"}):
@@ -163,7 +166,7 @@ class Pages(unittest.TestCase):
         self.assertEqual(d["identifier"], ["https://doi.org/10.5281/zenodo.1234567", "doi:10.5281/zenodo.1234567"])
         self.assertEqual(d["distribution"][0]["contentUrl"], "https://zenodo.org/records/1234567/files/aquarium-ammonia-fraction.csv?download=1")
         self.assertIn("https://doi.org/10.5281/zenodo.1234567", note)
-        self.assertEqual(opendata.doi_props("aquarium-ammonia-fraction"), {})
+        self.assertEqual(bool(opendata.doi_props("aquarium-ammonia-fraction")), bool(opendata.DOI["aquarium-ammonia-fraction"]))
         self.assertNotIn("identifier", aq.NH3_LD)
 
     def test_section_hub_sitemap_and_promo(self):
