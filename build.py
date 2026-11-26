@@ -21,6 +21,7 @@ from urllib.parse import quote, urljoin
 
 import calcs_more
 import guides
+import opendata
 import pages_data
 import pages_electrical
 import pages_hvac
@@ -705,7 +706,7 @@ def build_hvac():
           f"Free pressure-temperature charts for {len(PT)} refrigerants, including the new A2L refrigerants R-454B and R-32.",
           f'<div class="hero"><h1>Refrigerant PT charts</h1><p class="lead">Pressure–temperature tables for {len(PT)} refrigerants.</p></div><div class="grid">{index_rows}</div>'
           f'<p class="note">The same tables as files: <a href="{{rel}}{pages_data.PATH}">refrigerant PT data, CSV and JSON</a>.</p>',
-          "t-hvac")
+          "t-hvac", None, [opendata.GWP_LD])
 
 
 # ---------- Electrical ----------
@@ -854,7 +855,7 @@ def load_oils():
 
 
 def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_items, theme, calc, promo_html="", extra_scripts="", note="", answer_guide=None,
-              embed=None):
+              embed=None, extra_ld=()):
     """[embed] is (name, iframe height) for a calculator that also gets a bare copy for iframes (pages_embed.py)."""
     ans, guide_html, extra_faq = answer_guide or ("", "", [])
     faq_html, faq_ld = faq(faq_items + extra_faq)
@@ -869,7 +870,7 @@ def calc_page(path, title, desc, crumb, eyebrow, h1, lead, form, result, faq_ite
 {faq_html}
 """
     scripts = extra_scripts + '<script src="{rel}assets/calc.js"></script>'
-    shell(path, title, desc, body, theme, calc, [webapp_ld(h1, path, desc), faq_ld], scripts)
+    shell(path, title, desc, body, theme, calc, [webapp_ld(h1, path, desc), faq_ld, *extra_ld], scripts)
     if embed:
         calcs_more.calcs_common.embed_copy(embed[0], embed[1], h1, path, theme, calc, card, scripts)
 
@@ -889,7 +890,8 @@ def build_more():
 <div><span>mm² → closest AWG</span><span id="mm2-near">–</span></div></div>""",
         [("Is 2.5 mm² the same as 14 AWG?", "Close but not equal: 14 AWG is 2.08 mm² and 12 AWG is 3.31 mm². When you replace a metric cable with AWG wire, pick the size that is not smaller and check ampacity and voltage drop for your circuit."),
          ("Where do these numbers come from?", "Areas are from NEC Chapter 9, Table 8 (circular mils), converted with 1 cmil = 0.000506707 mm². Metric sizes are the IEC 60228 series.")],
-        "t-elec", "awg", answer_guide=guides.awg_guide(), promo_html=promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."))
+        "t-elec", "awg", answer_guide=guides.awg_guide(), promo_html=promo("electrician-calc", "awg", "Cable size with ampacity and derating, voltage drop and 21 calculators for NEC and IEC."),
+        extra_ld=[opendata.AWG_LD])
 
     calc_page(
         "electrical/wire-size-calculator.html", "Wire Size Calculator (NEC 310.16) | What Size Wire Do I Need?",

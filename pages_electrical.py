@@ -8,6 +8,8 @@ conduit, box and grounding tables are read from the Electrician Calc app (nec_ta
 from the app; the fill arithmetic is calc_math.py's mirror of the app's electrical.dart.
 """
 import math
+
+import opendata
 import re
 import subprocess
 from collections import Counter
@@ -17,7 +19,7 @@ import calc_math as cm
 import guides
 import refdata
 from guides import AMPACITY, NEC_SIZES, awg, drop_volts, fmt, max_feet, mm2_of, wire_size
-from pagekit import CSS, ELEC_NOTE, JS, REL, article_ld, byline, crumbs, dataset_ld, printbar, related, table
+from pagekit import CSS, ELEC_NOTE, JS, REL, article_ld, byline, crumbs, dataset_ld, printbar, related, table, url
 
 HUB = "electrical/index.html"
 VD_CALC = "electrical/voltage-drop-calculator.html"
@@ -1330,6 +1332,8 @@ States not listed here have not been checked: ask the local building department.
             f"{eds(lead)} {'leads' if len(lead) == 1 else 'lead'} with {top_n} states{'' if len(lead) == 1 else ' each'}. Checked {STATES_CHECKED[0]}.")
     ld = dataset_ld(b, path, "NEC edition in force by US state", desc, "NFPA, NEC enforcement table",
                     [("NEC edition", "year"), ("Effective date", "date")], STATES_CHECKED[1])
+    ld["@id"] = url(b, path) + "#dataset"
+    ld.update(opendata.doi_props("nec-edition-by-state"))
     b.shell(path, "NEC Edition by State (2026): Which Electrical Code Each State Uses", desc, body, "t-elec", None, [ld, faq_ld], JS)
 
 

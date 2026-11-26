@@ -14,6 +14,7 @@ from html import escape as e
 from pathlib import Path
 
 import guides
+import opendata
 from pagekit import CSS, HVAC_NOTE, REL, crumbs, person, related, table, url
 
 PATH = "hvac/refrigerant-pt-data.html"
@@ -269,4 +270,5 @@ Found a wrong cell? <a href="{b.error_mailto(url(b, PATH), "Refrigerant PT data"
           "distribution": [
               {"@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": f"{b.BASE}/{CSV_PATH}"},
               {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": f"{b.BASE}/{JSON_PATH}"}]}
+    ld.update(opendata.doi_props("refrigerant-pt"))
     b.shell(PATH, "Refrigerant PT Chart Data: CSV and JSON, 22 Refrigerants (CC BY)", desc, body, "t-hvac", None, [ld])

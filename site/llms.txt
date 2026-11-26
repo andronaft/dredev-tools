@@ -2,7 +2,7 @@
 
 > Phone apps for HVAC techs, electricians, floor coating installers, roofers, concrete crews, pool techs, soft washers and makers, many with a free browser calculator that uses the same formulas. Numbers come from published tables (refrigerant PT data, NEC 310.16, IEC 60364). Every app works offline, has no account and no ads, and keeps data on the phone.
 
-HVAC Charge, Electrician Calc, CoatCalc, Days Until, Focus Sprint, PoolPro, SoftWash Pro, RoofCalc, PaintBid, SiteLog, Lye Calc and Leben in DE are on Google Play. Electrician Calc and Focus Sprint are also on the App Store. The other Android apps are in closed testing on Google Play and anyone can join for free: https://zhukovskyi.space/testers/ . Last updated: 2026-11-25. Made by Andrii Zhukovskyi (https://zhukovskyi.space/). Support: mobile.support@zhukovskyi.space.
+HVAC Charge, Electrician Calc, CoatCalc, Days Until, Focus Sprint, PoolPro, SoftWash Pro, RoofCalc, PaintBid, SiteLog, Lye Calc and Leben in DE are on Google Play. Electrician Calc and Focus Sprint are also on the App Store. The other Android apps are in closed testing on Google Play and anyone can join for free: https://zhukovskyi.space/testers/ . Last updated: 2026-11-26. Made by Andrii Zhukovskyi (https://zhukovskyi.space/). Support: mobile.support@zhukovskyi.space.
 
 ## Apps you can install now
 
