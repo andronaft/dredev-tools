@@ -13,8 +13,8 @@ DOI = {
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
     # Not published yet: the session that owns open-data fills these in after Zenodo publishes them.
-    "shift-rota-patterns": "",
-    "public-holidays-rest-rules": "",
+    "shift-rota-patterns": "10.5281/zenodo.24547071",
+    "public-holidays-rest-rules": "10.5281/zenodo.24547077",
 }
 # The files of each dataset not built from a full copy below, in the order of the Zenodo record.
 FILES = {
