@@ -23,6 +23,7 @@ MORE_APPS = {
     "rowkeeper": ("RowKeeper: Row Counter", "rowkeeper", "rowcounter-app"),
     "shiftwise": ("ShiftWise: Shift Work Calendar", "shiftwise", "shift-calendar-app"),
     "levain": ("Levain: Sourdough Starter", "levain", "sourdough-app"),
+    "tanklog": ("TankLog: Aquarium Log & Dosing", "tanklog", "tanklog-app"),
 }
 _icons = {}
 
@@ -76,7 +77,7 @@ def scripts(data=None):
 
 
 def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, theme, app=None, calc=None, form="", result="",
-         guide_h2="Charts and worked example", note="", data=None, extra="", embed=None):
+         guide_h2="Charts and worked example", note="", data=None, extra="", embed=None, extra_ld=(), checked=CHECKED):
     """One page in the Voltage Drop pattern. [parts] are guides.table() / guides.example() blocks; [app] is
     (key, utm source, pitch); [embed] is (name, iframe height) for calculators offered on the embed page."""
     faq_html, faq_ld = B.faq(faq_items)
@@ -87,13 +88,13 @@ def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, 
 <div class="hero"><div class="eyebrow">{eyebrow}</div><h1>{h1}</h1><p class="lead">{lead}</p>{guides.answer(answer)}</div>
 {card}
 {note}
-{guide(guide_h2, parts)}
+{guide(guide_h2, parts, checked)}
 {extra}
 {app_promo(*app) if app else ""}
 {faq_html}
 """
     plain_h1 = re.sub("<[^>]+>", "", h1)
-    B.shell(path, title, desc, body, theme, calc, [B.webapp_ld(plain_h1, path, desc), faq_ld] if calc else [article_ld(plain_h1, path, desc), faq_ld],
+    B.shell(path, title, desc, body, theme, calc, ([B.webapp_ld(plain_h1, path, desc), faq_ld] if calc else [article_ld(plain_h1, path, desc), faq_ld]) + list(extra_ld),
             scripts(data) if calc else "")
     if embed and calc:
         name, height = embed
@@ -101,12 +102,12 @@ def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, 
         EMBEDS.append((name, plain_h1, path, height))
 
 
-def guide(h2, parts):
+def guide(h2, parts, checked=CHECKED):
     """The charts section with the author line. These calculators are not in the site's checked examples
     (verification.json covers calc.js), so the line says what was checked: the apps' control values and the sources."""
     by = (f'<p class="note byline">Made and checked by <a href="{guides.ABOUT}">{guides.AUTHOR}</a>. The source of each table is named under it; '
           f'assumptions and limits are in the <a href="{{rel}}methodology.html">methodology</a>. The formulas are the same as in the matching '
-          f'{e(B.CFG["brand"])} app and are tested against its control values. Web sources were read on {CHECKED}.</p>')
+          f'{e(B.CFG["brand"])} app and are tested against its control values. Web sources were read on {checked}.</p>')
     return f'<section class="guide"><h2>{h2}</h2>{"".join(parts)}{by}</section>'
 
 

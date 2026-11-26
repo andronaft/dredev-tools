@@ -1,7 +1,19 @@
 {
  "https://zhukovskyi.space/calculators/": {
-  "hash": "e648d7a81e73450a",
-  "date": "2026-11-25"
+  "hash": "26606a98cbbc2ff3",
+  "date": "2026-11-26"
+ },
+ "https://zhukovskyi.space/calculators/aquarium/": {
+  "hash": "04342866375fd708",
+  "date": "2026-11-26"
+ },
+ "https://zhukovskyi.space/calculators/aquarium/ammonia-toxicity-chart.html": {
+  "hash": "47f76051ab712012",
+  "date": "2026-11-26"
+ },
+ "https://zhukovskyi.space/calculators/aquarium/salinity-to-specific-gravity.html": {
+  "hash": "cac19ae60d360ee8",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/bread/": {
   "hash": "324ac69a9c599c44",
@@ -352,8 +364,8 @@
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/methodology.html": {
-  "hash": "75b28366d48fb966",
-  "date": "2026-11-22"
+  "hash": "70757b8baac41859",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/pool/": {
   "hash": "d5118745080ba404",

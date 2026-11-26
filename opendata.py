@@ -10,12 +10,16 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
+    "aquarium-ammonia-fraction": "",
+    "seawater-salinity-specific-gravity": "",
 }
 
 
 def doi_props(ds):
-    """identifier + sameAs for a Dataset whose copy on Zenodo has this DOI."""
+    """identifier + sameAs for a Dataset whose copy on Zenodo has this DOI; nothing while the DOI is still empty."""
     doi = DOI[ds]
+    if not doi:
+        return {}
     return {"identifier": [f"https://doi.org/{doi}", f"doi:{doi}"], "sameAs": [f"https://doi.org/{doi}"]}
 
 

@@ -1197,6 +1197,7 @@ HUB_INTRO = {
     "Candles": "Candle making: wax for your vessels and fragrance load.",
     "Coffee": "Espresso: dose, yield and brew ratio.",
     "Knitting": "Knitting: gauge and yarn yardage.",
+    "Aquarium": "Aquarium water: free ammonia (NH₃) by pH and temperature, and salinity to specific gravity.",
 }
 
 
