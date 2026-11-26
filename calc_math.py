@@ -66,6 +66,35 @@ def ppm_to_ec(ppm, scale):
     return ppm / EC_SCALES[scale]
 
 
+# ---------- GrowLab: growlab-app/lib/feature/calc.dart svp, leafVpd, dewPoint ----------
+
+LEAF_OFFSET_C = -2.0  # the app's default "Leaf vs air" (vpd_screen.dart)
+
+
+def svp(t_c):
+    """Saturation vapour pressure in kPa, FAO-56 Eq. 11."""
+    return 0.6108 * math.exp(17.27 * t_c / (t_c + 237.3))
+
+
+def leaf_vpd(air_c, leaf_c, rh):
+    """Leaf VPD in kPa: the leaf's air spaces are saturated at leaf temperature; the air holds rh % of e° at air temperature."""
+    return svp(leaf_c) - svp(air_c) * rh / 100
+
+
+def rh_for_vpd(air_c, leaf_c, vpd):
+    """Relative humidity (%) that gives [vpd] kPa; the inverse of leaf_vpd (rhForVpd)."""
+    return (svp(leaf_c) - vpd) / svp(air_c) * 100
+
+
+def dew_point(air_c, rh):
+    """Eq. 11 solved for T at e° = e_a; None without moisture."""
+    ea = svp(air_c) * rh / 100
+    if ea <= 0:
+        return None
+    x = math.log(ea / 0.6108)
+    return 237.3 * x / (17.27 - x)
+
+
 # ---------- WickCalc: wickcalc-app/lib/feature/calc.dart ----------
 
 WAX_FACTOR = 0.86  # defaultWaxFactor: wax weighs about 86 % of the same volume of water

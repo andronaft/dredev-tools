@@ -24,6 +24,16 @@
   const EC_SCALES = { ms: 1, us: 1000, ppm500: 500, ppm640: 640, ppm700: 700 };
   const toEc = (shown, scale) => shown / EC_SCALES[scale];
   const fromEc = (ec, scale) => ec * EC_SCALES[scale];
+  // GrowLab: growlab-app/lib/feature/calc.dart svp, leafVpd, rhForVpd, dewPoint (FAO-56 Eq. 11)
+  const svp = (t) => 0.6108 * Math.exp((17.27 * t) / (t + 237.3));
+  const leafVpd = (air, leaf, rh) => svp(leaf) - (svp(air) * rh) / 100;
+  const rhForVpd = (air, leaf, vpd) => ((svp(leaf) - vpd) / svp(air)) * 100;
+  const dewPoint = (air, rh) => {
+    const ea = (svp(air) * rh) / 100;
+    if (!(ea > 0)) return NaN;
+    const x = Math.log(ea / 0.6108);
+    return (237.3 * x) / (17.27 - x);
+  };
 
   // WickCalc: wickcalc-app/lib/feature/calc.dart
   const WAX_FACTOR = 0.86;
@@ -152,6 +162,7 @@
 
   const math = {
     ceilCount, degreesToSg, sgToDegrees, abvStandard, abvAlternate, attenuation, honeyPoints, honeyLbFor, toEc, fromEc,
+    svp, leafVpd, rhForVpd, dewPoint,
     fillFromWater, candleSplit, convertLoad, pitchFactor, hipFactor, pitchDegrees, roof, brewRatio, shotStyle, skeinsNeeded,
     swatchYarn, lengthFromWeight, gaugeCount, dayNumber, cycleDay, yearStats, coatGallons, coatRate, kits, slabFt3, bagsFor,
     orderRounded, piecesFor, rebarGrid, chlorineDose, chlorineSide, CHLORINE, slabFromUrl, gallonsFromUrl,
@@ -290,6 +301,65 @@
       else verdict('ec-verdict', 'good', `Inside the published range for ${c[0].toLowerCase()}.`);
     }
     listen(['ecval', 'ecfrom', 'eccrop'], run);
+    run();
+  }
+
+  /* VPD from air temperature, humidity and leaf offset */
+  function initVpd() {
+    let f = false;
+    const toC = (v) => (f ? ((v - 32) * 5) / 9 : v);
+    const unit = segmented('vunit', () => {
+      const nf = unit() === 'f';
+      if (nf !== f) {
+        const t = num('vair'), o = num('voff');
+        if (Number.isFinite(t)) $('vair').value = trim(nf ? (t * 9) / 5 + 32 : ((t - 32) * 5) / 9, 1).replace(/,/g, '');
+        if (Number.isFinite(o)) $('voff').value = trim(nf ? (o * 9) / 5 : (o * 5) / 9, 1).replace(/,/g, '');
+        f = nf;
+      }
+      set('vair-unit', f ? '(°F)' : '(°C)'); set('voff-unit', f ? '(°F, leaf minus air)' : '(°C, leaf minus air)');
+      run();
+    });
+    function run() {
+      const air = toC(num('vair')), rh = num('vrh');
+      const off = f ? (num('voff') * 5) / 9 : num('voff');
+      const ok = Number.isFinite(air) && Number.isFinite(off) && rh >= 0 && rh <= 100 && air > -40 && air < 60;
+      const leaf = air + off;
+      const vpd = ok ? leafVpd(air, leaf, rh) : NaN;
+      big('v-leaf', ok ? fmt(vpd, 2) : '–', 'kPa leaf VPD');
+      set('v-air', ok ? `${fmt(leafVpd(air, air, rh), 2)} kPa` : '–');
+      set('v-es', ok ? `${fmt(svp(air), 3)} kPa air · ${fmt(svp(leaf), 3)} kPa leaf` : '–');
+      set('v-ea', ok ? `${fmt((svp(air) * rh) / 100, 3)} kPa` : '–');
+      const dp = ok ? dewPoint(air, rh) : NaN;
+      set('v-dew', Number.isFinite(dp) ? (f ? `${fmt((dp * 9) / 5 + 32, 1)} °F` : `${fmt(dp, 1)} °C`) : '–');
+      const target = num('vtarget'), need = ok && target >= 0 ? rhForVpd(air, leaf, target) : NaN;
+      set('v-rh', !Number.isFinite(need) ? '–' : need < 0 ? 'not reachable: the air is too cool for it' : need > 100 ? 'above 100 %: lower the target' : `${fmt(need, 0)} %`);
+      verdict('v-note', ok && vpd <= 0 ? 'warn' : '', ok && vpd <= 0 ? 'The leaf is at or below the dew point: water condenses on it.' : '');
+    }
+    listen(['vair', 'vrh', 'voff', 'vtarget'], run);
+    run();
+  }
+
+  /* Brix, Plato and specific gravity */
+  function initGravity() {
+    const unit = segmented('bunit', () => {
+      set('bval-unit', { brix: '(°Bx)', plato: '(°P)', sg: '(SG)' }[unit()]);
+      $('bval').value = unit() === 'sg' ? '1.050' : '12';
+      run();
+    });
+    function run() {
+      const u = unit(), v = num('bval');
+      const sg = u === 'sg' ? v : degreesToSg(v);
+      const deg = u === 'sg' ? sgToDegrees(v) : v;
+      const ok = Number.isFinite(v) && sg >= 0.99 && sg < 1.6 && deg > -1 && deg <= 60;
+      if (u === 'sg') big('b-main', ok ? fmt(deg, 1) : '–', '°Bx / °P');
+      else big('b-main', ok ? sg.toFixed(3) : '–', 'SG');
+      set('b-sg', ok ? sg.toFixed(4) : '–');
+      set('b-deg', ok ? `${fmt(u === 'sg' ? deg : sgToDegrees(sg), 2)} °` : '–');
+      set('b-pts', ok ? fmt((sg - 1) * 1000, 1) : '–');
+      set('b-abv', ok && sg >= 1 ? `${fmt(abvStandard(sg, 1), 1)} %` : '–');
+      set('b-hall', ok && sg >= 1 ? `${fmt(abvAlternate(sg, 1), 1)} %` : '–');
+    }
+    listen(['bval'], run);
     run();
   }
 
@@ -570,7 +640,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const inits = { abv: initAbv, honey: initHoney, ec: initEc, frag: initFragrance, jar: initJar, roof: initRoof, ratio: initRatio,
+    const inits = { abv: initAbv, honey: initHoney, ec: initEc, vpd: initVpd, grav: initGravity, frag: initFragrance, jar: initJar, roof: initRoof, ratio: initRatio,
       yarn: initYarn, gauge: initGauge, shift: initShift, garage: initGarage, slab: initSlab, chlor: initChlorine, embed: initEmbed };
     const init = inits[document.body.dataset.calc];
     if (init) init();

@@ -67,6 +67,26 @@ class GrowLab(unittest.TestCase):
             self.assertAlmostEqual(a, b, places=9)
 
 
+class GrowLabVpd(unittest.TestCase):
+    def test_vpd(self):  # growlab-app/test/calc_test.dart
+        self.assertAlmostEqual(m.svp(20), 2.338, delta=0.001)  # FAO-56 Annex 2 Table 2.3
+        self.assertAlmostEqual(m.svp(25), 3.168, delta=0.001)
+        self.assertAlmostEqual(m.svp(30), 4.243, delta=0.001)
+        self.assertAlmostEqual(m.leaf_vpd(25, 25, 50), 1.584, delta=0.001)
+        self.assertAlmostEqual(m.leaf_vpd(25, 23, 60), 0.908, delta=0.002)
+        rh = m.rh_for_vpd(26, 24, 1.0)
+        self.assertAlmostEqual(m.leaf_vpd(26, 24, rh), 1.0, places=9)
+        dew = m.dew_point(25, 60)
+        self.assertAlmostEqual(m.svp(dew), m.svp(25) * 0.6, places=9)
+        self.assertAlmostEqual(m.leaf_vpd(25, dew, 60), 0, places=9)
+        self.assertIsNone(m.dew_point(25, 0))
+
+    def test_js(self):
+        got = js("[m.svp(25), m.leafVpd(25, 23, 60), m.rhForVpd(26, 24, 1), m.dewPoint(25, 60)]")
+        for a, b in zip(got, [m.svp(25), m.leaf_vpd(25, 23, 60), m.rh_for_vpd(26, 24, 1), m.dew_point(25, 60)]):
+            self.assertAlmostEqual(a, b, places=9)
+
+
 class WickCalc(unittest.TestCase):
     def test_jar(self):  # wickcalc-app/test/calc_test.dart
         self.assertAlmostEqual(m.fill_from_water(8), 6.88, delta=0.005)

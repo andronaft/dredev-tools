@@ -297,8 +297,10 @@ Pro:
 - [Shift pattern calendars](https://zhukovskyi.space/calculators/shifts/): 4 on 4 off, 2-2-3, DuPont and more: calendar, hours and days off.
 - [Mead ABV calculator](https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html): ABV for mead, cider and wine from SG, Brix or Plato.
 - [Honey per gallon calculator](https://zhukovskyi.space/calculators/brewing/honey-per-gallon-calculator.html): Honey for a target gravity, or the gravity from your honey.
+- [Brix, Plato and SG chart](https://zhukovskyi.space/calculators/brewing/brix-plato-sg-chart.html): Brix or Plato to specific gravity and back, with potential alcohol.
 - [EC to ppm converter](https://zhukovskyi.space/calculators/hydroponics/ec-to-ppm-converter.html): EC to ppm on the 500, 640 and 700 scales, and back.
 - [EC and pH chart by crop](https://zhukovskyi.space/calculators/hydroponics/ec-chart-by-crop.html): Target EC, ppm and pH for 23 vegetables, herbs and flowers.
+- [VPD chart and calculator](https://zhukovskyi.space/calculators/hydroponics/vpd-chart.html): Air and leaf VPD in kPa from temperature and humidity.
 - [Fragrance load calculator](https://zhukovskyi.space/calculators/candles/fragrance-load-calculator.html): Fragrance oil for your wax weight and load percentage.
 - [Candle wax calculator](https://zhukovskyi.space/calculators/candles/candle-wax-calculator.html): Wax and fragrance for any jar, from the water it holds.
 - [Espresso ratio calculator](https://zhukovskyi.space/calculators/coffee/espresso-ratio-calculator.html): Dose, yield and brew ratio for espresso.
