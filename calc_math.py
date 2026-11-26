@@ -370,9 +370,24 @@ MW_CL2, MW_NAOCL, MW_CYA, MW_CACO3 = 70.906, 74.44, 129.07, 100.09
 ML_PER_FLOZ = 29.5735
 
 
+# Specific gravity (60 °F) against weight % NaOCl: OxyChem, Sodium Hypochlorite Handbook, Table 2 "Materials for
+# Making 1000 Gallons of Bleach Solution", the rows 5.0–8.0 wt % available chlorine (read 26 November 2026,
+# https://www.forceflowscales.com/downloads/chemical-safety/hypochlorite/Hypo_Handbook_Oxy_Chem.pdf).
+# Replaces the unsourced fit 1.0174 + 0.01003·%, which was 0.9 % (6 %) and 2.1 % (8.25 %) too light.
+BLEACH_SG = [(5.25, 1.075), (5.51, 1.079), (5.78, 1.083), (6.04, 1.088), (6.30, 1.092), (7.35, 1.109), (8.40, 1.126)]
+
+
+def bleach_sg(pct):
+    """Specific gravity of bleach labelled [pct] wt % NaOCl: straight line between the two BLEACH_SG rows around it."""
+    for (x0, y0), (x1, y1) in zip(BLEACH_SG, BLEACH_SG[1:]):
+        if x0 <= pct <= x1:
+            return y0 + (y1 - y0) * (pct - x0) / (x1 - x0)
+    raise ValueError(f"{pct} % NaOCl is outside the OxyChem rows used (5.25–8.40 %)")
+
+
 def bleach_gpl(pct):
     """Grams of available chlorine per litre of bleach labelled % NaOCl by weight (chlorineGramsPerLitre)."""
-    return pct * 10 * (1.0174 + 0.01003 * pct) * MW_CL2 / MW_NAOCL
+    return pct * 10 * bleach_sg(pct) * MW_CL2 / MW_NAOCL
 
 
 # id: (name, kind, strength). Liquids: g of available chlorine per litre; dry: share of available chlorine.

@@ -287,8 +287,20 @@ class PoolPro(unittest.TestCase):
     def test_doses(self):  # pool-chem-app/test/chem_test.dart: per 1 ppm in 10,000 US gal
         self.assertAlmostEqual(m.chlorine_dose("liquid10", 1, 10000)[0], 12.8, delta=0.05)
         self.assertAlmostEqual(m.chlorine_dose("liquid125", 1, 10000)[0], 10.24, delta=0.05)
-        self.assertAlmostEqual(m.chlorine_dose("bleach6", 1, 10000)[0], 20.79, delta=0.05)
+        # bleach density from the OxyChem handbook (Table 2): 6 % NaOCl SG 1.0872, 8.25 % SG 1.1236
+        self.assertAlmostEqual(m.chlorine_dose("bleach6", 1, 10000)[0], 20.60, delta=0.01)
+        self.assertAlmostEqual(m.chlorine_dose("bleach825", 1, 10000)[0], 14.50, delta=0.01)
         self.assertAlmostEqual(m.chlorine_dose("calhypo65", 1, 10000)[0], 2.05, delta=0.02)
+
+    def test_bleach_density_oxychem(self):  # OxyChem Sodium Hypochlorite Handbook, Table 2 rows
+        self.assertAlmostEqual(m.bleach_sg(5.25), 1.075, places=9)
+        self.assertAlmostEqual(m.bleach_sg(6.30), 1.092, places=9)
+        self.assertAlmostEqual(m.bleach_sg(6), 1.083 + 0.005 * 0.22 / 0.26, places=9)
+        self.assertAlmostEqual(m.bleach_sg(8.25), 1.109 + 0.017 * 0.90 / 1.05, places=9)
+        # the handbook's own example: 5.25 % NaOCl = 5.0 % available chlorine, 53.7 g/L
+        self.assertAlmostEqual(m.bleach_gpl(5.25), 53.7, delta=0.2)
+        with self.assertRaises(ValueError):
+            m.bleach_sg(12.5)
 
     def test_side_effects(self):
         self.assertAlmostEqual(m.chlorine_side("dichlor", 1)[0], 0.9, delta=0.02)
