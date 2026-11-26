@@ -32,8 +32,8 @@ class Site(unittest.TestCase):
         cls.home = (SITE / "index.html").read_text()
 
     def test_page_count(self):
-        # hobby 9, roofing 2, shifts 7, concrete 1, garage 1, chlorine 1
-        self.assertEqual(len(new_pages()), 9 + 2 + 7 + 1 + 1 + 1)
+        # hobby 9, roofing 2, shifts 8 (6 patterns, the hub, rest and holidays), concrete 1, garage 1, chlorine 1
+        self.assertEqual(len(new_pages()), 9 + 2 + 8 + 1 + 1 + 1)
 
     def test_sizes_are_rows_not_pages(self):
         """Slab sizes and pool volumes live in one table on one page each; a row's link loads the size into the calculator."""
@@ -61,7 +61,7 @@ class Site(unittest.TestCase):
             for needle in ('class="answer"', 'class="guide"', "Worked example", 'class="faq"', "Made and checked by <a", "methodology.html",
                            'class="promo"', '"@type": "FAQPage"', "dateModified"):
                 self.assertIn(needle, html, f"{name}: {needle}")
-            if name != "shifts/index.html":
+            if name not in ("shifts/index.html", pages_trades.REST_PAGE):  # reference pages without a calculator
                 self.assertIn('class="calc card"', html, name)
                 self.assertIn("assets/calc-more.js", html, name)
             self.assertNotIn("{rel}", html, name)

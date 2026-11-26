@@ -3,6 +3,8 @@
 The DOIs tie the site's Dataset markup to the Zenodo records, so Google Dataset Search treats them as one dataset.
 GWP_LD and AWG_LD are copied from experimental/open-data (schema-org-dataset.jsonld, built by its build.py); the
 refrigerant-pt and NEC pages build their own Dataset and only add the DOI here.
+SHIFT_PATTERNS_LD and HOLIDAYS_REST_LD (the shift pages) are copied the same way but not published yet: their DOI is
+"" until the session that owns open-data publishes them, and with_doi() adds the DOI and downloads once it is set.
 """
 
 DOI = {
@@ -10,13 +12,35 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
+    # Not published yet: the session that owns open-data fills these in after Zenodo publishes them.
+    "shift-rota-patterns": "10.5281/zenodo.24547071",
+    "public-holidays-rest-rules": "10.5281/zenodo.24547077",
+}
+# The files of each dataset not built from a full copy below, in the order of the Zenodo record.
+FILES = {
+    "shift-rota-patterns": ["shift-rota-patterns.csv", "shift-rota-patterns.json"],
+    "public-holidays-rest-rules": ["public-holidays-rest-rules.csv", "public-holidays.csv", "public-holidays-rest-rules.json"],
 }
 
 
 def doi_props(ds):
-    """identifier + sameAs for a Dataset whose copy on Zenodo has this DOI."""
+    """identifier + sameAs for a Dataset whose copy on Zenodo has this DOI; nothing while the DOI is not known yet."""
     doi = DOI[ds]
+    if not doi:
+        return {}
     return {"identifier": [f"https://doi.org/{doi}", f"doi:{doi}"], "sameAs": [f"https://doi.org/{doi}"]}
+
+
+def with_doi(ld, ds):
+    """A Dataset dict from open-data (schema-org-dataset.jsonld without its mirrors) plus the DOI and the Zenodo
+    downloads once the record exists. Before that the page carries the Dataset without them."""
+    out = dict(ld, **doi_props(ds))
+    if DOI[ds]:
+        record = DOI[ds].rsplit(".", 1)[1]
+        out["distribution"] = [{"@type": "DataDownload", "encodingFormat": "text/csv" if f.endswith(".csv") else "application/json",
+                                "contentUrl": f"https://zenodo.org/records/{record}/files/{f}?download=1"} for f in FILES[ds]]
+        out["citation"] = out["citation"].rsplit(". https://", 1)[0] + f". https://doi.org/{DOI[ds]}"
+    return out
 
 
 GWP_LD = {
@@ -255,5 +279,266 @@ AWG_LD = {
     "identifier": [
         "https://doi.org/10.5281/zenodo.24545621",
         "doi:10.5281/zenodo.24545621"
+    ]
+}
+
+# open-data/shift-rota-patterns (built 2026-11-26), without distribution and sameAs: with_doi() adds them.
+SHIFT_PATTERNS_LD = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "@id": "https://zhukovskyi.space/calculators/shifts/#dataset",
+    "name": "Shift rota patterns written out day by day: 4 on 4 off, 2-2-3 Pitman, DuPont, Continental and others, with average hours per week and days off per year",
+    "alternateName": "Shift rota patterns: hours and days off",
+    "description": "Thirteen common shift rotas, each written out day by day as a string of letters (D day, N night, E early, L late, X 8-hour night, T 10-hour day, W 9 to 5, F 24-hour, O off), with the cycle as runs, the cycle length, shifts and days off per cycle, the shift length, hours per cycle, the average hours per week (hours per cycle ÷ cycle days × 7), the average days off per year (days off per cycle ÷ cycle days × 365.25), the longest run of shifts and the longest break. It covers the six patterns of the free shift calendars on zhukovskyi.space (4 on 4 off, 2-2-3 Pitman, DuPont, 3 on 3 off, 4 on 3 off, Continental) and the eleven presets of the ShiftWise shift calendar app (with its default shift times); where a pattern is in both, the two sequences are checked to be the same. Every number is computed from the cycle; scheduled hours only, without unpaid breaks, leave or overtime.",
+    "url": "https://zhukovskyi.space/calculators/shifts/",
+    "version": "1.0.0",
+    "datePublished": "2026-11-26",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "isAccessibleForFree": True,
+    "inLanguage": "en",
+    "creator": {
+        "@type": "Person",
+        "@id": "https://zhukovskyi.space/#person",
+        "name": "Andrii Zhukovskyi",
+        "url": "https://zhukovskyi.space/"
+    },
+    "publisher": {
+        "@id": "https://zhukovskyi.space/#dredev"
+    },
+    "keywords": [
+        "shift work",
+        "shift pattern",
+        "rota",
+        "roster",
+        "4 on 4 off",
+        "2-2-3",
+        "Pitman",
+        "DuPont",
+        "Continental",
+        "12-hour shifts",
+        "working time"
+    ],
+    "citation": "Zhukovskyi, A. (2026). Shift rota patterns written out day by day: 4 on 4 off, 2-2-3 Pitman, DuPont, Continental and others, with average hours per week and days off per year (Version 1.0.0) [Data set]. Dre Dev. https://zhukovskyi.space/calculators/shifts/",
+    "variableMeasured": [
+        {
+            "@type": "PropertyValue",
+            "name": "pattern",
+            "description": "Short key, the same as in the ShiftWise app and the site's code."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "name",
+            "description": "Name of the pattern."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "cycle",
+            "description": "One letter per day of the cycle: D day, N night (12 h), E early, L late, X night (8 h), T 10-hour day, W 9 to 5, F 24-hour, O off."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "cycle_runs",
+            "description": "The cycle as runs of the same letter, for example D×4 O×4."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "cycle_days",
+            "description": "Length of the cycle.",
+            "unitText": "days"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "shifts_per_cycle",
+            "description": "Working days in one cycle.",
+            "unitText": "shifts"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "days_off_per_cycle",
+            "description": "Days off in one cycle.",
+            "unitText": "days"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "shift_types",
+            "description": "The letters used, with shift length and, for ShiftWise presets, the app's default start and end times."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "shift_hours",
+            "description": "Scheduled length of each shift (every shift of a pattern has the same length).",
+            "unitText": "h"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "hours_per_cycle",
+            "description": "shifts_per_cycle × shift_hours.",
+            "unitText": "h"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "avg_hours_per_week",
+            "description": "hours_per_cycle ÷ cycle_days × 7.",
+            "unitText": "h/week"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "days_off_per_year",
+            "description": "days_off_per_cycle ÷ cycle_days × 365.25.",
+            "unitText": "days/year"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "longest_run_of_shifts",
+            "description": "Most shifts in a row, counting across the end of the cycle into the next.",
+            "unitText": "shifts"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "longest_break_days",
+            "description": "Most days off in a row, counting across the end of the cycle.",
+            "unitText": "days"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "in_shiftwise_app",
+            "description": "yes if the pattern is a preset in the ShiftWise app."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "site_page",
+            "description": "The pattern's calendar page on zhukovskyi.space; empty if there is none."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "sequence_source",
+            "description": "Where the day-by-day sequence was read (URLs), or the ShiftWise preset."
+        }
+    ],
+    "isBasedOn": [
+        "https://en.wikipedia.org/wiki/Shift_plan",
+        "https://soon.works/shift-patterns/pitman",
+        "https://soon.works/shift-patterns/continental",
+        "https://soon.works/shift-patterns",
+        "https://www.rosterelf.com/uk/guides/shift-patterns"
+    ]
+}
+
+# open-data/public-holidays-rest-rules (built 2026-11-26), the same way.
+HOLIDAYS_REST_LD = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "@id": "https://zhukovskyi.space/calculators/shifts/public-holidays-and-rest.html#dataset",
+    "name": "Minimum daily rest between shifts by country, with the statute, and public holidays of the UK, Ireland, Germany, Spain, France, Italy, the Netherlands, Poland, Brazil, Mexico, the United States and Ukraine",
+    "alternateName": "Rest between shifts and public holidays",
+    "description": "Two tables for shift workers and rota software. The main table has one row per country or UK region (England and Wales, Scotland, Northern Ireland, Ireland, Germany, Spain, France, Italy, the Netherlands, Poland, Brazil, Mexico, the United States, Ukraine): the minimum daily rest between working days as the national law states it (11 hours in the UK, Ireland, the EU countries listed and Brazil, 12 in Spain, twice the previous shift in Ukraine, no general rule in Mexico or US federal law), the statute and article with a link to the official text read on 26 November 2026, where the public holidays come from, and the 2027 holiday list. The second table (public-holidays.csv) lists every public holiday with its date, weekday and name: UK bank holidays 2019–2028 from gov.uk (Open Government Licence v3.0, one-off holidays and substitute days included), and the national holidays of the other countries for 2026–2028, computed from their statutory rules and checked against the dates the ShiftWise shift calendar app uses. Regional and local holidays are not included.",
+    "url": "https://zhukovskyi.space/calculators/shifts/public-holidays-and-rest.html",
+    "version": "1.0.0",
+    "datePublished": "2026-11-26",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "isAccessibleForFree": True,
+    "inLanguage": "en",
+    "creator": {
+        "@type": "Person",
+        "@id": "https://zhukovskyi.space/#person",
+        "name": "Andrii Zhukovskyi",
+        "url": "https://zhukovskyi.space/"
+    },
+    "publisher": {
+        "@id": "https://zhukovskyi.space/#dredev"
+    },
+    "keywords": [
+        "public holidays",
+        "bank holidays",
+        "daily rest",
+        "rest between shifts",
+        "working time",
+        "Working Time Directive",
+        "11 hours rest",
+        "shift work",
+        "labour law",
+        "holiday calendar"
+    ],
+    "citation": "Zhukovskyi, A. (2026). Minimum daily rest between shifts by country, with the statute, and public holidays of the UK, Ireland, Germany, Spain, France, Italy, the Netherlands, Poland, Brazil, Mexico, the United States and Ukraine (Version 1.0.0) [Data set]. Dre Dev. https://zhukovskyi.space/calculators/shifts/public-holidays-and-rest.html",
+    "variableMeasured": [
+        {
+            "@type": "PropertyValue",
+            "name": "region",
+            "description": "Key: england-and-wales, scotland, northern-ireland, or the country (ireland, germany …)."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "country_code",
+            "description": "ISO 3166-1 alpha-2 code."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "region_name",
+            "description": "Name of the country or UK region."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "min_daily_rest_hours",
+            "description": "Minimum consecutive rest between working days for adult workers; empty where the law sets no fixed number of hours.",
+            "unitText": "h"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "rest_rule",
+            "description": "The rule in plain English, with the built-in exceptions."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "rest_law",
+            "description": "Statute and article."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "rest_law_url",
+            "description": "Official text read on 26 November 2026."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "holidays_scope",
+            "description": "Which holidays are listed and their legal basis."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "holidays_source_url",
+            "description": "Official source of the holiday rules; empty for Germany (the 16 state laws)."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "holiday_years",
+            "description": "Years in public-holidays.csv for this region."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "holidays_in_2027",
+            "description": "Number of public holidays in 2027.",
+            "unitText": "days"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "holidays_2027",
+            "description": "The 2027 holidays: date and name, separated by semicolons."
+        }
+    ],
+    "isBasedOn": [
+        "https://www.gov.uk/bank-holidays.json",
+        "https://www.legislation.gov.uk/uksi/1998/1833/regulation/10",
+        "https://www.legislation.gov.uk/nisr/2016/49/regulation/12",
+        "https://revisedacts.lawreform.ie/eli/1997/act/20/section/11/revised/en/html",
+        "https://www.gesetze-im-internet.de/arbzg/__5.html",
+        "https://www.boe.es/buscar/act.php?id=BOE-A-2015-11430",
+        "https://code.travail.gouv.fr/code-du-travail/l3131-1",
+        "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.legislativo:2003-04-08;66~art7",
+        "https://wetten.overheid.nl/jci1.3:c:BWBR0007671&hoofdstuk=5&paragraaf=5.2&artikel=5:3",
+        "https://api.sejm.gov.pl/eli/acts/DU/2026/1245/text.pdf",
+        "https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm",
+        "https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf",
+        "https://www.dol.gov/agencies/whd/overtime",
+        "https://zakon.rada.gov.ua/laws/show/322-08",
+        "https://www.opm.gov/policy-data-oversight/pay-leave/federal-holidays/"
     ]
 }
