@@ -530,6 +530,26 @@
     fromAddress(slabFromUrl, (s) => { $('sl').value = s[0]; $('sw').value = s[1]; run(); });
   }
 
+  /* Rebar weight from the size chart (window.CALC_DATA.bars: [label, diameter mm, kg per m]) */
+  function initRebar() {
+    const bars = {};
+    (DATA.bars || []).forEach(([label, d, kg]) => { bars[label] = { d, kg }; });
+    const unit = segmented('runit', run);
+    function run() {
+      const bar = bars[$('rbar').value], count = num('rcount'), len = num('rlength');
+      const metres = unit() === 'm' ? len : len * 0.3048;
+      set('rb-unit', bar ? `${fmt(bar.kg * 0.3048 / 0.45359237, 3)} lb/ft · ${fmt(bar.kg, 3)} kg/m` : '–');
+      set('rb-size', bar ? `${fmt(bar.d, 1)} mm (${fmt(bar.d / 25.4, 3)} in)` : '–');
+      const ok = bar && count > 0 && metres > 0;
+      const kg = ok ? bar.kg * count * metres : NaN;
+      big('rb-total', ok ? fmt(kg / 0.45359237, 0) : '–', 'lb');
+      set('rb-kg', ok ? `${fmt(kg, 1)} kg` : '–');
+      set('rb-len', ok ? `${fmt(count * metres / 0.3048, 0)} ft · ${fmt(count * metres, 1)} m` : '–');
+    }
+    listen(['rbar', 'rcount', 'rlength'], run);
+    run();
+  }
+
   /* Chlorine for a pool */
   function initChlorine() {
     $('cprod').innerHTML = Object.keys(CHLORINE).map((k) => `<option value="${k}">${CHLORINE[k].name}</option>`).join('');
@@ -571,7 +591,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     const inits = { abv: initAbv, honey: initHoney, ec: initEc, frag: initFragrance, jar: initJar, roof: initRoof, ratio: initRatio,
-      yarn: initYarn, gauge: initGauge, shift: initShift, garage: initGarage, slab: initSlab, chlor: initChlorine, embed: initEmbed };
+      yarn: initYarn, gauge: initGauge, shift: initShift, garage: initGarage, slab: initSlab, rebar: initRebar, chlor: initChlorine, embed: initEmbed };
     const init = inits[document.body.dataset.calc];
     if (init) init();
   });

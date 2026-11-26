@@ -76,9 +76,10 @@ def scripts(data=None):
 
 
 def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, theme, app=None, calc=None, form="", result="",
-         guide_h2="Charts and worked example", note="", data=None, extra="", embed=None):
+         guide_h2="Charts and worked example", note="", data=None, extra="", embed=None, extra_ld=()):
     """One page in the Voltage Drop pattern. [parts] are guides.table() / guides.example() blocks; [app] is
-    (key, utm source, pitch); [embed] is (name, iframe height) for calculators offered on the embed page."""
+    (key, utm source, pitch); [embed] is (name, iframe height) for calculators offered on the embed page;
+    [extra_ld] are more JSON-LD objects for the page (a Dataset)."""
     faq_html, faq_ld = B.faq(faq_items)
     card = f'<div class="calc card"><div class="fields">{form}</div><div class="result" aria-live="polite">{result}</div></div>' if calc else ""
     body = f"""
@@ -93,7 +94,8 @@ def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, 
 {faq_html}
 """
     plain_h1 = re.sub("<[^>]+>", "", h1)
-    B.shell(path, title, desc, body, theme, calc, [B.webapp_ld(plain_h1, path, desc), faq_ld] if calc else [article_ld(plain_h1, path, desc), faq_ld],
+    B.shell(path, title, desc, body, theme, calc,
+            ([B.webapp_ld(plain_h1, path, desc), faq_ld] if calc else [article_ld(plain_h1, path, desc), faq_ld]) + list(extra_ld),
             scripts(data) if calc else "")
     if embed and calc:
         name, height = embed

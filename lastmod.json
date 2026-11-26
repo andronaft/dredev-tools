@@ -1,7 +1,7 @@
 {
  "https://zhukovskyi.space/calculators/": {
-  "hash": "e648d7a81e73450a",
-  "date": "2026-11-25"
+  "hash": "67118d5784960ea3",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/bread/": {
   "hash": "324ac69a9c599c44",
@@ -16,24 +16,24 @@
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/brewing/honey-per-gallon-calculator.html": {
-  "hash": "1fb901efa410ca8d",
-  "date": "2026-11-13"
+  "hash": "01a2f427b2f20efd",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/brewing/mead-abv-calculator.html": {
-  "hash": "6b3bfa12f3d469c5",
-  "date": "2026-11-13"
+  "hash": "44420ab0aba2a9cc",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/candles/": {
   "hash": "1812d996752f984a",
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/candles/candle-wax-calculator.html": {
-  "hash": "c5a0a6e1f4a6574e",
-  "date": "2026-11-13"
+  "hash": "0695ea999fccca1a",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/candles/fragrance-load-calculator.html": {
-  "hash": "e345554a147c6597",
-  "date": "2026-11-13"
+  "hash": "f8e91b58ff1ef418",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/changelog.html": {
   "hash": "0cc7ceece1d197c8",
@@ -48,24 +48,28 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/coating/garage-floor-epoxy-calculator.html": {
-  "hash": "d9eae22307d8bcd1",
-  "date": "2026-11-21"
+  "hash": "7c6bfe0d80641c98",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/coffee/": {
   "hash": "3ef6b4dab4740e4c",
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/coffee/espresso-ratio-calculator.html": {
-  "hash": "87e7f4f4217fb862",
-  "date": "2026-11-13"
+  "hash": "cef85ee703965279",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/concrete/": {
-  "hash": "aa707dc01d1d5a8f",
-  "date": "2026-11-25"
+  "hash": "7d7b1120124ca482",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html": {
-  "hash": "1a7d1e2bc6bda912",
-  "date": "2026-11-13"
+  "hash": "33627fd2953f96f9",
+  "date": "2026-11-26"
+ },
+ "https://zhukovskyi.space/calculators/concrete/rebar-size-chart.html": {
+  "hash": "1e2421d71e27a026",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/countdown/": {
   "hash": "58f97dc6e7dd858e",
@@ -144,12 +148,12 @@
   "date": "2026-11-22"
  },
  "https://zhukovskyi.space/calculators/embed/": {
-  "hash": "aca07012cfabade5",
-  "date": "2026-11-25"
+  "hash": "cdfc1b43a00ec30f",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/embed/uk/": {
-  "hash": "3dee7c424465b52b",
-  "date": "2026-11-25"
+  "hash": "896c04b5b8676a74",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/hvac/": {
   "hash": "cfd91f3429c74e92",
@@ -332,36 +336,36 @@
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/hydroponics/ec-chart-by-crop.html": {
-  "hash": "4bddb09967e0c861",
-  "date": "2026-11-13"
+  "hash": "6f30742cd4bf8bc2",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/hydroponics/ec-to-ppm-converter.html": {
-  "hash": "13e845a922f6b3e1",
-  "date": "2026-11-13"
+  "hash": "859297dee5704728",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/knitting/": {
   "hash": "86d6b3bd85b126d9",
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/knitting/gauge-calculator.html": {
-  "hash": "9d75cc1c114cd7e1",
-  "date": "2026-11-13"
+  "hash": "e3009f7d9b2a2684",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/knitting/yarn-yardage-calculator.html": {
-  "hash": "a8577bec23e4ac22",
-  "date": "2026-11-13"
+  "hash": "ef602c4ca9d4f8a7",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/methodology.html": {
-  "hash": "75b28366d48fb966",
-  "date": "2026-11-22"
+  "hash": "733600ac72224e11",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/pool/": {
   "hash": "d5118745080ba404",
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html": {
-  "hash": "ee82da7bf6a85c24",
-  "date": "2026-11-21"
+  "hash": "613db6da634977b9",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/pool/pool-chemical-calculator.html": {
   "hash": "5f41eed6418fa76a",
@@ -372,40 +376,40 @@
   "date": "2026-11-25"
  },
  "https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html": {
-  "hash": "d5dc21551d41bb3a",
-  "date": "2026-11-21"
+  "hash": "86d43eec2b95d3b1",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/roofing/shingle-bundles-calculator.html": {
-  "hash": "388d56fb71221bf4",
-  "date": "2026-11-21"
+  "hash": "1ae55dda1666b865",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/shifts/": {
   "hash": "62ec524476afbcfa",
   "date": "2026-11-13"
  },
  "https://zhukovskyi.space/calculators/shifts/2-2-3-pitman.html": {
-  "hash": "ae83143e29b488c0",
-  "date": "2026-11-13"
+  "hash": "a21b84cc3a3f5014",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/shifts/3-on-3-off.html": {
-  "hash": "97b6b6c7fa9274f8",
-  "date": "2026-11-13"
+  "hash": "48041eb30b531cea",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/shifts/4-on-3-off.html": {
-  "hash": "164205ebcb08e348",
-  "date": "2026-11-13"
+  "hash": "82ce7474cbc8ef01",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/shifts/4-on-4-off.html": {
-  "hash": "7a24cecfccf5173f",
-  "date": "2026-11-13"
+  "hash": "b1f1d11cd096cd76",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/shifts/continental.html": {
-  "hash": "e71579100fc92341",
-  "date": "2026-11-13"
+  "hash": "fdb04336099adb97",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/shifts/dupont.html": {
-  "hash": "e9a94f2010583c06",
-  "date": "2026-11-13"
+  "hash": "a789c9009fcd0b63",
+  "date": "2026-11-26"
  },
  "https://zhukovskyi.space/calculators/soap/": {
   "hash": "87c1ae1a0f2ceda9",

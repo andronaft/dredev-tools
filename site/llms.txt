@@ -292,6 +292,7 @@ Pro:
 - [Roof pitch multiplier chart](https://zhukovskyi.space/calculators/roofing/roof-pitch-multiplier-chart.html): Slope factors for 1/12 to 12/12, with roof area and squares.
 - [Shingle bundles calculator](https://zhukovskyi.space/calculators/roofing/shingle-bundles-calculator.html): Squares and bundles from the footprint and pitch.
 - [Concrete slab calculator](https://zhukovskyi.space/calculators/concrete/concrete-slab-calculator.html): Yards, bags and rebar, with a table of 30 common slab sizes.
+- [Rebar size chart](https://zhukovskyi.space/calculators/concrete/rebar-size-chart.html): US #3–#18, metric Ø6–Ø40 and Canadian 10M–55M: diameter, area, weight.
 - [Garage floor epoxy calculator](https://zhukovskyi.space/calculators/coating/garage-floor-epoxy-calculator.html): Gallons and kits for a 1, 2 or 3 car garage by system.
 - [How much chlorine to add](https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html): Liquid chlorine, cal-hypo or trichlor for your pool's gallons.
 - [Shift pattern calendars](https://zhukovskyi.space/calculators/shifts/): 4 on 4 off, 2-2-3, DuPont and more: calendar, hours and days off.
