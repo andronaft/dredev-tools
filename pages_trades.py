@@ -20,11 +20,13 @@ SLABS = [(10, 10), (10, 12), (10, 20), (12, 12), (12, 16), (12, 20), (12, 24), (
          (40, 40), (40, 50), (40, 60), (40, 80), (50, 100), (60, 100)]
 POOL_VOLUMES = [5000, 7500, 10000, 15000, 20000, 25000, 30000, 40000]
 SLAB_PAGE = "concrete/concrete-slab-calculator.html"
+REBAR_PAGE = "concrete/rebar-size-chart.html"
 
 HOME_CARDS = [
     ("roofing/roof-pitch-multiplier-chart.html", "Roofing", "Roof pitch multiplier chart", "Slope factors for 1/12 to 12/12, with roof area and squares.", "t-roof"),
     ("roofing/shingle-bundles-calculator.html", "Roofing", "Shingle bundles calculator", "Squares and bundles from the footprint and pitch.", "t-roof"),
     (SLAB_PAGE, "Concrete", "Concrete slab calculator", f"Yards, bags and rebar, with a table of {len(SLABS)} common slab sizes.", "t-slab"),
+    (REBAR_PAGE, "Concrete", "Rebar size chart", "US #3–#18, metric Ø6–Ø40 and Canadian 10M–55M: diameter, area, weight.", "t-slab"),
     ("coating/garage-floor-epoxy-calculator.html", "Coatings", "Garage floor epoxy calculator", "Gallons and kits for a 1, 2 or 3 car garage by system.", "t-coat"),
     ("pool/how-much-chlorine-to-add.html", "Pool", "How much chlorine to add", "Liquid chlorine, cal-hypo or trichlor for your pool's gallons.", "t-pool"),
     ("shifts/index.html", "Shifts", "Shift pattern calendars", "4 on 4 off, 2-2-3, DuPont and more: calendar, hours and days off.", "t-lid"),
@@ -91,7 +93,7 @@ def build_pitch():
              "Hold a level horizontally against the roof or a rafter, mark 12 in along it and measure straight down to the roof. That drop in inches is the rise per 12."),
         ], "t-roof", ("roofcalc", "pitch-chart", ROOF_PITCH), "roof", roof_form(50, 40), ROOF_RESULT, "Pitch charts and worked example", ROOF_NOTE,
         extra=c.related("More roofing tools", [("roofing/shingle-bundles-calculator.html", "Shingle bundles calculator")]),
-        embed=("roof-pitch", 660))
+        embed=("roof-pitch", 660), extra_ld=[opendata.dataset_ld("roof-pitch-multipliers", opendata.ROOF_LD)])
 
 
 def build_bundles():
@@ -561,7 +563,104 @@ def build_slab():
             ("Does the calculator handle footings, columns and stairs?",
              "This page is for rectangular slabs. The SlabCalc app does footings, pads, columns, sonotubes, post holes, walls and stairs, and adds mesh and forms."),
         ], "t-slab", ("slabcalc", "slab-calc", SLAB_PITCH), "slab", slab_form(20, 20), SLAB_RESULT, "Slab sizes and worked examples",
+        extra=c.related("More concrete tools", [(REBAR_PAGE, "Rebar size chart and weight calculator")]),
         embed=("concrete-slab", 860))
+
+
+# ---------- Rebar size chart (SlabCalc; open dataset rebar-sizes-us-eu-canada) ----------
+
+REBAR_READ = "26 November 2026"
+CALTRANS = ('<a href="https://dot.ca.gov/-/media/dot-media/programs/engineering/documents/bridgedesigndetails/chapter-12/202509bdd131reinforcement-a11y.pdf">'
+            'Caltrans Bridge Design Details 13.1, Table 13.1.1</a>')
+CS2 = '<a href="https://www.cedd.gov.hk/filemanager/eng/content_77/cs2_2012.pdf">Hong Kong Construction Standard CS2:2012, Table 2</a>'
+RSIC = '<a href="https://rebar.org/">RSIC Manual of Standard Practice (2020), Table 1A</a>'
+BAR_HEAD = ["Bar", "Diameter (mm)", "Diameter (in)", "Area (mm²)", "Area (in²)", "Mass (kg/m)", "Weight (lb/ft)"]
+LB_PER_FT_PER_KG_PER_M = 0.3048 / 0.45359237
+
+
+def bar_cells(label, d):
+    a, kg = m.bar_area_mm2(d), m.bar_kg_per_m(d)
+    return [label, f"{d:.1f}", f"{d / 25.4:.3f}", f"{a:,.1f}", f"{a / 645.16:.3f}", f"{kg:.3f}", f"{kg * LB_PER_FT_PER_KG_PER_M:.3f}"]
+
+
+def rebar_form():
+    groups = {"US": "US bars (ASTM A615)", "EU": "European bars (EN 10080)", "CA": "Canadian bars (CSA G30.18)"}
+    opts = ""
+    for key, name in groups.items():
+        o = "".join(f'<option value="{label}"{" selected" if label == "#4" else ""}>{label}</option>'
+                    for sys_, label, _std, _d in m.rebar_sizes() if sys_ == key)
+        opts += f'<optgroup label="{name}">{o}</optgroup>'
+    return (f'<div class="full"><label for="rbar">Bar size</label><select id="rbar">{opts}</select></div>'
+            + inp("rcount", "Number of bars", "", "20") + inp("rlength", "Length of each bar", "", "20")
+            + seg("runit", "Length unit", [("ft", "feet"), ("m", "metres")]))
+
+
+REBAR_RESULT = rows("rb-total", "Total weight", [("rb-kg", "In kilograms"), ("rb-len", "Total length"), ("rb-unit", "Per foot · per metre"),
+                                                 ("rb-size", "Nominal diameter")]) \
+    + '<p class="note">Nominal weight from the nominal diameter at 7,850 kg/m³. Real bars may weigh a few percent more or less (mill tolerance).</p>'
+
+
+def build_rebar():
+    sizes = m.rebar_sizes()
+    us = [bar_cells(label, d) for s_, label, _std, d in sizes if s_ == "US"]
+    eu = [bar_cells(label, d) for s_, label, _std, d in sizes if s_ == "EU"]
+    ca = [bar_cells(label, d) for s_, label, _std, d in sizes if s_ == "CA"]
+    calc_note = "Area = π/4 × d²; mass = area × 7,850 kg/m³, computed here, not copied from the standard."
+    t1 = table("US rebar sizes, #3 to #18 (ASTM A615/A615M)", BAR_HEAD, us,
+               src(f"nominal diameters in inches as printed in {CALTRANS}", REBAR_READ) + " " + calc_note
+               + " ASTM prints rounded weights (0.376, 0.668, 1.043 lb/ft …); they differ from these by 0.2 % at most (#10: 4.303 printed, 4.311 computed).")
+    t2 = table("European rebar sizes, Ø6 to Ø40 mm (EN 10080)", BAR_HEAD, eu,
+               src(f"the EN 10080 metric series; diameters 6–40 mm checked in {CS2}, except Ø14 and Ø28, which it does not list", REBAR_READ)
+               + " " + calc_note + " A European bar is named by its nominal diameter in mm.")
+    t3 = table("Canadian rebar sizes, 10M to 55M (CSA G30.18)", BAR_HEAD, ca,
+               src(f"nominal diameters as printed in the {RSIC}", REBAR_READ) + " " + calc_note
+               + " CSA prints rounded nominal areas (100, 200, 300 mm² …) and masses from them (0.785, 1.570, 2.355 kg/m …), up to 0.6 % from these.")
+
+    def closest(d_mm, system):
+        return min(((label, dd) for s_, label, _std, dd in sizes if s_ == system), key=lambda x: abs(m.bar_area_mm2(x[1]) - m.bar_area_mm2(d_mm)))[0]
+    t4 = table("Closest sizes by area", ["US bar", "Area", "Closest European bar", "Closest Canadian bar"],
+               [[label, f"{m.bar_area_mm2(d):,.0f} mm²", closest(d, "EU"), closest(d, "CA")] for s_, label, _std, d in sizes if s_ == "US"],
+               "The bar of the other system whose cross-section is nearest. This is a comparison, not a substitution rule: "
+               "a different bar size changes spacing, cover and laps, and the engineer of record approves substitutions.")
+    lb4 = m.bar_kg_per_m(12.7) * LB_PER_FT_PER_KG_PER_M
+    ex = guides.example("the weight of 20 bars of #4, 20 ft long", [
+        "Total length: 20 bars × 20 ft = 400 ft.",
+        f"Weight per foot of #4: area π/4 × 0.5² = 0.196 in², × 0.2836 lb/in³ steel × 12 in = {lb4:.3f} lb/ft.",
+        f"Total: 400 ft × {lb4:.3f} = {400 * lb4:,.0f} lb, or {400 * 0.3048 * m.bar_kg_per_m(12.7):,.0f} kg.",
+        f"In metric: 50 bars of Ø12, 6 m long = 300 m × {m.bar_kg_per_m(12):.3f} kg/m = {300 * m.bar_kg_per_m(12):,.0f} kg.",
+    ], f"Result: 20 × 20 ft of #4 weighs about {400 * lb4:,.0f} lb; 50 × 6 m of Ø12 weighs about {300 * m.bar_kg_per_m(12):,.0f} kg.")
+    kg = {label: m.bar_kg_per_m(d) for _s, label, _std, d in sizes}
+    answer = (f"#3 rebar is 3/8 in (9.5 mm) and weighs {kg['#3'] * LB_PER_FT_PER_KG_PER_M:.3f} lb per foot, #4 is 1/2 in (12.7 mm) and {kg['#4'] * LB_PER_FT_PER_KG_PER_M:.3f} lb/ft, "
+              f"#5 is 5/8 in (15.9 mm) and {kg['#5'] * LB_PER_FT_PER_KG_PER_M:.3f} lb/ft: the bar number is the diameter in eighths of an inch up to #8. "
+              f"Metric bars are named in mm (Ø12 = 12 mm, {kg['Ø12']:.3f} kg/m); Canadian 15M is 16.0 mm, {kg['15M']:.3f} kg/m.")
+    data = {"bars": [[label, round(d, 4), round(m.bar_kg_per_m(d), 6)] for _s, label, _std, d in sizes]}
+    c.page(
+        REBAR_PAGE, "Rebar Size Chart: #3 to #18, Metric and 10M to 55M, Weight per Foot | Free",
+        "Rebar size chart for US #3 to #18, European Ø6 to Ø40 mm and Canadian 10M to 55M bars: diameter, area, weight per foot and per metre, with a rebar weight calculator.",
+        "Concrete", "Free concrete tool", "Rebar size chart and weight calculator",
+        "Diameter, area and weight of every common US, European and Canadian reinforcing bar, and the weight of the bars on your list.",
+        answer, [t1, t2, t3, t4, ex], [
+            ("How much does #4 rebar weigh?",
+             f"{kg['#4'] * LB_PER_FT_PER_KG_PER_M:.3f} lb per foot, the figure ASTM A615 prints as 0.668. A 20 ft stick weighs about {20 * kg['#4'] * LB_PER_FT_PER_KG_PER_M:.1f} lb "
+             f"and a 10 ft stick about {10 * kg['#4'] * LB_PER_FT_PER_KG_PER_M:.1f} lb."),
+            ("What size is #5 rebar in mm?",
+             "15.9 mm (5/8 in). In ASTM's soft-metric marking the same bar is #16; the nearest European bar by area is Ø16 and the nearest Canadian bar 15M."),
+            ("What do 10M, 15M and 20M mean?",
+             "They are Canadian bar sizes under CSA G30.18, named after the rounded diameter: 10M is 11.3 mm, 15M 16.0 mm and 20M 19.5 mm across, "
+             "with nominal areas of 100, 200 and 300 mm²."),
+            ("How do I calculate the weight of rebar?",
+             "Area × density × length. For a bar of d mm, mass in kg/m = d² ÷ 162 (π/4 × d² mm² × 7,850 kg/m³). "
+             "For a US bar of d inches, lb/ft = 2.67 × d². Multiply by the total length of bar."),
+            ("Is #4 rebar the same as 12 mm?",
+             "No. #4 is 12.7 mm and 127 mm²; Ø12 is 113 mm², about 11 % less steel. Ø14 has 154 mm². Changing bar size needs the engineer's approval."),
+            ("Why does my supplier's chart show slightly different weights?",
+             "Standards print rounded nominal areas and weights, and some charts compute from them. The table here computes from the nominal diameter, "
+             "so its values can differ in the last digit, by up to 0.6 % for Canadian bars. Real bars also vary within the mill tolerance."),
+        ], "t-slab", ("slabcalc", "rebar-chart", SLAB_PITCH), "rebar", rebar_form(), REBAR_RESULT, "Rebar size charts and worked example",
+        '<p class="note">This chart is an open dataset (CC BY 4.0): 30 bar sizes with nominal diameter, area and mass, computed by Dre Dev. '
+        'Only the nominal diameters come from the standards.</p>',
+        data=data, extra=c.related("More concrete tools", [(SLAB_PAGE, "Concrete slab calculator")]),
+        extra_ld=[opendata.dataset_ld("rebar-sizes-us-eu-canada", opendata.REBAR_LD)])
 
 
 # ---------- PoolPro ----------
@@ -688,6 +787,7 @@ def build():
         build_shift(key)
     build_garage()
     build_slab()
+    build_rebar()
     build_pool()
 
 
@@ -706,6 +806,12 @@ METHODS = [
      ["A flat rectangular slab of even thickness.", "10 % extra unless you change it; bars 3 in clear of the edges."],
      ["It sizes an order. Thickness, reinforcement, joints and base come from your plans, engineer or building department.",
       "Lap length depends on the concrete, the bar and the spacing: the engineer gives it."]),
+    ("Rebar size chart and weight calculator", REBAR_PAGE,
+     ["Nominal diameters: US #3 to #18 in inches (ASTM A615/A615M, as printed by Caltrans Bridge Design Details 13.1), European &Oslash;6 to &Oslash;40 mm (EN 10080 series), Canadian 10M to 55M (CSA G30.18, as printed in the RSIC Manual of Standard Practice); read 26 November 2026.",
+      "Area = &pi;/4 &times; d&sup2;; mass = area &times; 7,850 kg/m&sup3;; weight of a list = mass per length &times; number of bars &times; bar length."],
+     ["Nominal size: the diameter of a plain round bar with the same mass per length."],
+     ["Standards print rounded nominal areas and masses, up to 0.6 % from these.", "Real bars vary within the mill tolerance.",
+      "Grades, bends, laps and substitutions come from the standards, the design code and the engineer."]),
     ("Garage floor epoxy calculator", "coating/garage-floor-epoxy-calculator.html",
      ["Gallons = area &times; mils &divide; (1,604 &times; solids by volume) &times; (1 + waste), as on the epoxy coverage calculator.",
       "System presets (solids and thickness) are the CoatCalc app's mid-range values from makers' data sheets (read October 2026)."],

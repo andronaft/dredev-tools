@@ -320,6 +320,31 @@ BAGS = [("80 lb", 0.60), ("60 lb", 0.45), ("40 lb", 0.30)]  # Quikrete Concrete 
 REBAR = {"#3": (0.375, 0.376), "#4": (0.500, 0.668), "#5": (0.625, 1.043)}  # diameter in, lb/ft (ASTM A615)
 
 
+# Rebar size chart (concrete/rebar-size-chart.html, open dataset rebar-sizes-us-eu-canada): nominal diameters only
+# from the standards (US in inches, ASTM A615/A615M; EU in mm, EN 10080; Canada in mm, CSA G30.18); area and mass
+# are computed: area = π/4 × d², mass = area × 7,850 kg/m³. The standards print rounded values (up to 0.6 % apart).
+STEEL_KG_M3 = 7850.0
+REBAR_US_IN = [("#3", 0.375), ("#4", 0.500), ("#5", 0.625), ("#6", 0.750), ("#7", 0.875), ("#8", 1.000), ("#9", 1.128),
+               ("#10", 1.270), ("#11", 1.410), ("#14", 1.693), ("#18", 2.257)]
+REBAR_EU_MM = [6, 8, 10, 12, 14, 16, 20, 25, 28, 32, 40]
+REBAR_CA_MM = [("10M", 11.3), ("15M", 16.0), ("20M", 19.5), ("25M", 25.2), ("30M", 29.9), ("35M", 35.7), ("45M", 43.7), ("55M", 56.4)]
+
+
+def bar_area_mm2(d_mm):
+    return math.pi / 4 * d_mm * d_mm
+
+
+def bar_kg_per_m(d_mm):
+    return bar_area_mm2(d_mm) * 1e-6 * STEEL_KG_M3
+
+
+def rebar_sizes():
+    """[(system, label, standard, diameter mm)] in the order of the chart."""
+    return ([("US", b, "ASTM A615/A615M", d * 25.4) for b, d in REBAR_US_IN]
+            + [("EU", f"Ø{d}", "EN 10080", float(d)) for d in REBAR_EU_MM]
+            + [("CA", b, "CSA G30.18", d) for b, d in REBAR_CA_MM])
+
+
 def slab_ft3(length_ft, width_ft, thick_in, extra_pct=0.0):
     return length_ft * width_ft * thick_in / 12 * (1 + extra_pct / 100)
 

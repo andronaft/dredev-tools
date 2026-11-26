@@ -32,12 +32,13 @@ class Site(unittest.TestCase):
         cls.home = (SITE / "index.html").read_text()
 
     def test_page_count(self):
-        # hobby 9, roofing 2, shifts 8 (6 patterns, the hub, rest and holidays), concrete 1, garage 1, chlorine 1
-        self.assertEqual(len(new_pages()), 9 + 2 + 8 + 1 + 1 + 1)
+        # hobby 9, roofing 2, shifts 8 (6 patterns, the hub, rest and holidays), concrete 2 (slab, rebar chart), garage 1, chlorine 1
+        self.assertEqual(len(new_pages()), 9 + 2 + 8 + 2 + 1 + 1)
 
     def test_sizes_are_rows_not_pages(self):
         """Slab sizes and pool volumes live in one table on one page each; a row's link loads the size into the calculator."""
-        self.assertEqual([p.name for p in (SITE / "concrete").glob("*.html") if p.name != "index.html"], ["concrete-slab-calculator.html"])
+        self.assertEqual(sorted(p.name for p in (SITE / "concrete").glob("*.html") if p.name != "index.html"),
+                         ["concrete-slab-calculator.html", "rebar-size-chart.html"])
         self.assertEqual(sorted(p.name for p in (SITE / "pool").glob("*.html") if p.name != "index.html"), ["how-much-chlorine-to-add.html", "pool-chemical-calculator.html"])
         slab = (SITE / pages_trades.SLAB_PAGE).read_text()
         for l, w in pages_trades.SLABS:
