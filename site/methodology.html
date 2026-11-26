@@ -144,6 +144,16 @@
 <h3>Assumptions</h3><ul><li>Your meter is calibrated and temperature-compensated.</li></ul>
 <h3>Limits</h3><ul><li>The 640 scale is arithmetic only: no meter maker's manual was found that confirms a 0.64 factor.</li><li>Crop ranges are starting points from one fact sheet; variety, water and climate move them. Follow your nutrient maker's label.</li></ul>
 </section>
+<section class="method"><h2><a href="brewing/brix-plato-sg-chart.html">Brix, Plato and SG chart</a></h2>
+<h3>Tables and formulas</h3><ul><li>Brix or Plato to SG: 1 + &deg;P &divide; (258.6 &minus; &deg;P &divide; 258.2 &times; 227.1), the Lyons equation as published by Brewer's Friend; SG to degrees by the ASBC polynomial.</li><li>Potential ABV = (SG &minus; 1.000) &times; 131.25, and Michael Hall's formula (Zymurgy, Summer 1995).</li><li>Checked against the NBS Circular C457 sucrose table (apparent SG 20/20 &deg;C): within 0.0003 up to 40 &deg;Bx (read 26 November 2026).</li></ul>
+<h3>Assumptions</h3><ul><li>Brix and Plato are treated as one scale, as in the Ferment app.</li><li>The must ferments to 1.000 for the potential ABV.</li></ul>
+<h3>Limits</h3><ul><li>Apparent SG of pure sugar solutions at 20 &deg;C: wort and juice contain other solids.</li><li>A refractometer reading needs the wort correction factor, and a separate correction once alcohol is present.</li><li>Above about 30 &deg;Bx yeast stops before 1.000, so the potential ABV is a ceiling.</li></ul>
+</section>
+<section class="method"><h2><a href="hydroponics/vpd-chart.html">VPD chart and calculator</a></h2>
+<h3>Tables and formulas</h3><ul><li>Saturation vapour pressure e&deg;(T) = 0.6108 &times; exp(17.27 T &divide; (T + 237.3)) kPa, FAO-56 Eq. 11; it reproduces FAO's Annex 2 Table 2.3 to the third decimal from 15 to 35 &deg;C.</li><li>Leaf VPD = e&deg;(leaf) &minus; e&deg;(air) &times; RH &divide; 100, and the humidity for a target VPD by the inverse, as in the GrowLab app.</li></ul>
+<h3>Assumptions</h3><ul><li>The leaf is 2 &deg;C cooler than the air (GrowLab's default) unless you enter your own offset.</li></ul>
+<h3>Limits</h3><ul><li>Target VPD ranges are guidance from extension and trade sources, not data; the page does not judge a reading.</li><li>Leaf temperature varies across the canopy: measure it with an infrared thermometer.</li></ul>
+</section>
 <section class="method"><h2><a href="candles/fragrance-load-calculator.html">Candle fragrance and wax calculators</a></h2>
 <h3>Tables and formulas</h3><ul><li>Fragrance = wax weight &times; load, with the load as a percentage of the wax.</li><li>Wax and fragrance in a jar = weight of water to the fill line &times; 0.86 (Armatage Candle Company; common waxes are 82&ndash;95 % as dense as water), then wax = fill &divide; (1 + load).</li><li>Listed fragrance loads for five container waxes from their CandleScience product pages (read 12 November 2026).</li></ul>
 <h3>Assumptions</h3><ul><li>The wax factor 0.86 until you measure your own from a test candle.</li></ul>

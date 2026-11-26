@@ -7,13 +7,16 @@ import re
 import calc_math as m
 import calcs_common as c
 import guides
+import opendata
 from calcs_common import n, src, table, trim
 
 HOME_CARDS = [
     ("brewing/mead-abv-calculator.html", "Brewing", "Mead ABV calculator", "ABV for mead, cider and wine from SG, Brix or Plato.", "t-bread"),
     ("brewing/honey-per-gallon-calculator.html", "Brewing", "Honey per gallon calculator", "Honey for a target gravity, or the gravity from your honey.", "t-bread"),
+    ("brewing/brix-plato-sg-chart.html", "Brewing", "Brix, Plato and SG chart", "Brix or Plato to specific gravity and back, with potential alcohol.", "t-bread"),
     ("hydroponics/ec-to-ppm-converter.html", "Hydroponics", "EC to ppm converter", "EC to ppm on the 500, 640 and 700 scales, and back.", "t-site"),
     ("hydroponics/ec-chart-by-crop.html", "Hydroponics", "EC and pH chart by crop", "Target EC, ppm and pH for 23 vegetables, herbs and flowers.", "t-site"),
+    ("hydroponics/vpd-chart.html", "Hydroponics", "VPD chart and calculator", "Air and leaf VPD in kPa from temperature and humidity.", "t-site"),
     ("candles/fragrance-load-calculator.html", "Candles", "Fragrance load calculator", "Fragrance oil for your wax weight and load percentage.", "t-elec"),
     ("candles/candle-wax-calculator.html", "Candles", "Candle wax calculator", "Wax and fragrance for any jar, from the water it holds.", "t-elec"),
     ("coffee/espresso-ratio-calculator.html", "Coffee", "Espresso ratio calculator", "Dose, yield and brew ratio for espresso.", "t-roof"),
@@ -95,7 +98,8 @@ def build_abv():
              "Step feeding raises the real original gravity. Add the gravity points of every addition to the OG before you calculate, "
              f'or use the <a href="{{rel}}brewing/honey-per-gallon-calculator.html">honey calculator</a> to find the points each addition gave.'),
         ], "t-bread", ("ferment", "abv", FERMENT_PITCH), "abv", form, result, "ABV charts and worked example",
-        extra=c.related("More brewing tools", [("brewing/honey-per-gallon-calculator.html", "Honey per gallon calculator")]),
+        extra=c.related("More brewing tools", [("brewing/honey-per-gallon-calculator.html", "Honey per gallon calculator"),
+                                               ("brewing/brix-plato-sg-chart.html", "Brix, Plato and SG chart")]),
         embed=("mead-abv", 760))
 
 
@@ -146,7 +150,78 @@ def build_honey():
             ("Can I add honey later to raise the alcohol?",
              "Yes, that is step feeding. Set the starting gravity to your current reading and the calculator shows the honey for the points you want to add."),
         ], "t-bread", ("ferment", "honey", FERMENT_PITCH), "honey", form, result, "Honey charts and worked example",
-        extra=c.related("More brewing tools", [("brewing/mead-abv-calculator.html", "Mead ABV calculator")]))
+        extra=c.related("More brewing tools", [("brewing/mead-abv-calculator.html", "Mead ABV calculator"),
+                                               ("brewing/brix-plato-sg-chart.html", "Brix, Plato and SG chart")]))
+
+
+NBS_C457 = ('<a href="https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular457.pdf">National Bureau of Standards, Circular C457 '
+            '(Snyder and Hammond, 1946), Table 1, apparent specific gravity 20°/20 °C</a>')
+GRAVITY_FORMULAS = ('SG = 1 + °P ÷ (258.6 − (°P ÷ 258.2 × 227.1)), the equation <a href="https://www.brewersfriend.com/brix-converter/">'
+                    'Brewer\'s Friend publishes as the Lyons equation</a>; SG to degrees by the ASBC polynomial '
+                    '°P = −616.868 + 1111.14 SG − 630.272 SG² + 135.997 SG³ (<a href="https://www.brewersfriend.com/plato-to-sg-conversion-chart/">'
+                    'Brewer\'s Friend, Plato to SG</a>)')
+
+
+def build_gravity():
+    t1 = table("Brix or Plato to specific gravity, with potential alcohol",
+               ["°Brix / °Plato", "Specific gravity", "Gravity points", "Potential ABV, to 1.000", "Hall formula, to 1.000"],
+               [[f"{d}", f"{m.degrees_to_sg(d):.4f}", f"{(m.degrees_to_sg(d) - 1) * 1000:.1f}", f"{m.abv_standard(m.degrees_to_sg(d), 1):.1f} %",
+                 f"{m.abv_alternate(m.degrees_to_sg(d), 1):.1f} %"] for d in range(0, 41)],
+               src(f"computed with {GRAVITY_FORMULAS}; ABV = (OG − FG) × 131.25 and Michael Hall's formula (Zymurgy, Summer 1995), the formulas of the Ferment app",
+                   "26 November 2026")
+               + " " + open_dataset("brix-plato-specific-gravity", "The full table (every 0.5 °, with the ASBC back-conversion)"))
+    sgs = [1.000 + i / 100 for i in range(0, 17)]
+    t2 = table("Specific gravity to Brix or Plato", ["Specific gravity", "°Brix / °Plato (ASBC)", "Potential ABV, to 1.000"],
+               [[f"{sg:.3f}", f"{m.sg_to_degrees(sg):.1f}", f"{m.abv_standard(sg, 1):.1f} %"] for sg in sgs],
+               src("the ASBC polynomial as published by Brewer's Friend, as in the Ferment app", "26 November 2026"))
+    t3 = table("Check against the US National Bureau of Standards sucrose table", ["°Brix", "NBS apparent SG 20/20 °C", "This chart"],
+               [[f"{b}", f"{v:.5f}", f"{m.degrees_to_sg(b):.5f}"] for b, v in ((10, 1.04003), (20, 1.08297), (30, 1.12913), (40, 1.17874))],
+               src(f"printed values from {NBS_C457}", "26 November 2026")
+               + " The formula agrees to the fifth decimal up to 10 °Bx and within 0.0003 (0.3 gravity points) up to 40 °Bx.")
+    d = 24
+    sg = m.degrees_to_sg(d)
+    ex = guides.example("a mead must that reads 24 °Brix", [
+        f"Specific gravity: 1 + 24 ÷ (258.6 − 24 ÷ 258.2 × 227.1) = 1 + 24 ÷ {258.6 - d / 258.2 * 227.1:.2f} = {sg:.4f}.",
+        f"Gravity points: ({sg:.4f} − 1) × 1000 = {(sg - 1) * 1000:.0f}.",
+        f"Potential alcohol if it ferments dry to 1.000: ({sg:.4f} − 1.000) × 131.25 = {m.abv_standard(sg, 1):.1f} % ABV; Hall's formula gives {m.abv_alternate(sg, 1):.1f} %.",
+        f"Back to degrees with the ASBC polynomial: {m.sg_to_degrees(sg):.2f} °P, the same within a few hundredths.",
+    ], f"Result: 24 °Bx is about {sg:.3f} SG, enough sugar for roughly {m.abv_standard(sg, 1):.0f}–{m.abv_alternate(sg, 1):.0f} % ABV if the yeast takes it dry.")
+    answer = (f"SG = 1 + °Bx ÷ (258.6 − °Bx ÷ 258.2 × 227.1). 10 °Bx is {m.degrees_to_sg(10):.3f}, 12 °Bx {m.degrees_to_sg(12):.3f}, "
+              f"20 °Bx {m.degrees_to_sg(20):.3f} and 24 °Bx {m.degrees_to_sg(24):.3f}. Going back, 1.050 is {m.sg_to_degrees(1.05):.1f} °P and "
+              f"1.100 is {m.sg_to_degrees(1.1):.1f} °P. Brix and Plato are the same within a tenth of a degree at brewing gravities.")
+    form = (seg("bunit", "Scale of your reading", [("brix", "°Brix"), ("plato", "°Plato"), ("sg", "SG")]) + inp("bval", "Reading", "(°Bx)", "12"))
+    result = rows("b-main", "Converted", [("b-sg", "Specific gravity"), ("b-deg", "Degrees Brix / Plato"), ("b-pts", "Gravity points"),
+                                          ("b-abv", "Potential ABV, to 1.000"), ("b-hall", "Potential ABV, Hall formula")])
+    c.page(
+        "brewing/brix-plato-sg-chart.html", "Brix to SG Chart and Converter: Brix, Plato and Specific Gravity | Free",
+        "Free Brix, Plato and specific gravity converter with a chart from 0 to 40 °Bx: SG, gravity points and potential alcohol, checked against the NBS sucrose table.",
+        "Brewing", "Free brewing chart", "Brix, Plato and SG chart",
+        "Convert degrees Brix or Plato to specific gravity and back, with gravity points and the alcohol a must can reach if it ferments dry.",
+        answer, [t1, t2, t3, ex], [
+            ("How do I convert Brix to specific gravity?",
+             f"SG = 1 + °Bx ÷ (258.6 − °Bx ÷ 258.2 × 227.1). 12 °Bx is {m.degrees_to_sg(12):.4f}. For the other direction homebrewers use the ASBC "
+             f"polynomial: °P = −616.868 + 1111.14 SG − 630.272 SG² + 135.997 SG³, so 1.050 is {m.sg_to_degrees(1.05):.2f} °P."),
+            ("Are Brix and Plato the same?",
+             "Both are sucrose percent by weight, measured to slightly different reference tables. At brewing and winemaking gravities they differ "
+             "only in the third decimal of SG, so homebrew tools, the Ferment app included, use one formula for both."),
+            ("Is there a simple rule of thumb?",
+             f"SG ≈ 1 + °Bx × 4 ÷ 1000 is close at low gravities (10 °Bx → 1.040, the formula gives {m.degrees_to_sg(10):.3f}) but drifts higher up "
+             f"(25 °Bx → 1.100, the formula gives {m.degrees_to_sg(25):.3f}). Use the chart for musts and strong worts."),
+            ("Can I use a refractometer reading with this chart?",
+             "Before fermentation, yes, after dividing the Brix reading by your wort correction factor (often about 1.04). Once there is alcohol a "
+             "refractometer reads too high, and the reading needs a separate correction (Sean Terrill's formula, used in the Ferment app), not this chart."),
+            ("How much alcohol will my must make?",
+             f"The potential ABV column assumes every bit of sugar ferments down to 1.000. 20 °Bx gives about {m.abv_standard(m.degrees_to_sg(20), 1):.1f} %. "
+             "Yeast stops early at high gravities, so above about 30 °Bx the number is a ceiling, not a forecast. Measure the final gravity and use the "
+             f'<a href="{{rel}}brewing/mead-abv-calculator.html">ABV calculator</a>.'),
+            ("At what temperature is SG measured?",
+             "These are apparent specific gravities of sugar solutions at 20 °C, what a hydrometer calibrated at 20 °C reads in a pure sugar solution. "
+             "Read your hydrometer at its calibration temperature or correct the reading."),
+        ], "t-bread", ("ferment", "gravity-chart", FERMENT_PITCH), "grav", form, result, "Gravity charts and worked example",
+        extra=c.related("More brewing tools", [("brewing/mead-abv-calculator.html", "Mead ABV calculator"),
+                                               ("brewing/honey-per-gallon-calculator.html", "Honey per gallon calculator")]),
+        extra_ld=[opendata.with_doi(opendata.BRIX_LD, "brix-plato-specific-gravity",
+                                    ["brix-plato-specific-gravity.csv", "brix-plato-specific-gravity.json"])])
 
 
 # ---------- GrowLab ----------
@@ -222,7 +297,8 @@ def build_ec(crops):
              f'It depends on the crop: see the <a href="{{rel}}hydroponics/ec-chart-by-crop.html">EC and pH chart by crop</a> '
              "with the ranges published by Oklahoma State University Extension."),
         ], "t-site", ("growlab", "ec-ppm", GROW_PITCH), "ec", form, result, "Conversion charts and worked example",
-        data={"crops": crops}, extra=c.related("More hydroponics tools", [("hydroponics/ec-chart-by-crop.html", "EC and pH chart by crop")]),
+        data={"crops": crops}, extra=c.related("More hydroponics tools", [("hydroponics/ec-chart-by-crop.html", "EC and pH chart by crop"),
+                                                                           ("hydroponics/vpd-chart.html", "VPD chart")]),
         embed=("ec-ppm", 740))
 
 
@@ -265,7 +341,89 @@ def build_crops(crops):
              "They are starting points from one university fact sheet. Water quality, light, temperature and the variety all move the best value, "
              "so watch the plants and follow your nutrient maker's label.")],
         "t-site", ("growlab", "ec-chart", GROW_PITCH), "ec", form, result, "Crop chart and worked example",
-        data={"crops": crops}, extra=c.related("More hydroponics tools", [("hydroponics/ec-to-ppm-converter.html", "EC to ppm converter")]))
+        data={"crops": crops}, extra=c.related("More hydroponics tools", [("hydroponics/ec-to-ppm-converter.html", "EC to ppm converter"),
+                                                                           ("hydroponics/vpd-chart.html", "VPD chart")]))
+
+
+FAO56 = ('<a href="https://www.fao.org/4/x0490e/x0490e07.htm">FAO Irrigation and Drainage Paper 56 (Allen et al., 1998), '
+         'Chapter 3, Eq. 11</a>')
+FAO56_T23 = '<a href="https://www.fao.org/4/x0490e/x0490e0j.htm">FAO-56 Annex 2, Table 2.3</a>'
+VPD_PITCH = ("A hydroponic nutrient calculator with a VPD screen: air temperature, humidity and your leaf offset give the leaf VPD "
+             "and the humidity to aim for at each growth stage.")
+
+
+def open_dataset(ds, what):
+    """The line under a chart that names the open dataset; it links the Zenodo record once the DOI is in opendata.DOI."""
+    doi = opendata.DOI.get(ds, "")
+    name = f'<a href="https://doi.org/{doi}">open dataset (CC BY 4.0, DOI {doi})</a>' if doi else "open dataset under CC BY 4.0"
+    return f"{what} is published as an {name}: CSV and JSON, with the formulas and checks."
+
+
+def build_vpd():
+    temps = list(range(15, 36))
+    rhs = [30, 40, 50, 60, 70, 80, 90]
+    off = m.LEAF_OFFSET_C
+    t1 = table("Air VPD (kPa) by air temperature and relative humidity", ["Air"] + [f"{h} % RH" for h in rhs],
+               [[f"{t} °C ({t * 9 / 5 + 32:.0f} °F)"] + [f"{m.leaf_vpd(t, t, h):.2f}" for h in rhs] for t in temps],
+               src(f"computed with e°(T) = 0.6108 × exp(17.27 T ÷ (T + 237.3)) kPa from {FAO56}; air VPD = e°(air) × (1 − RH ÷ 100), "
+                   "the leaf taken at air temperature", "26 November 2026"))
+    t2 = table(f"Leaf VPD (kPa) for a leaf {abs(off):g} °C cooler than the air", ["Air / leaf"] + [f"{h} % RH" for h in rhs],
+               [[f"{t} / {t + off:g} °C"] + [f"{m.leaf_vpd(t, t + off, h):.2f}" for h in rhs] for t in temps],
+               src(f"leaf VPD = e°(leaf) − e°(air) × RH ÷ 100, the GrowLab app's formula and its default offset of {off:g} °C, with {FAO56}. "
+                   "A negative value means the leaf is at or below the dew point", "26 November 2026")
+               + " " + open_dataset("vpd-table", "The full table (every 5 % RH, with vapour pressures and dew point)"))
+    t3 = table("Saturation vapour pressure: the formula against FAO's printed table", ["Temperature", "e°(T), Eq. 11", "FAO-56 Table 2.3"],
+               [[f"{t} °C", f"{m.svp(t):.3f} kPa", f"{v:.3f} kPa"] for t, v in ((15, 1.705), (20, 2.338), (25, 3.168), (30, 4.243), (35, 5.623))],
+               src(f"printed values from {FAO56_T23}", "26 November 2026") + " All 21 values from 15 to 35 °C match to the third decimal.")
+    air, rh, leaf = 25, 60, 23
+    ex = guides.example("a grow tent at 25 °C and 60 % RH", [
+        f"Saturation vapour pressure at the air temperature: e°(25) = 0.6108 × exp(17.27 × 25 ÷ 262.3) = {m.svp(air):.3f} kPa.",
+        f"The air holds 60 % of that: {m.svp(air):.3f} × 0.60 = {m.svp(air) * rh / 100:.3f} kPa.",
+        f"Air VPD: {m.svp(air):.3f} − {m.svp(air) * rh / 100:.3f} = {m.leaf_vpd(air, air, rh):.2f} kPa.",
+        f"The leaves read 23 °C on an infrared thermometer: e°(23) = {m.svp(leaf):.3f} kPa, so leaf VPD = {m.svp(leaf):.3f} − {m.svp(air) * rh / 100:.3f} = {m.leaf_vpd(air, leaf, rh):.2f} kPa.",
+        f"For a leaf VPD of 1.2 kPa at the same temperatures the humidity would be ({m.svp(leaf):.3f} − 1.2) ÷ {m.svp(air):.3f} × 100 = {m.rh_for_vpd(air, leaf, 1.2):.0f} %.",
+    ], f"Result: {m.leaf_vpd(air, air, rh):.2f} kPa in the air, {m.leaf_vpd(air, leaf, rh):.2f} kPa at the leaf. A cooler leaf means a lower VPD.")
+    answer = (f"VPD = e°(T) × (1 − RH ÷ 100), with e°(T) = 0.6108 × exp(17.27 T ÷ (T + 237.3)) kPa (FAO-56). "
+              f"At 25 °C and 60 % RH the air VPD is {m.leaf_vpd(25, 25, 60):.2f} kPa; with leaves 2 °C cooler it is {m.leaf_vpd(25, 23, 60):.2f} kPa. "
+              f"At 20 °C and 70 % it is {m.leaf_vpd(20, 20, 70):.2f} kPa, at 30 °C and 50 % {m.leaf_vpd(30, 30, 50):.2f} kPa.")
+    form = (seg("vunit", "Temperature unit", [("c", "°C"), ("f", "°F")]) + inp("vair", "Air temperature", "(°C)", "25")
+            + inp("vrh", "Relative humidity", "(%)", "60") + inp("voff", "Leaf offset", "(°C, leaf minus air)", "-2")
+            + inp("vtarget", "Target leaf VPD", "(kPa, optional)", "1.0"))
+    result = rows("v-leaf", "Leaf VPD", [("v-air", "Air VPD (leaf at air temperature)"), ("v-es", "Saturation vapour pressure"),
+                                         ("v-ea", "Actual vapour pressure"), ("v-dew", "Dew point"), ("v-rh", "Humidity for the target VPD")]) \
+        + '<div id="v-note" class="verdict"></div>'
+    c.page(
+        "hydroponics/vpd-chart.html", "VPD Chart and Calculator (kPa): Air and Leaf VPD by Temperature and Humidity | Free",
+        "Free VPD chart and calculator: vapour pressure deficit in kPa for 15–35 °C and 30–90 % humidity, for the air and for a leaf 2 °C cooler, from the FAO-56 formula.",
+        "Hydroponics", "Free grow room chart", "VPD chart and calculator",
+        "Vapour pressure deficit for your grow room or greenhouse from air temperature and humidity, for the air and at the leaf, with the humidity that gives a target VPD.",
+        answer, [t1, t2, t3, ex], [
+            ("What is VPD?",
+             "Vapour pressure deficit is how much more water vapour the air could hold before it is saturated, in kilopascals. "
+             "It drives transpiration: the higher the VPD, the faster leaves lose water. Unlike relative humidity it accounts for temperature, "
+             "so 60 % RH is a different climate at 20 °C than at 30 °C."),
+            ("How do I calculate VPD?",
+             "Work out the saturation vapour pressure e°(T) = 0.6108 × exp(17.27 T ÷ (T + 237.3)) kPa (FAO-56, Eq. 11). "
+             f"Air VPD = e°(air) × (1 − RH ÷ 100). Leaf VPD = e°(leaf) − e°(air) × RH ÷ 100. At 25 °C and 60 % the air VPD is {m.leaf_vpd(25, 25, 60):.2f} kPa."),
+            ("Why use leaf temperature?",
+             "The air spaces inside a leaf are saturated at the leaf's own temperature, which is usually a little below the air under lights. "
+             f"A leaf 2 °C cooler than 25 °C air at 60 % has a VPD of {m.leaf_vpd(25, 23, 60):.2f} kPa instead of {m.leaf_vpd(25, 25, 60):.2f}. "
+             "Measure your leaves with an infrared thermometer and enter the difference."),
+            ("What VPD should I aim for?",
+             "It depends on the crop and the stage, and the published advice is guidance rather than a rule. "
+             '<a href="https://www.canr.msu.edu/floriculture/uploads/files/Water%20VPD.pdf">Michigan State University\'s floriculture team</a> '
+             "suggests keeping VPD above about 0.5 kPa so plants transpire and foliar disease is held back, and notes that above about 1.5 kPa "
+             "water loss is high. GrowLab starts from 0.4–0.8 kPa for seedlings and cuttings, 0.8–1.2 for vegetative growth and 1.0–1.5 for "
+             "flowering and fruiting, as editable defaults."),
+            ("What does a negative leaf VPD mean?",
+             "The leaf is at or below the dew point of the air, so water condenses on it. That happens with cool leaves in very humid air "
+             f"(at 25 °C and 90 % RH the dew point is {m.dew_point(25, 90):.1f} °C) and invites mould: raise the temperature or lower the humidity."),
+            ("Does altitude change VPD?",
+             "No. VPD depends on temperature and humidity only; air pressure does not enter the formula."),
+        ], "t-site", ("growlab", "vpd-chart", VPD_PITCH), "vpd", form, result, "VPD charts and worked example",
+        extra=c.related("More hydroponics tools", [("hydroponics/ec-to-ppm-converter.html", "EC to ppm converter"),
+                                                   ("hydroponics/ec-chart-by-crop.html", "EC and pH chart by crop")]),
+        extra_ld=[opendata.with_doi(opendata.VPD_LD, "vpd-table", ["vpd-table.csv", "vpd-table.json"])])
 
 
 # ---------- WickCalc ----------
@@ -542,6 +700,8 @@ def build():
     build_honey()
     build_ec(crops)
     build_crops(crops)
+    build_gravity()
+    build_vpd()
     build_fragrance()
     build_jar()
     build_espresso()
@@ -566,6 +726,20 @@ METHODS = [
      ["Your meter is calibrated and temperature-compensated."],
      ["The 640 scale is arithmetic only: no meter maker's manual was found that confirms a 0.64 factor.",
       "Crop ranges are starting points from one fact sheet; variety, water and climate move them. Follow your nutrient maker's label."]),
+    ("Brix, Plato and SG chart", "brewing/brix-plato-sg-chart.html",
+     ["Brix or Plato to SG: 1 + &deg;P &divide; (258.6 &minus; &deg;P &divide; 258.2 &times; 227.1), the Lyons equation as published by Brewer's Friend; SG to degrees by the ASBC polynomial.",
+      "Potential ABV = (SG &minus; 1.000) &times; 131.25, and Michael Hall's formula (Zymurgy, Summer 1995).",
+      "Checked against the NBS Circular C457 sucrose table (apparent SG 20/20 &deg;C): within 0.0003 up to 40 &deg;Bx (read 26 November 2026)."],
+     ["Brix and Plato are treated as one scale, as in the Ferment app.", "The must ferments to 1.000 for the potential ABV."],
+     ["Apparent SG of pure sugar solutions at 20 &deg;C: wort and juice contain other solids.",
+      "A refractometer reading needs the wort correction factor, and a separate correction once alcohol is present.",
+      "Above about 30 &deg;Bx yeast stops before 1.000, so the potential ABV is a ceiling."]),
+    ("VPD chart and calculator", "hydroponics/vpd-chart.html",
+     ["Saturation vapour pressure e&deg;(T) = 0.6108 &times; exp(17.27 T &divide; (T + 237.3)) kPa, FAO-56 Eq. 11; it reproduces FAO's Annex 2 Table 2.3 to the third decimal from 15 to 35 &deg;C.",
+      "Leaf VPD = e&deg;(leaf) &minus; e&deg;(air) &times; RH &divide; 100, and the humidity for a target VPD by the inverse, as in the GrowLab app."],
+     ["The leaf is 2 &deg;C cooler than the air (GrowLab's default) unless you enter your own offset."],
+     ["Target VPD ranges are guidance from extension and trade sources, not data; the page does not judge a reading.",
+      "Leaf temperature varies across the canopy: measure it with an infrared thermometer."]),
     ("Candle fragrance and wax calculators", "candles/fragrance-load-calculator.html",
      ["Fragrance = wax weight &times; load, with the load as a percentage of the wax.",
       "Wax and fragrance in a jar = weight of water to the fill line &times; 0.86 (Armatage Candle Company; common waxes are 82&ndash;95 % as dense as water), then wax = fill &divide; (1 + load).",
