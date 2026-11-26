@@ -10,7 +10,7 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
-    "pool-chlorine-dose": "",
+    "pool-chlorine-dose": "10.5281/zenodo.24547075",
 }
 
 
