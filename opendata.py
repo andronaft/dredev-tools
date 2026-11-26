@@ -10,8 +10,8 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
-    "vpd-table": "",  # not on Zenodo yet: the coordinating session fills these in
-    "brix-plato-specific-gravity": "",
+    "vpd-table": "10.5281/zenodo.24547085",
+    "brix-plato-specific-gravity": "10.5281/zenodo.24547087",
 }
 
 
