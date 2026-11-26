@@ -19,6 +19,7 @@ DOI = {
     "seawater-salinity-specific-gravity": "10.5281/zenodo.24547081",
     "roof-pitch-multipliers": "10.5281/zenodo.24547073",
     "rebar-sizes-us-eu-canada": "10.5281/zenodo.24547083",
+    "pool-chlorine-dose": "10.5281/zenodo.24547075",
 }
 # The files of each dataset not built from a full copy below, in the order of the Zenodo record.
 FILES = {
@@ -751,3 +752,144 @@ REBAR_LD = {
         "https://rebar.org/"
     ]
 }
+
+
+# Copied from experimental/open-data/pool-chlorine-dose/schema-org-dataset.jsonld (built 26 November 2026), without
+# sameAs and distribution: the dataset is not on Zenodo yet. Fill DOI["pool-chlorine-dose"] once it is.
+POOL_CHLORINE_LD = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "@id": "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html#dataset",
+    "name": "Pool chlorine dose to raise free chlorine by 1 ppm, with the stabilizer (CYA) and calcium each product adds: liquid chlorine, bleach, cal-hypo, dichlor and trichlor",
+    "alternateName": "Pool chlorine dose per 1 ppm, 8 products",
+    "description": "How much of each common pool chlorine product raises free chlorine by 1 ppm (1 mg/L as Cl2): liquid chlorine 10 % and 12.5 % (trade percent), household bleach 6 % and 8.25 % (weight % NaOCl), calcium hypochlorite 65 % and 73 %, dichlor 56 % and trichlor 90 % (weight % available chlorine). For each product: grams of available chlorine per litre (liquids), the dose per 10,000 US gallons (US fl oz or oz), per m³ and per 10 m³ (mL or g), the available chlorine of the pure compound, and how much stabilizer (cyanuric acid) or calcium hardness (as CaCO3) each 1 ppm of chlorine leaves in the water. Computed by stoichiometry from the CIAAW 2024 standard atomic weights and the available-chlorine definitions; the density of bleach is interpolated in the OxyChem Sodium Hypochlorite Handbook (Table 2). The table behind the pool chlorine calculator on zhukovskyi.space and the PoolPro app.",
+    "url": "https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html",
+    "version": "1.0.0",
+    "datePublished": "2026-11-26",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "isAccessibleForFree": True,
+    "inLanguage": "en",
+    "creator": {
+        "@type": "Person",
+        "@id": "https://zhukovskyi.space/#person",
+        "name": "Andrii Zhukovskyi",
+        "url": "https://zhukovskyi.space/"
+    },
+    "publisher": {
+        "@id": "https://zhukovskyi.space/#dredev"
+    },
+    "keywords": [
+        "pool chlorine",
+        "free chlorine",
+        "ppm",
+        "sodium hypochlorite",
+        "bleach",
+        "calcium hypochlorite",
+        "trichlor",
+        "dichlor",
+        "cyanuric acid",
+        "pool chemistry"
+    ],
+    "citation": "Zhukovskyi, A. (2026). Pool chlorine dose to raise free chlorine by 1 ppm, with the stabilizer (CYA) and calcium each product adds: liquid chlorine, bleach, cal-hypo, dichlor and trichlor (Version 1.0.0) [Data set]. Dre Dev. https://zhukovskyi.space/calculators/pool/how-much-chlorine-to-add.html",
+    "variableMeasured": [
+        {
+            "@type": "PropertyValue",
+            "name": "product_id",
+            "description": "Short id, the same as the calculator uses (liquid10, bleach6, calhypo65 …)."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "product",
+            "description": "Product as sold, with its common label strength."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "form",
+            "description": "liquid or solid."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "active_compound",
+            "description": "The chlorine compound: NaOCl, Ca(OCl)2, sodium dichloroisocyanurate dihydrate, trichloroisocyanuric acid."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "label_strength_pct",
+            "description": "The strength printed on the label, on the basis in strength_basis.",
+            "unitText": "%"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "strength_basis",
+            "description": "What the label percent means: trade % (g available chlorine per 100 mL), weight % NaOCl, or weight % available chlorine."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "specific_gravity",
+            "description": "Bleach only: specific gravity at 60 °F interpolated in OxyChem Table 2. Empty where not needed."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "available_chlorine_g_per_l",
+            "description": "Liquids: grams of available chlorine (as Cl2) per litre.",
+            "unitText": "g/L"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "available_chlorine_wt_pct",
+            "description": "Weight % available chlorine: the label value for solids, g/L ÷ (10 × SG) for bleach; empty for trade-percent liquids (density not given).",
+            "unitText": "%"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "pure_compound_available_chlorine_pct",
+            "description": "Available chlorine of the pure active compound, from molar masses (upper bound for the label).",
+            "unitText": "%"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "dose_per_10000_usgal",
+            "description": "Amount that raises free chlorine by 1 ppm in 10,000 US gallons: US fl oz for liquids, avoirdupois oz for solids.",
+            "unitText": "US fl oz or oz"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "dose_unit_us",
+            "description": "US fl oz or oz (weight)."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "dose_per_m3",
+            "description": "Amount that raises 1 m³ (1,000 L) by 1 ppm: mL for liquids, g for solids.",
+            "unitText": "mL or g"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "dose_per_10_m3",
+            "description": "The same for 10 m³.",
+            "unitText": "mL or g"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "dose_unit_metric",
+            "description": "mL or g."
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "cya_ppm_per_ppm_fc",
+            "description": "Cyanuric acid (stabilizer) added with each 1 ppm of free chlorine; 0 for unstabilized products.",
+            "unitText": "ppm per ppm"
+        },
+        {
+            "@type": "PropertyValue",
+            "name": "calcium_hardness_ppm_per_ppm_fc",
+            "description": "Calcium hardness (as CaCO3) added with each 1 ppm of free chlorine; 0 except cal-hypo.",
+            "unitText": "ppm CaCO3 per ppm"
+        }
+    ],
+    "isBasedOn": [
+        "https://www.ciaaw.org/abridged-atomic-weights.htm",
+        "https://www.forceflowscales.com/downloads/chemical-safety/hypochlorite/Hypo_Handbook_Oxy_Chem.pdf"
+    ]
+}
+POOL_CHLORINE_LD.update(doi_props("pool-chlorine-dose"))

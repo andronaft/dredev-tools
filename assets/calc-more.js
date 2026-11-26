@@ -114,7 +114,15 @@
 
   // PoolPro: pool-chem-app/lib/feature/chem/products.dart, dosing.dart
   const MW = { cl2: 70.906, naocl: 74.44, cya: 129.07, caco3: 100.09 };
-  const bleachGpl = (pct) => (pct * 10 * (1.0174 + 0.01003 * pct) * MW.cl2) / MW.naocl;
+  // Specific gravity (60 °F) against wt % NaOCl: OxyChem Sodium Hypochlorite Handbook, Table 2 (calc_math.BLEACH_SG).
+  const BLEACH_SG = [[5.25, 1.075], [5.51, 1.079], [5.78, 1.083], [6.04, 1.088], [6.30, 1.092], [7.35, 1.109], [8.40, 1.126]];
+  const bleachGpl = (pct) => {
+    for (let i = 1; i < BLEACH_SG.length; i++) {
+      const [x0, y0] = BLEACH_SG[i - 1], [x1, y1] = BLEACH_SG[i];
+      if (pct >= x0 && pct <= x1) return (pct * 10 * (y0 + ((y1 - y0) * (pct - x0)) / (x1 - x0)) * MW.cl2) / MW.naocl;
+    }
+    throw new RangeError('bleach strength outside 5.25–8.40 %');
+  };
   const CHLORINE = {
     liquid10: { name: 'Liquid chlorine 10 %', kind: 'liquid', v: 100 },
     liquid125: { name: 'Liquid chlorine 12.5 %', kind: 'liquid', v: 125 },

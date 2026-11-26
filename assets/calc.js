@@ -453,11 +453,20 @@ function initDcWire() {
 /* ---------- Pool chemicals (same math as PoolPro) ---------- */
 
 const MW = { cl2: 70.906, naocl: 74.44, caco3Eq: 50.04, nahco3: 84.007 };
+// Specific gravity (60 °F) against wt % NaOCl: OxyChem Sodium Hypochlorite Handbook, Table 2 (calc_math.BLEACH_SG).
+const BLEACH_SG = [[5.25, 1.075], [5.51, 1.079], [5.78, 1.083], [6.04, 1.088], [6.30, 1.092], [7.35, 1.109], [8.40, 1.126]];
+function bleachGpl(pct) {
+  for (let i = 1; i < BLEACH_SG.length; i++) {
+    const [x0, y0] = BLEACH_SG[i - 1], [x1, y1] = BLEACH_SG[i];
+    if (pct >= x0 && pct <= x1) return pct * 10 * (y0 + (y1 - y0) * (pct - x0) / (x1 - x0)) * MW.cl2 / MW.naocl;
+  }
+  throw new RangeError('bleach strength outside 5.25–8.40 %');
+}
 const POOL_PRODUCTS = {
   liquid10: { name: 'Liquid chlorine 10 %', liquid: true, gpl: 100 },
   liquid125: { name: 'Liquid chlorine 12.5 %', liquid: true, gpl: 125 },
-  bleach6: { name: 'Bleach 6 %', liquid: true, gpl: 6 * 10 * (1.0174 + 0.01003 * 6) * MW.cl2 / MW.naocl },
-  bleach825: { name: 'Bleach 8.25 %', liquid: true, gpl: 8.25 * 10 * (1.0174 + 0.01003 * 8.25) * MW.cl2 / MW.naocl },
+  bleach6: { name: 'Bleach 6 %', liquid: true, gpl: bleachGpl(6) },
+  bleach825: { name: 'Bleach 8.25 %', liquid: true, gpl: bleachGpl(8.25) },
   calhypo65: { name: 'Cal-hypo 65 %', share: 0.65 },
   dichlor: { name: 'Dichlor 56 %', share: 0.56 },
 };

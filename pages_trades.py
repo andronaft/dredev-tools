@@ -720,8 +720,10 @@ def adds(key, amount, gallons):
 def build_pool():
     t1 = table("Chlorine to raise free chlorine by 1 ppm in 10,000 US gallons", ["Product (label strength)", "Amount", "Each 1 ppm also adds"],
                [[m.CHLORINE[k][0], dose_text(k, 1, 10000), side_text(k)] for k in POOL_KEYS],
-               src("stoichiometry: ppm × litres = milligrams of chlorine, divided by the product's label strength; the same maths as PoolPro, which agrees with "
-                   "Trouble Free Pool's Pool Math within about 1 % (10 % liquid chlorine: 12.8 fl oz)", "25 October 2026")
+               src("stoichiometry: ppm × litres = milligrams of chlorine, divided by the product's label strength. Bleach is labelled in weight % NaOCl, "
+                   'so its strength per litre uses the density from the <a href="https://www.forceflowscales.com/downloads/chemical-safety/hypochlorite/Hypo_Handbook_Oxy_Chem.pdf">'
+                   "OxyChem Sodium Hypochlorite Handbook</a>, Table 2 (read 26 November 2026). Agrees with Trouble Free Pool's Pool Math within about 1 % "
+                   "(10 % liquid chlorine: 12.8 fl oz)", "25 October 2026")
                + " Strengths are common label values: use the one printed on your product.")
     t2 = table("Chlorine for a 1 ppm rise by pool size", ["Pool volume", "Liquid chlorine 10 %", "Liquid chlorine 12.5 %", "Cal-hypo 65 %", "Trichlor 90 %"],
                [[f'<a id="{g}-gallons" href="#{g}-gallons">{n(g)} gal</a>'] + [dose_text(k, 1, g) for k in ("liquid10", "liquid125", "calhypo65", "trichlor")]
@@ -775,7 +777,7 @@ def build_pool():
              "Follow the product label. As a rule, let the pump circulate the water, test again, and swim only when the free chlorine is back within the range for your pool."),
         ], "t-pool", ("poolpro", "chlorine", POOL_PITCH), "chlor", pool_form(15000), POOL_RESULT, "Chlorine charts and worked example", POOL_NOTE,
         extra=c.related("More pool tools", [("pool/pool-chemical-calculator.html", "Pool chemical calculator")]),
-        embed=("pool-chlorine", 800))
+        embed=("pool-chlorine", 800), extra_ld=[opendata.POOL_CHLORINE_LD])
 
 
 def build():

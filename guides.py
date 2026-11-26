@@ -9,6 +9,8 @@ from datetime import date
 from html import escape as e
 from pathlib import Path
 
+import calc_math
+
 AUTHOR = "Andrii Zhukovskyi"
 ABOUT = "https://zhukovskyi.space/about/"  # who makes these tools
 # The day the sources were last read against the checked examples (verification.json).
@@ -269,8 +271,8 @@ L_PER_GAL = 3.78541
 PRODUCTS = {
     "Liquid chlorine 10 %": ("liquid", 100),
     "Liquid chlorine 12.5 %": ("liquid", 125),
-    "Bleach 6 %": ("liquid", 6 * 10 * (1.0174 + 0.01003 * 6) * MW["cl2"] / MW["naocl"]),
-    "Bleach 8.25 %": ("liquid", 8.25 * 10 * (1.0174 + 0.01003 * 8.25) * MW["cl2"] / MW["naocl"]),
+    "Bleach 6 %": ("liquid", calc_math.bleach_gpl(6)),  # density from the OxyChem handbook, see calc_math.BLEACH_SG
+    "Bleach 8.25 %": ("liquid", calc_math.bleach_gpl(8.25)),
     "Cal-hypo 65 %": ("solid", 0.65),
     "Dichlor 56 %": ("solid", 0.56),
 }
