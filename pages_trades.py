@@ -3,12 +3,15 @@ concrete slabs (SlabCalc) and pool chlorine (PoolPro). Slab sizes and pool volum
 each, not pages of their own: a row's link loads that size into the calculator. Formulas are in calc_math.py; presets the apps own
 (coating products, garage sizes) are read from their Dart sources at build time.
 """
+import csv
+import os
 import re
 from datetime import date, timedelta
 
 import calc_math as m
 import calcs_common as c
 import guides
+import opendata
 from calcs_common import n, src, table, trim
 from pages_hobby import inp, rows, seg
 
@@ -242,7 +245,87 @@ def build_shift(key):
         note='<section class="card" style="margin-top:20px"><h2>Your next 12 weeks</h2><div class="tablewrap" style="border:0" id="s-cal"></div>'
              '<p class="legend"><span><i style="background:#fde9c4"></i>day shift</span><span><i style="background:#fbd5d0"></i>afternoon</span>'
              '<span><i style="background:#d9d9f7"></i>night</span><span>plain = day off</span></p></section>',
-        data={"cycle": "".join(cycle), "names": NAMES}, extra=c.related("Other shift patterns", others))
+        data={"cycle": "".join(cycle), "names": NAMES}, extra=c.related("Other shift patterns", others + [(REST_PAGE, "Rest between shifts and public holidays")]))
+
+
+REST_PAGE = "shifts/public-holidays-and-rest.html"
+REST_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public-holidays-rest-rules.csv")
+REST_CHECKED = "26 November 2026"  # the day the statutes in public-holidays-rest-rules.csv were read
+HOLIDAY_YEAR = 2027
+
+
+def load_rest():
+    """The main table of the open dataset public-holidays-rest-rules (copied from experimental/open-data):
+    one row per country or UK region, with the daily rest rule, its statute and the 2027 holidays."""
+    with open(REST_CSV, encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def short_dates(listed):
+    """'2027-01-01 New Year's Day; 2027-03-26 Good Friday' -> '1 Jan, 26 Mar'."""
+    days = [date.fromisoformat(item.split(" ", 1)[0]) for item in listed.split("; ")]
+    return ", ".join(f"{d.day} {d:%b}" for d in days)
+
+
+def build_rest_page():
+    regions = load_rest()
+    eleven = [r["region_name"] for r in regions if r["min_daily_rest_hours"] == "11"]
+    t1 = table("Minimum rest between two working days, by country", ["Country or region", "Minimum rest", "The rule", "Law"],
+               [[r["region_name"], f'{r["min_daily_rest_hours"]} hours' if r["min_daily_rest_hours"] else "no fixed hours", r["rest_rule"],
+                 f'<a href="{r["rest_law_url"]}" rel="noopener">{r["rest_law"]}</a>'] for r in regions],
+               src("the official text of each law, linked in the table (Great Britain and Northern Ireland have separate regulations "
+                   "with the same rule)", REST_CHECKED) + " Adult workers; young workers get more. Collective agreements and sector rules can change the number for a job.")
+    t2 = table(f"Public holidays in {HOLIDAY_YEAR}", ["Country or region", "Days", "Dates"],
+               [[r["region_name"], r["holidays_in_2027"], short_dates(r["holidays_2027"])] for r in regions],
+               src('UK: <a href="https://www.gov.uk/bank-holidays">gov.uk bank holidays</a>, Open Government Licence v3.0; '
+                   "other countries: computed from the national rules named in the dataset, the same dates as the ShiftWise app", REST_CHECKED)
+               + " National holidays only: states, regions and cities add their own. In Ukraine, while martial law lasts, ShiftWise treats them as ordinary working days (Law 2136-IX).")
+    ex = guides.example("a late shift followed by an early", [
+        "The late shift ends at 22:00 and the next early starts at 06:00: the rest between them is 8 hours.",
+        "That is 3 hours short of the 11-hour rule in the UK, Ireland, Germany, France, Italy, Poland and Brazil, and 4 hours short of Spain's 12.",
+        "In the Netherlands 8 hours is allowed once in every 7 days when the work requires it (Arbeidstijdenwet art. 5:3).",
+        "Moving the early start to 09:00 gives 11 hours; Spain needs 10:00 for 12.",
+    ], "Result: a late-then-early swap is the most common way a rota breaks the daily rest rule; leave a day between them or start later.")
+    dataset = opendata.with_doi(opendata.HOLIDAYS_REST_LD, "public-holidays-rest-rules")
+    doi = opendata.DOI["public-holidays-rest-rules"]
+    cite = (f' Cite it as <a href="https://doi.org/{doi}">doi:{doi}</a>.' if doi else "")
+    answer = (f"{len(eleven) - 3} countries in this table and all three parts of the UK give at least 11 hours of rest between two working days; "
+              "Spain gives 12. Ukraine asks for twice the length of the previous shift, and Mexico and US federal law set no minimum. "
+              f"Below: the law behind each rule and every public holiday in {HOLIDAY_YEAR}.")
+    c.page(
+        REST_PAGE, f"Minimum Rest Between Shifts by Country, and Public Holidays {HOLIDAY_YEAR}",
+        "Minimum daily rest between shifts in the UK, Ireland, Germany, Spain, France, Italy, the Netherlands, Poland, Brazil, Mexico, "
+        f"the US and Ukraine, with the law behind each rule, and every public holiday in {HOLIDAY_YEAR}.",
+        f'<a href="{{rel}}shifts/index.html">Shifts</a> › Rest and public holidays', "Rules for shift workers",
+        "Minimum rest between shifts and public holidays, by country",
+        f"How long the law says you must rest between two shifts, where that rule is written, and the public holidays of {HOLIDAY_YEAR}, "
+        "for the countries the ShiftWise app covers.",
+        answer, [t1, t2, ex,
+                 f'<p class="note">Both tables are an open dataset, “Minimum daily rest between shifts by country, and public holidays”, '
+                 f"free to reuse under CC BY 4.0 with a credit; it also lists every holiday from 2026 to 2028 (the UK from 2019).{cite}</p>"], [
+            ("How many hours of rest do you need between shifts in the UK?",
+             "At least 11 consecutive hours in each 24-hour period for workers 18 and over: regulation 10 of the Working Time Regulations 1998 "
+             "in Great Britain, regulation 12 of the 2016 regulations in Northern Ireland. Young workers get 12, and the regulations list exceptions for some jobs."),
+            ("Is there a minimum rest between shifts in the US?",
+             "Not in federal law: the Fair Labor Standards Act sets no limit on the hours of employees 16 and over and has no daily rest rule. "
+             "Some states, sectors such as transport, and union contracts set their own."),
+            ("Why does Spain need 12 hours?",
+             "The Estatuto de los Trabajadores, article 34.3, says at least twelve hours must pass between the end of one working day and the start of the next. "
+             "The EU directive asks for 11; Spain gives more."),
+            ("Can the 11 hours be shortened?",
+             "Each law has its own exceptions, written next to the rule: Germany allows 10 hours in hospitals, care, hotels, transport and a few other sectors if each cut is made up "
+             "within a month or four weeks with a rest of at least 12 hours, and the Netherlands allows 8 hours once a week. Read the article linked in the table for your country."),
+            ("Do public holidays count for shift workers?",
+             "Shifts go on, but whether a holiday is paid extra or gives a day off depends on your contract or collective agreement. "
+             "In Ireland a holiday on a day you don't work gives you an entitlement instead, and in Ukraine, under martial law, they are ordinary working days paid at the single rate (Law 2136-IX, as ShiftWise applies it)."),
+            ("Can I reuse this table?",
+             "Yes. It is an open dataset under CC BY 4.0: copy it, change it and use it in your own product with a credit to Dre Dev Tools. "
+             "The UK holiday dates are gov.uk's, under the Open Government Licence v3.0."),
+        ], "t-lid", ("shiftwise", "shift-rest", "ShiftWise points out a gap shorter than the legal rest before a shift, marks your country's public holidays "
+                                                "on the rota and pays them at your holiday rate in the pay estimate."),
+        guide_h2="Rest rules and holidays", checked=REST_CHECKED,
+        extra=c.related("Shift patterns", [("shifts/index.html", "All shift patterns")] + [(shift_path(k), SHIFTS[k][1]) for k in SHIFTS]),
+        ld=[dataset])
 
 
 def build_shift_hub():
@@ -279,7 +362,9 @@ def build_shift_hub():
             ("Can I put my rota on my phone?",
              "Yes. ShiftWise has 4 on 4 off, Pitman, DuPont and 3 on 3 off as presets and lets you build any other rota day by day. "
              "It shows your shifts in a calendar and a home screen widget and exports them to your phone's calendar."),
-        ], "t-lid", ("shiftwise", "shift-hub", SHIFT_PITCH), guide_h2="Patterns and comparison")
+        ], "t-lid", ("shiftwise", "shift-hub", SHIFT_PITCH), guide_h2="Patterns and comparison",
+        extra=c.related("Rules for shift workers", [(REST_PAGE, "Minimum rest between shifts and public holidays, by country")]),
+        ld=[opendata.with_doi(opendata.SHIFT_PATTERNS_LD, "shift-rota-patterns")])
 
 
 # ---------- CoatCalc ----------
@@ -598,6 +683,7 @@ def build():
     build_pitch()
     build_bundles()
     build_shift_hub()
+    build_rest_page()
     for key in SHIFTS:
         build_shift(key)
     build_garage()
@@ -637,4 +723,11 @@ METHODS = [
       "The sequences are those of the ShiftWise app where it has the pattern, and of the sources named on each page (read 12 November 2026)."],
      ["Every shift has the same length; the calendar year is counted day by day."],
      ["Scheduled hours only: unpaid breaks, leave, overtime and public holidays are not counted.", "Employers run variants of every pattern: go by your own rota."]),
+    ("Minimum rest between shifts and public holidays", REST_PAGE,
+     ["Daily rest: the rule as each country's statute states it, read on the official text on 26 November 2026 (the law and article are linked in the table).",
+      "UK bank holidays: the gov.uk list; other countries: fixed dates, Easter by the anonymous Gregorian algorithm (the Orthodox one for Ukraine) and the "
+      "weekday rules of each national law, the same dates as the ShiftWise app."],
+     ["Adult workers on an ordinary contract.", "National holidays only."],
+     ["Collective agreements, sector rules and the exceptions written into each law can change the rest for a particular job.",
+      "Regional and local holidays are not listed; whether a holiday is a paid day off depends on the contract.", "Not legal advice."]),
 ]
