@@ -15,6 +15,8 @@ DOI = {
     # Not published yet: the session that owns open-data fills these in after Zenodo publishes them.
     "shift-rota-patterns": "10.5281/zenodo.24547071",
     "public-holidays-rest-rules": "10.5281/zenodo.24547077",
+    "aquarium-ammonia-fraction": "10.5281/zenodo.24547079",
+    "seawater-salinity-specific-gravity": "10.5281/zenodo.24547081",
 }
 # The files of each dataset not built from a full copy below, in the order of the Zenodo record.
 FILES = {

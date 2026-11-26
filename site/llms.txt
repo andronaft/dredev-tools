@@ -304,6 +304,8 @@ Pro:
 - [Espresso ratio calculator](https://zhukovskyi.space/calculators/coffee/espresso-ratio-calculator.html): Dose, yield and brew ratio for espresso.
 - [Yarn yardage calculator](https://zhukovskyi.space/calculators/knitting/yarn-yardage-calculator.html): Yarn for a scarf, hat or blanket, from your own swatch.
 - [Knitting gauge calculator](https://zhukovskyi.space/calculators/knitting/gauge-calculator.html): Stitches to cast on and rows to work, from your gauge.
+- [Ammonia toxicity chart](https://zhukovskyi.space/calculators/aquarium/ammonia-toxicity-chart.html): Free NH₃ from your test kit's total ammonia, pH and temperature.
+- [Salinity to specific gravity](https://zhukovskyi.space/calculators/aquarium/salinity-to-specific-gravity.html): ppt to SG and back on the 77, 68 and 60 °F scales.
 - [Embed a calculator](https://zhukovskyi.space/calculators/embed/): Free iframe code for your blog or shop. No sign-up.
 
 ## Refrigerant PT charts

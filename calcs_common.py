@@ -23,6 +23,7 @@ MORE_APPS = {
     "rowkeeper": ("RowKeeper: Row Counter", "rowkeeper", "rowcounter-app"),
     "shiftwise": ("ShiftWise: Shift Work Calendar", "shiftwise", "shift-calendar-app"),
     "levain": ("Levain: Sourdough Starter", "levain", "sourdough-app"),
+    "tanklog": ("TankLog: Aquarium Log & Dosing", "tanklog", "tanklog-app"),
 }
 _icons = {}
 
@@ -76,7 +77,7 @@ def scripts(data=None):
 
 
 def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, theme, app=None, calc=None, form="", result="",
-         guide_h2="Charts and worked example", note="", data=None, extra="", embed=None, ld=None, checked=CHECKED):
+         guide_h2="Charts and worked example", note="", data=None, extra="", embed=None, ld=None, extra_ld=(), checked=CHECKED):
     """One page in the Voltage Drop pattern. [parts] are guides.table() / guides.example() blocks; [app] is
     (key, utm source, pitch); [embed] is (name, iframe height) for calculators offered on the embed page;
     [ld] adds JSON-LD objects (a Dataset) after the page's own."""
@@ -95,7 +96,7 @@ def page(path, title, desc, crumb, eyebrow, h1, lead, answer, parts, faq_items, 
 """
     plain_h1 = re.sub("<[^>]+>", "", h1)
     B.shell(path, title, desc, body, theme, calc,
-            ([B.webapp_ld(plain_h1, path, desc), faq_ld] if calc else [article_ld(plain_h1, path, desc), faq_ld]) + (ld or []),
+            ([B.webapp_ld(plain_h1, path, desc), faq_ld] if calc else [article_ld(plain_h1, path, desc), faq_ld]) + (ld or []) + list(extra_ld),
             scripts(data) if calc else "")
     if embed and calc:
         name, height = embed
