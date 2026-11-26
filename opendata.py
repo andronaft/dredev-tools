@@ -10,8 +10,8 @@ DOI = {
     "nec-edition-by-state": "10.5281/zenodo.24545613",
     "refrigerant-gwp-safety": "10.5281/zenodo.24545617",
     "awg-to-mm2": "10.5281/zenodo.24545621",
-    "roof-pitch-multipliers": "",  # not on Zenodo yet: fill in after publishing
-    "rebar-sizes-us-eu-canada": "",
+    "roof-pitch-multipliers": "10.5281/zenodo.24547073",
+    "rebar-sizes-us-eu-canada": "10.5281/zenodo.24547083",
 }
 
 
