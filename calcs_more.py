@@ -43,3 +43,4 @@ def build_embed():
     """The embed page. build.py calls it after its own calculators (voltage drop, lye, superheat) have registered
     their copies too."""
     pages_embed.build()
+    pages_embed.link_full_pages()

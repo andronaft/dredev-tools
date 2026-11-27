@@ -29,7 +29,7 @@ def build():
         code = snippet(name, title, path, height)
         preview = (f'<iframe src="{{rel}}embed/{name}.html" title="{e(title)} preview" height="{height}" loading="lazy"></iframe>'
                    if name in FEATURED else "")
-        blocks.append(f'<div class="embed-item"><h3>{e(title)}</h3><p class="muted">Full page: <a href="{{rel}}{path}">{e(title)}</a></p>'
+        blocks.append(f'<div class="embed-item" id="{name}"><h3>{e(title)}</h3><p class="muted">Full page: <a href="{{rel}}{path}">{e(title)}</a></p>'
                       f'<textarea class="embed-code" readonly rows="6" aria-label="Embed code for {e(title)}">{e(code)}</textarea>{preview}</div>')
     faq_html, faq_ld = c.B.faq([
         ("Is it free? Do I need an account?",
@@ -141,7 +141,7 @@ def build_uk():
         c.embed_page(name, title, path, "t-elec", calc, card, None, js, lang="uk", sub="uk/", head=head)
         code = snippet(name, title, path, height, sub="uk/", credit="Калькулятор:")
         full = "повна сторінка" if "/uk/" in path else "повна сторінка, англ."
-        blocks.append(f'<div class="embed-item"><h3>{e(title)}</h3><p class="muted">{lead} <a href="{{rel}}{path}">{e(title)} ({full})</a></p>'
+        blocks.append(f'<div class="embed-item" id="{name}"><h3>{e(title)}</h3><p class="muted">{lead} <a href="{{rel}}{path}">{e(title)} ({full})</a></p>'
                       f'<textarea class="embed-code" readonly rows="6" aria-label="Код для вставки: {e(title)}">{e(code)}</textarea>'
                       f'<iframe src="{{rel}}embed/uk/{name}.html" title="{e(title)}: попередній перегляд" height="{height}" loading="lazy"></iframe></div>')
     faq_html, faq_ld = c.B.faq([
@@ -179,3 +179,21 @@ def build_uk():
               "Вбудуйте на сайт магазину, ОСББ чи блогу калькулятор українською: на скільки вистачить АКБ або ДБЖ, переріз кабелю до інвертора, "
               "падіння напруги. Код iframe, безкоштовно, без реєстрації.",
               body, "", "embed", [faq_ld], c.scripts(), lang="uk", alternates=alternates())
+
+
+def link_full_pages():
+    """One line on each full calculator page that has an embed copy, pointing at its code on the embed page.
+    Added after the pages are written (the copies register themselves after their page), before the FAQ. It is a
+    navigation line, not page content, so it leaves the page's lastmod alone."""
+    lines = {path: f'<p class="note embed-cta">Run a blog, shop or course site? <a href="{{rel}}embed/#{name}">Embed this calculator</a> on it, free.</p>'
+             for name, _, path, _ in c.EMBEDS}
+    for name, _, path, _, _ in UK_EMBEDS:
+        if "/uk/" in path:
+            lines[path] = (f'<p class="note embed-cta">Маєте сайт магазину, ОСББ чи блог? <a href="{{rel}}embed/uk/#{name}">Вставте цей '
+                           f'калькулятор на свій сайт</a> безкоштовно.</p>')
+    for path, line in lines.items():
+        f = c.B.OUT / path
+        html = f.read_text()
+        assert html.count('<section class="faq">') == 1, f"{path}: no single FAQ section to put the embed line before"
+        line = line.replace("{rel}", "../" * path.count("/"))
+        f.write_text(html.replace('<section class="faq">', line + '\n<section class="faq">', 1))
